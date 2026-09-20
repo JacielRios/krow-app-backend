@@ -22,6 +22,11 @@
     "lint": "npm run lint --workspaces --if-present",
     "test": "npm run test --workspace @krow/api",
     "test:e2e": "npm run test:e2e --workspace @krow/api",
+    "test:stops-import": "node --test scripts/transport-stops-csv.test.mjs",
+    "stops:import": "node scripts/import-transport-stops.mjs",
     "format": "npm run format --workspaces --if-present"
+  },
+  "devDependencies": {
+    "supabase": "2.117.0"
   }
 }

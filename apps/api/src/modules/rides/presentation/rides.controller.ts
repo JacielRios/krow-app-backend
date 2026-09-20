@@ -5,6 +5,7 @@ import {
   Param,
   ParseUUIDPipe,
   Post,
+  Put,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -16,9 +17,12 @@ import { RidesService } from '../application/rides.service.js';
 import { RideViewsService } from '../application/ride-views.service.js';
 import {
   CreateRideDto,
+  DriverRidesQueryDto,
   RecentRidesQueryDto,
   RideReasonDto,
   SearchRidesDto,
+  RideStopOptionsDto,
+  UpdateRideDto,
 } from './ride.dto.js';
 
 @ApiTags('rides')
@@ -51,6 +55,19 @@ export class RidesController {
   @Get('mine/active') active(@CurrentUser() user: AuthenticatedUser) {
     return this.views.active(user);
   }
+  @Get('mine') mine(
+    @CurrentUser() user: AuthenticatedUser,
+    @Query() query: DriverRidesQueryDto,
+  ) {
+    return this.rides.mine(user, query);
+  }
+  @Post(':rideId/stop-options') stopOptions(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('rideId', ParseUUIDPipe) rideId: string,
+    @Body() dto: RideStopOptionsDto,
+  ) {
+    return this.rides.stopOptions(user, rideId, dto);
+  }
   @Get(':rideId/scheduled-view') scheduledView(
     @CurrentUser() user: AuthenticatedUser,
     @Param('rideId', ParseUUIDPipe) rideId: string,
@@ -68,6 +85,13 @@ export class RidesController {
     @Param('rideId', ParseUUIDPipe) rideId: string,
   ) {
     return this.rides.findOne(user, rideId);
+  }
+  @Put(':rideId') update(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('rideId', ParseUUIDPipe) rideId: string,
+    @Body() dto: UpdateRideDto,
+  ) {
+    return this.rides.update(user, rideId, dto);
   }
   @Post(':rideId/start') start(
     @CurrentUser() user: AuthenticatedUser,

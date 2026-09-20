@@ -15,12 +15,13 @@ export class UsersService {
       .eq('uuid', user.id)
       .maybeSingle();
     if (error) throw error;
-    const { data: driver } = await this.supabase
+    const { data: driver, error: driverError } = await this.supabase
       .forUser(user.accessToken)
       .from('driver_profiles')
       .select('driver_id, status, rating')
       .eq('user_id', user.id)
       .maybeSingle();
+    if (driverError) throw driverError;
 
     return {
       userId: data?.uuid ?? user.id,
@@ -29,6 +30,7 @@ export class UsersService {
       profilePhoto: data?.profile_photo ?? null,
       rating: data?.rating ?? null,
       role: driver ? 'conductor' : 'pasajero',
+      canPublishRides: driver?.status === 'approved',
       driverProfile: driver
         ? {
             driverId: driver.driver_id,

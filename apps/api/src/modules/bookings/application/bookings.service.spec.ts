@@ -48,4 +48,23 @@ describe('BookingsService commands', () => {
       p_reason: 'Sin lugares disponibles',
     });
   });
+
+  it('solicita una reserva con subida y bajada explícitas', async () => {
+    const { service, rpc } = createService();
+
+    await service.request(user, 'ride-id', {
+      seats: 2,
+      pickupStopId: '11111111-1111-4111-8111-111111111111',
+      dropoffStopId: '22222222-2222-4222-8222-222222222222',
+    });
+
+    expect(rpc).toHaveBeenCalledWith('request_booking_v2', {
+      p_payload: {
+        ride_id: 'ride-id',
+        seats_reserved: 2,
+        pickup_stop_id: '11111111-1111-4111-8111-111111111111',
+        dropoff_stop_id: '22222222-2222-4222-8222-222222222222',
+      },
+    });
+  });
 });

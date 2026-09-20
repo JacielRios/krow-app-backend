@@ -33,7 +33,7 @@ export class BookingsController {
     @Param('rideId', ParseUUIDPipe) rideId: string,
     @Body() dto: RequestBookingDto,
   ) {
-    return this.bookings.request(user, rideId, dto.seats);
+    return this.bookings.request(user, rideId, dto);
   }
   @Post('bookings/:bookingId/accept') accept(
     @CurrentUser() user: AuthenticatedUser,

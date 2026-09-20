@@ -9,6 +9,7 @@ import { VehiclesModule } from './modules/vehicles/vehicles.module.js';
 import { RidesModule } from './modules/rides/rides.module.js';
 import { BookingsModule } from './modules/bookings/bookings.module.js';
 import { MapsModule } from './modules/maps/maps.module.js';
+import { RoutesModule } from './modules/routes/routes.module.js';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { MapsModule } from './modules/maps/maps.module.js';
     RidesModule,
     BookingsModule,
     MapsModule,
+    RoutesModule,
   ],
   controllers: [AppController],
 })

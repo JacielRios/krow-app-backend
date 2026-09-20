@@ -18,7 +18,9 @@ export class VehiclesService {
 
     const { data, error } = await client
       .from('vehicles')
-      .select('vehicle_id, brand, model, car_year, license_plate, car_color')
+      .select(
+        'vehicle_id, brand, model, car_year, license_plate, car_color, capacity',
+      )
       .eq('driver_id', driver.driver_id)
       .eq('is_active', true);
     if (error) throw error;

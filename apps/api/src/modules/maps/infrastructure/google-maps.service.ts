@@ -7,6 +7,17 @@ import {
 import { ConfigService } from '@nestjs/config';
 
 type Params = Record<string, string | number | undefined>;
+export interface GoogleRoutePreview {
+  encodedPolyline: string;
+  distanceMeters: number;
+  durationSeconds: number;
+  bounds: {
+    northeast: { lat: number; lng: number };
+    southwest: { lat: number; lng: number };
+  };
+  provider: 'google';
+  calculatedAt: string;
+}
 
 @Injectable()
 export class GoogleMapsService {
@@ -78,7 +89,7 @@ export class GoogleMapsService {
     origin: { lat: number; lng: number },
     destination: { lat: number; lng: number },
     departureTime?: string,
-  ) {
+  ): Promise<GoogleRoutePreview | null> {
     const json = await this.get(
       'https://maps.googleapis.com/maps/api/directions/json',
       {

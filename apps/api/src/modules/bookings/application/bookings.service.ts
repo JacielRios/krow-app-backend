@@ -2,16 +2,26 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { SupabaseService } from '../../../infrastructure/supabase/supabase.service.js';
 import type { AuthenticatedUser } from '../../auth/domain/authenticated-user.js';
 import type { BookingStatus } from '../domain/booking-state.js';
+import type { RequestBookingDto } from '../presentation/booking.dto.js';
 
 @Injectable()
 export class BookingsService {
   constructor(private readonly supabase: SupabaseService) {}
 
-  async request(user: AuthenticatedUser, rideId: string, seats: number) {
+  async request(
+    user: AuthenticatedUser,
+    rideId: string,
+    dto: RequestBookingDto,
+  ) {
     const { data, error } = await this.supabase
       .forUser(user.accessToken)
-      .rpc('request_booking', {
-        p_payload: { ride_id: rideId, seats_reserved: seats },
+      .rpc('request_booking_v2', {
+        p_payload: {
+          ride_id: rideId,
+          seats_reserved: dto.seats,
+          pickup_stop_id: dto.pickupStopId,
+          dropoff_stop_id: dto.dropoffStopId,
+        },
       });
     if (error) throw new BadRequestException(error.message);
     return { bookingId: data };
