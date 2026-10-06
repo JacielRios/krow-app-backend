@@ -5,6 +5,7 @@ export const REQUIRED_HEADERS = [
   'municipality',
   'latitude',
   'longitude',
+  'stop_type',
   'active',
 ];
 
@@ -74,8 +75,16 @@ export function parseTransportStopsCsv(text) {
     if (values.length !== REQUIRED_HEADERS.length) {
       throw new Error(`Línea ${line}: se esperaban ${REQUIRED_HEADERS.length} columnas`);
     }
-    const [externalId, name, address, municipality, latitudeRaw, longitudeRaw, activeRaw] =
-      values.map(value => value.trim());
+    const [
+      externalId,
+      name,
+      address,
+      municipality,
+      latitudeRaw,
+      longitudeRaw,
+      stopType,
+      activeRaw,
+    ] = values.map(value => value.trim());
     if (!externalId || !name) {
       throw new Error(`Línea ${line}: external_id y name son obligatorios`);
     }
@@ -101,6 +110,11 @@ export function parseTransportStopsCsv(text) {
     ) {
       throw new Error(`Línea ${line}: longitude inválida`);
     }
+    if (!['general', 'official_boarding_zone'].includes(stopType)) {
+      throw new Error(
+        `Línea ${line}: stop_type debe ser general u official_boarding_zone`,
+      );
+    }
     return {
       external_id: externalId,
       name,
@@ -109,6 +123,7 @@ export function parseTransportStopsCsv(text) {
       latitude,
       longitude,
       source: 'krow_curated_csv',
+      stop_type: stopType,
       active: parseActive(activeRaw, line),
     };
   });

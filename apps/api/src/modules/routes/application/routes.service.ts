@@ -33,6 +33,17 @@ export class RoutesService {
   ) {}
 
   async preview(user: AuthenticatedUser, dto: RoutePreviewRequestDto) {
+    const computed = await this.computeWithCompatibleStops(user, dto);
+    return {
+      ...computed.preview,
+      compatibleStops: computed.compatibleStops,
+    };
+  }
+
+  async computeWithCompatibleStops(
+    user: AuthenticatedUser,
+    dto: RoutePreviewRequestDto,
+  ) {
     const computed = await this.compute(dto);
     const { data, error } = await this.client(user).rpc(
       'find_compatible_transport_stops',
@@ -40,7 +51,7 @@ export class RoutesService {
     );
     if (error) throw new BadRequestException(error.message);
     return {
-      ...computed.preview,
+      ...computed,
       compatibleStops: (data ?? []).map((stop) => ({
         stopId: stop.stop_id,
         externalId: stop.external_id,
@@ -121,7 +132,7 @@ export class RoutesService {
     dto: SaveFavoriteRouteDto,
     routeId?: string,
   ) {
-    const computed = await this.compute({
+    const computed = await this.computeWithCompatibleStops(user, {
       origin: dto.origin,
       destination: dto.destination,
     });
@@ -145,7 +156,9 @@ export class RoutesService {
             dto.defaultPricePerSeatCents == null
               ? undefined
               : dto.defaultPricePerSeatCents / 100,
-          transport_stop_ids: dto.transportStopIds,
+          transport_stop_ids: computed.compatibleStops.map(
+            (stop) => stop.stopId,
+          ),
           route_geojson: computed.routeGeoJson,
         },
       },

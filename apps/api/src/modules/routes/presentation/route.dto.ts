@@ -1,6 +1,5 @@
 import { Type } from 'class-transformer';
 import {
-  ArrayMinSize,
   ArrayUnique,
   IsArray,
   IsDateString,
@@ -33,11 +32,11 @@ export class SaveFavoriteRouteDto {
   @ValidateNested()
   @Type(() => RouteEndpointDto)
   destination!: RouteEndpointDto;
+  @IsOptional()
   @IsArray()
-  @ArrayMinSize(2)
   @ArrayUnique()
   @IsUUID('4', { each: true })
-  transportStopIds!: string[];
+  transportStopIds?: string[];
   @IsOptional() @IsUUID() defaultVehicleId?: string;
   @IsOptional() @IsInt() @Min(1) @Max(20) defaultAvailableSeats?: number;
   @IsOptional() @IsInt() @Min(1) defaultPricePerSeatCents?: number;

@@ -3,4 +3,5 @@ export interface AuthenticatedUser {
   email: string | null;
   accessToken: string;
   userMetadata: Record<string, unknown>;
+  appMetadata: Record<string, unknown>;
 }

@@ -1,0 +1,49 @@
+{
+  "startedAt": "2026-09-30T16:53:59.126Z",
+  "scope": "local PostgreSQL only; no HTTP, Kafka, Redis, mobile or SLO certification",
+  "operations": 10000,
+  "concurrency": 50,
+  "checks": {
+    "duplicateRequests": "20 concurrent replays; one booking",
+    "capacity": "50 rides; two seats accepted, third rejected; committed commands replayed idempotently",
+    "connectionLoss": "Terminated real PostgreSQL connection: uncommitted row rolled back; pool and ride session recovered"
+  },
+  "load": {
+    "elapsedMs": 11349,
+    "operationsPerSecond": 881.16,
+    "p50Ms": 51.59,
+    "p95Ms": 86.06,
+    "p99Ms": 126.87,
+    "errors": 0
+  },
+  "recovery": {
+    "restoreAndVerifyMs": 980,
+    "sha256": "c4798cbbdd45babe0f668072f4915968903183267186acd7f924c050c66f16be",
+    "counts": {
+      "krow_runtime.commands": 10100,
+      "krow_runtime.delivery_attempts": 0,
+      "krow_runtime.devices": 0,
+      "krow_runtime.incident_audit": 0,
+      "krow_runtime.location_sessions": 0,
+      "krow_runtime.notification_intents": 0,
+      "krow_runtime.outbox_events": 10150,
+      "krow_runtime.rides": 50,
+      "krow_runtime.route_versions": 0,
+      "krow_runtime.safety_incidents": 0,
+      "krow_runtime.stop_visits": 150,
+      "krow_runtime.traffic_events": 0,
+      "public.bookings": 10000,
+      "public.driver_profiles": 50,
+      "public.recovery_probe": 0,
+      "public.ride_status_history": 0,
+      "public.ride_stops": 150,
+      "public.rides": 50,
+      "public.transport_stops": 150,
+      "public.users": 10050,
+      "public.vehicles": 50
+    },
+    "kind": "logical backup restoration, not PITR or regional failover"
+  },
+  "status": "passed",
+  "finishedAt": "2026-09-30T16:54:16.349Z"
+}

@@ -20,7 +20,8 @@ antes de publicar o editar.
   `hasStaleStops`.
 - `POST /v1/routes/favorites` y `PATCH /v1/routes/favorites/:routeId`:
   reciben nombre, origen/destino con dirección, coordenadas y Place ID
-  opcional, `transportStopIds` (mínimo dos únicas) y los valores
+  opcional. La API vuelve a calcular e incluye automáticamente todas las
+  paradas del corredor; `transportStopIds` del cliente se ignora. Admite los valores
   predeterminados opcionales `defaultVehicleId`,
   `defaultAvailableSeats`, `defaultPricePerSeatCents`.
 - `DELETE /v1/routes/favorites/:routeId`: elimina solo la plantilla.
@@ -28,7 +29,7 @@ antes de publicar o editar.
 ## Viajes del conductor
 
 - `POST /v1/rides`: vehículo, origen/destino, direcciones, fecha futura,
-  `transportStopIds`, `favoriteRouteId?`, `availableSeats` y
+  `favoriteRouteId?`, `availableSeats` y
   `pricePerSeatCents`. La base crea el viaje, sus paradas y el historial en
   una transacción.
 - `GET /v1/rides/mine?status=&limit=50&offset=0`: viajes propios paginados.
@@ -46,9 +47,12 @@ La capacidad del vehículo incluye al conductor; el máximo ofertable es
 
 ## Búsqueda y reserva del pasajero
 
-- `POST /v1/rides/search`: `{origin:{lat,lng},destination:{lat,lng}}`.
+- `POST /v1/rides/stops/candidates`: devuelve todas las paradas de subida y
+  bajada a 1 km, su disponibilidad, tipo y pares que comparten un viaje.
+- `POST /v1/rides/search`: `{origin:{lat,lng},destination:{lat,lng},
+  pickupTransportStopId?,dropoffTransportStopId?}`.
   Cada resultado tiene `bestPickupStop`, `bestDropoffStop` y distancias.
-  Solo coinciden paradas activas del catálogo a 500 m de los puntos solicitados,
+  Solo coinciden paradas activas del catálogo a 1 km de los puntos solicitados,
   con subida anterior a bajada.
 - `POST /v1/rides/:rideId/stop-options`: mismo origen/destino; devuelve
   `pairs` válidos para escoger en mapa/lista.
@@ -63,10 +67,9 @@ registradas en el proyecto Supabase. Desplegar el backend antes del nuevo
 móvil. Las RPC antiguas siguen disponibles temporalmente para clientes
 existentes; retirarlas solo después de confirmar que no reciben tráfico.
 
-El catálogo permanece vacío hasta importar el CSV real de KROW con
-`npm run stops:import -- <archivo.csv>` (véase
-`docs/transport-stops-import.md`). Sin catálogo, la publicación y la
-reserva por este flujo muestran su estado vacío. Android necesita una clave
+El catálogo inicial contiene Parada 1, Parada 2 y Parada 3 como paradas
+generales. Se amplía con `npm run stops:import -- <archivo.csv>` o mediante la
+API administrativa (véase `docs/transport-stops-import.md`). Android necesita una clave
 separada del Maps SDK en `KROW_ANDROID_MAPS_API_KEY`, restringida por
 `com.krownmobileapp` y el SHA de firma; no reutilizar la clave REST de
 NestJS.

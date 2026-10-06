@@ -22,6 +22,7 @@ import {
   RideReasonDto,
   SearchRidesDto,
   RideStopOptionsDto,
+  PassengerStopCandidatesDto,
   UpdateRideDto,
 } from './ride.dto.js';
 
@@ -45,6 +46,12 @@ export class RidesController {
     @Body() dto: SearchRidesDto,
   ) {
     return this.rides.search(user, dto);
+  }
+  @Post('stops/candidates') stopCandidates(
+    @CurrentUser() user: AuthenticatedUser,
+    @Body() dto: PassengerStopCandidatesDto,
+  ) {
+    return this.rides.stopCandidates(user, dto);
   }
   @Get('mine/recent') recent(
     @CurrentUser() user: AuthenticatedUser,

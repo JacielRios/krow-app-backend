@@ -1,0 +1,20 @@
+{
+  "startedAt": "2026-09-30T16:59:31.615Z",
+  "scope": "Real local Kafka/Redis primitives, not application HTTP or 50,000 sockets",
+  "status": "passed",
+  "publish": {
+    "samples": 10000,
+    "elapsedMs": 524,
+    "p95BatchAckMs": 14.768699999999853
+  },
+  "applicationRedisRecovery": "Actual RuntimeStreams request connection and subscriber recovered after Redis restart",
+  "brokerRestart": {
+    "elapsedMs": 13085,
+    "check": "Restarted only isolated Kafka/Redis containers after 10,000 durable acknowledgements; named volumes retained"
+  },
+  "recovery": {
+    "elapsedMs": 4584,
+    "check": "Consumer restart and lost Redis projection rebuilt from durable Kafka history; duplicate/older sequences did not regress latest state"
+  },
+  "finishedAt": "2026-09-30T17:00:00.397Z"
+}

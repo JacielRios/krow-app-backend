@@ -169,6 +169,7 @@ export type Database = {
           longitude: number;
           location: unknown;
           source: string;
+          stop_type: string;
           active: boolean;
           created_at: string;
           updated_at: string;
@@ -183,6 +184,7 @@ export type Database = {
           longitude: number;
           location?: unknown;
           source?: string;
+          stop_type?: string;
           active?: boolean;
           created_at?: string;
           updated_at?: string;
@@ -309,6 +311,10 @@ export type Database = {
     };
     Views: { [_ in never]: never };
     Functions: {
+      admin_upsert_transport_stop: {
+        Args: { p_payload: Json };
+        Returns: string;
+      };
       create_ride: { Args: { p_payload: Json }; Returns: string };
       create_ride_v2: { Args: { p_payload: Json }; Returns: string };
       update_ride_v2: {
@@ -332,6 +338,58 @@ export type Database = {
           distance_from_route_m: number;
           route_fraction: number;
         }>;
+      };
+      get_passenger_stop_candidates: {
+        Args: {
+          p_origin_lat: number;
+          p_origin_lng: number;
+          p_destination_lat: number;
+          p_destination_lng: number;
+          p_max_distance_m?: number;
+        };
+        Returns: Array<{
+          stop_role: string;
+          stop_id: string;
+          external_id: string;
+          stop_name: string;
+          stop_address: string | null;
+          municipality: string | null;
+          stop_type: string;
+          lat: number;
+          lng: number;
+          distance_m: number;
+          enabled: boolean;
+          ride_count: number;
+        }>;
+      };
+      get_passenger_stop_pairs: {
+        Args: {
+          p_origin_lat: number;
+          p_origin_lng: number;
+          p_destination_lat: number;
+          p_destination_lng: number;
+          p_max_distance_m?: number;
+        };
+        Returns: Array<{
+          pickup_transport_stop_id: string;
+          dropoff_transport_stop_id: string;
+          ride_count: number;
+        }>;
+      };
+      search_available_rides_by_stops: {
+        Args: {
+          p_origin_lat: number;
+          p_origin_lng: number;
+          p_destination_lat: number;
+          p_destination_lng: number;
+          p_pickup_transport_stop_id: string;
+          p_dropoff_transport_stop_id: string;
+          p_max_results?: number;
+          p_from_time?: string | null;
+          p_to_time?: string | null;
+          p_max_distance_m?: number;
+        };
+        Returns: Database['public']['Functions']['search_available_rides_v2']['Returns'];
       };
       upsert_favorite_route: {
         Args: { p_payload: Json };

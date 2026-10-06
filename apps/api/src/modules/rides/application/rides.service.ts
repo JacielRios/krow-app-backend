@@ -12,6 +12,7 @@ import { RoutesService } from '../../routes/application/routes.service.js';
 import type {
   CreateRideDto,
   DriverRidesQueryDto,
+  PassengerStopCandidatesDto,
   RideStopOptionsDto,
   SearchRidesDto,
   UpdateRideDto,
@@ -117,7 +118,7 @@ export class RidesService {
   ) {}
 
   async create(user: AuthenticatedUser, dto: CreateRideDto) {
-    const computed = await this.routes.compute({
+    const computed = await this.routes.computeWithCompatibleStops(user, {
       origin: dto.origin,
       destination: dto.destination,
       departureTime: dto.departureTime,
@@ -130,7 +131,7 @@ export class RidesService {
   }
 
   async update(user: AuthenticatedUser, rideId: string, dto: UpdateRideDto) {
-    const computed = await this.routes.compute({
+    const computed = await this.routes.computeWithCompatibleStops(user, {
       origin: dto.origin,
       destination: dto.destination,
       departureTime: dto.departureTime,
@@ -208,22 +209,82 @@ export class RidesService {
   }
 
   async search(user: AuthenticatedUser, dto: SearchRidesDto) {
-    const { data, error } = await this.client(user).rpc(
-      'search_available_rides_v2',
-      {
-        p_origin_lat: dto.origin.lat,
-        p_origin_lng: dto.origin.lng,
-        p_destination_lat: dto.destination.lat,
-        p_destination_lng: dto.destination.lng,
-        p_max_results: dto.maxResults,
-        p_from_time: dto.fromTime ?? null,
-        p_to_time: dto.toTime ?? null,
-        p_max_distance_m: dto.maxDistanceMeters,
-      },
-    );
+    const hasPickup = Boolean(dto.pickupTransportStopId);
+    const hasDropoff = Boolean(dto.dropoffTransportStopId);
+    if (hasPickup !== hasDropoff) {
+      throw new BadRequestException(
+        'Selecciona tanto la parada de subida como la de bajada',
+      );
+    }
+    const commonArgs = {
+      p_origin_lat: dto.origin.lat,
+      p_origin_lng: dto.origin.lng,
+      p_destination_lat: dto.destination.lat,
+      p_destination_lng: dto.destination.lng,
+      p_max_results: dto.maxResults,
+      p_from_time: dto.fromTime ?? null,
+      p_to_time: dto.toTime ?? null,
+      p_max_distance_m: dto.maxDistanceMeters,
+    };
+    const request =
+      hasPickup && hasDropoff
+        ? this.client(user).rpc('search_available_rides_by_stops', {
+            ...commonArgs,
+            p_pickup_transport_stop_id: dto.pickupTransportStopId!,
+            p_dropoff_transport_stop_id: dto.dropoffTransportStopId!,
+          })
+        : this.client(user).rpc('search_available_rides_v2', commonArgs);
+    const { data, error } = await request;
     if (error) throw new BadRequestException(error.message);
     const rows = (data ?? []) as unknown as SearchRideRow[];
     return rows.map((row) => this.mapSearchRow(row));
+  }
+
+  async stopCandidates(
+    user: AuthenticatedUser,
+    dto: PassengerStopCandidatesDto,
+  ) {
+    const args = {
+      p_origin_lat: dto.origin.lat,
+      p_origin_lng: dto.origin.lng,
+      p_destination_lat: dto.destination.lat,
+      p_destination_lng: dto.destination.lng,
+      p_max_distance_m: dto.maxDistanceMeters,
+    };
+    const client = this.client(user);
+    const [candidateResult, pairResult] = await Promise.all([
+      client.rpc('get_passenger_stop_candidates', args),
+      client.rpc('get_passenger_stop_pairs', args),
+    ]);
+    if (candidateResult.error) {
+      throw new BadRequestException(candidateResult.error.message);
+    }
+    if (pairResult.error) {
+      throw new BadRequestException(pairResult.error.message);
+    }
+    const candidates = (candidateResult.data ?? []).map((stop) => ({
+      role: stop.stop_role,
+      stopId: stop.stop_id,
+      externalId: stop.external_id,
+      name: stop.stop_name,
+      address: stop.stop_address,
+      municipality: stop.municipality,
+      stopType: stop.stop_type,
+      location: { lat: Number(stop.lat), lng: Number(stop.lng) },
+      distanceMeters: Math.round(Number(stop.distance_m)),
+      enabled: Boolean(stop.enabled),
+      rideCount: Number(stop.ride_count),
+    }));
+    return {
+      radiusMeters: dto.maxDistanceMeters,
+      pickupStops: candidates.filter((stop) => stop.role === 'pickup'),
+      dropoffStops: candidates.filter((stop) => stop.role === 'dropoff'),
+      pairs: (pairResult.data ?? []).map((pair) => ({
+        pickupStopId: pair.pickup_transport_stop_id,
+        dropoffStopId: pair.dropoff_transport_stop_id,
+        rideCount: Number(pair.ride_count),
+      })),
+    };
   }
 
   async stopOptions(
@@ -300,7 +361,7 @@ export class RidesService {
 
   private ridePayload(
     dto: CreateRideDto,
-    computed: Awaited<ReturnType<RoutesService['compute']>>,
+    computed: Awaited<ReturnType<RoutesService['computeWithCompatibleStops']>>,
   ) {
     return {
       vehicle_id: dto.vehicleId,
@@ -320,7 +381,7 @@ export class RidesService {
       departure_time: dto.departureTime,
       available_seats: dto.availableSeats,
       price_per_seat: dto.pricePerSeatCents / 100,
-      transport_stop_ids: dto.transportStopIds,
+      transport_stop_ids: computed.compatibleStops.map((stop) => stop.stopId),
     };
   }
 

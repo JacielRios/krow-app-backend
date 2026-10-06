@@ -3,23 +3,24 @@ import test from 'node:test';
 import { parseTransportStopsCsv } from './transport-stops-csv.mjs';
 
 const header =
-  'external_id,name,address,municipality,latitude,longitude,active\n';
+  'external_id,name,address,municipality,latitude,longitude,stop_type,active\n';
 
 test('acepta comas escapadas y normaliza una parada', () => {
   const [stop] = parseTransportStopsCsv(
     header +
-      'KROW-1,"Parada, Centro","Av. Uno 10",Guadalupe,25.66,-100.24,true\n',
+      'KROW-1,"Parada, Centro","Av. Uno 10",Guadalupe,25.66,-100.24,general,true\n',
   );
   assert.equal(stop.name, 'Parada, Centro');
   assert.equal(stop.active, true);
   assert.equal(stop.source, 'krow_curated_csv');
+  assert.equal(stop.stop_type, 'general');
 });
 
 test('rechaza coordenadas inválidas', () => {
   assert.throws(
     () =>
       parseTransportStopsCsv(
-        header + 'KROW-1,Parada,Dirección,Guadalupe,125,-100.24,true\n',
+        header + 'KROW-1,Parada,Dirección,Guadalupe,125,-100.24,general,true\n',
       ),
     /latitude inválida/,
   );
@@ -29,7 +30,7 @@ test('rechaza una coordenada vacía en lugar de convertirla en cero', () => {
   assert.throws(
     () =>
       parseTransportStopsCsv(
-        header + 'KROW-1,Parada,Dirección,Guadalupe,,-100.24,true\n',
+        header + 'KROW-1,Parada,Dirección,Guadalupe,,-100.24,general,true\n',
       ),
     /latitude inválida/,
   );
@@ -40,8 +41,8 @@ test('rechaza external_id duplicado para mantener upserts deterministas', () => 
     () =>
       parseTransportStopsCsv(
         header +
-          'KROW-1,Primera,Dirección,Guadalupe,25.66,-100.24,true\n' +
-          'KROW-1,Segunda,Dirección,Guadalupe,25.67,-100.25,false\n',
+          'KROW-1,Primera,Dirección,Guadalupe,25.66,-100.24,general,true\n' +
+          'KROW-1,Segunda,Dirección,Guadalupe,25.67,-100.25,general,false\n',
       ),
     /external_id duplicado/,
   );
@@ -49,7 +50,7 @@ test('rechaza external_id duplicado para mantener upserts deterministas', () => 
 
 test('una segunda lectura produce exactamente el mismo payload idempotente', () => {
   const csv =
-    header + 'KROW-1,Parada,Dirección,Guadalupe,25.66,-100.24,false\n';
+    header + 'KROW-1,Parada,Dirección,Guadalupe,25.66,-100.24,official_boarding_zone,false\n';
   assert.deepEqual(parseTransportStopsCsv(csv), parseTransportStopsCsv(csv));
 });
 

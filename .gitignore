@@ -54,5 +54,8 @@ pids
 *.seed
 *.pid.lock
 
+# Synthetic local recovery backup; report.json remains reviewable.
+/artifacts/runtime-local/*.dump
+
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
