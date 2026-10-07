@@ -1,5 +1,10 @@
-import { PublicSection } from '@/components/PublicSection';
+import EmpresasPage from "@/components/EmpresasPage";
 
-export default function CompaniesPage() {
-  return <PublicSection title="Movilidad para empresas" description="Base pública para presentar la solución corporativa de KROW. El contenido comercial definitivo se incorporará con el equipo de producto." />;
+export const metadata = {
+  title: "Empresas | KROW",
+  description: "Lleva el carpooling a tu organización con KROW.",
+};
+
+export default function Page() {
+  return <EmpresasPage />;
 }

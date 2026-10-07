@@ -1,3 +1,4 @@
+"use client";
 import Link from 'next/link';
 
 export function PublicSection({ title, description }: { title: string; description: string }) {

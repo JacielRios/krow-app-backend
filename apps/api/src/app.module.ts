@@ -10,6 +10,7 @@ import { RidesModule } from './modules/rides/rides.module.js';
 import { BookingsModule } from './modules/bookings/bookings.module.js';
 import { MapsModule } from './modules/maps/maps.module.js';
 import { RoutesModule } from './modules/routes/routes.module.js';
+import { ReportsModule } from './modules/reports/reports.module.js'
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { RoutesModule } from './modules/routes/routes.module.js';
     BookingsModule,
     MapsModule,
     RoutesModule,
+    ReportsModule,
   ],
   controllers: [AppController],
 })

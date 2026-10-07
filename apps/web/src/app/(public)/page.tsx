@@ -1,4 +1,4 @@
-import Link from 'next/link';
+/*import Link from 'next/link';
 
 export default function LandingPage() {
   return (
@@ -7,7 +7,7 @@ export default function LandingPage() {
         <Link className="brand" href="/">KROW</Link>
         <nav className="nav" aria-label="Navegación principal">
           <Link href="/empresas">Para empresas</Link>
-          <Link href="/contacto">Contacto</Link>
+          <Link href="/Dashboards">Dashboards</Link>
           <Link className="button secondary" href="/admin/login">Acceso administrativo</Link>
         </nav>
       </header>
@@ -47,4 +47,11 @@ export default function LandingPage() {
       <footer className="shell site-footer">© {new Date().getFullYear()} KROW</footer>
     </>
   );
+}
+*/
+
+import LandingPage from "@/components/LandingPage";
+
+export default function Page() {
+  return <LandingPage />;
 }
