@@ -30,6 +30,7 @@ export class SupabaseAuthGuard implements CanActivate {
       email: data.user.email ?? null,
       accessToken,
       userMetadata: data.user.user_metadata,
+      appMetadata: data.user.app_metadata,
     };
     return true;
   }

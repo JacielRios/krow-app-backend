@@ -11,13 +11,14 @@ describe('RidesService commands', () => {
     email: 'user@example.com',
     accessToken: 'access-token',
     userMetadata: {},
+    appMetadata: {},
   };
 
   function createService(bookingRideId = 'ride-id') {
     const rpc = jest
       .fn<
         (...args: unknown[]) => Promise<{
-          data: string | number | null;
+          data: unknown;
           error: { message: string } | null;
         }>
       >()
@@ -35,6 +36,7 @@ describe('RidesService commands', () => {
           type: 'LineString';
           coordinates: [number, number][];
         };
+        compatibleStops: Array<{ stopId: string }>;
       }>
     >();
     compute.mockResolvedValue({
@@ -52,6 +54,10 @@ describe('RidesService commands', () => {
           [-100.25, 25.67],
         ],
       },
+      compatibleStops: [
+        { stopId: '44444444-4444-4444-8444-444444444444' },
+        { stopId: '55555555-5555-4555-8555-555555555555' },
+      ],
     });
     const maybeSingle = jest
       .fn<
@@ -71,7 +77,9 @@ describe('RidesService commands', () => {
     const supabase = {
       forUser: jest.fn().mockReturnValue(client),
     } as unknown as SupabaseService;
-    const routes = { compute } as unknown as RoutesService;
+    const routes = {
+      computeWithCompatibleStops: compute,
+    } as unknown as RoutesService;
 
     return {
       service: new RidesService(supabase, routes),
@@ -104,7 +112,7 @@ describe('RidesService commands', () => {
     await expect(service.create(user, rideDto)).resolves.toEqual({
       rideId: 'ride-created',
     });
-    expect(compute).toHaveBeenCalledWith({
+    expect(compute).toHaveBeenCalledWith(user, {
       origin: rideDto.origin,
       destination: rideDto.destination,
       departureTime: rideDto.departureTime,
@@ -116,7 +124,10 @@ describe('RidesService commands', () => {
     expect(callPayload.p_payload).toMatchObject({
       route_polyline: 'polyline-from-google',
       route_distance_meters: 1200,
-      transport_stop_ids: rideDto.transportStopIds,
+      transport_stop_ids: [
+        '44444444-4444-4444-8444-444444444444',
+        '55555555-5555-4555-8555-555555555555',
+      ],
       price_per_seat: 45,
     });
   });

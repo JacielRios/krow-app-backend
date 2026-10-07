@@ -1,6 +1,5 @@
 import { Type } from 'class-transformer';
 import {
-  ArrayMinSize,
   ArrayUnique,
   IsArray,
   IsDateString,
@@ -29,11 +28,11 @@ export class CreateRideDto {
   @IsOptional() @IsString() originAddress?: string;
   @IsOptional() @IsString() destinationAddress?: string;
   @IsOptional() @IsString() routePolyline?: string;
+  @IsOptional()
   @IsArray()
-  @ArrayMinSize(2)
   @ArrayUnique()
   @IsUUID('4', { each: true })
-  transportStopIds!: string[];
+  transportStopIds?: string[];
   @IsDateString() departureTime!: string;
   @IsInt() @Min(1) @Max(20) availableSeats!: number;
   @IsInt() @Min(1) pricePerSeatCents!: number;
@@ -50,7 +49,9 @@ export class SearchRidesDto {
   @IsOptional() @IsDateString() toTime?: string;
   @IsOptional() @IsInt() @Min(1) @Max(100) maxResults = 50;
   @IsOptional() @IsNumber() @Min(0.1) @Max(100) maxDistanceKm = 8;
-  @IsOptional() @IsInt() @Min(1) @Max(5000) maxDistanceMeters = 500;
+  @IsOptional() @IsInt() @Min(1) @Max(5000) maxDistanceMeters = 1000;
+  @IsOptional() @IsUUID() pickupTransportStopId?: string;
+  @IsOptional() @IsUUID() dropoffTransportStopId?: string;
 }
 
 export class UpdateRideDto extends CreateRideDto {
@@ -60,7 +61,13 @@ export class UpdateRideDto extends CreateRideDto {
 export class RideStopOptionsDto {
   @ValidateNested() @Type(() => CoordinateDto) origin!: CoordinateDto;
   @ValidateNested() @Type(() => CoordinateDto) destination!: CoordinateDto;
-  @IsOptional() @IsInt() @Min(1) @Max(5000) maxDistanceMeters = 500;
+  @IsOptional() @IsInt() @Min(1) @Max(5000) maxDistanceMeters = 1000;
+}
+
+export class PassengerStopCandidatesDto {
+  @ValidateNested() @Type(() => CoordinateDto) origin!: CoordinateDto;
+  @ValidateNested() @Type(() => CoordinateDto) destination!: CoordinateDto;
+  @IsOptional() @IsInt() @Min(1) @Max(5000) maxDistanceMeters = 1000;
 }
 
 export class RideReasonDto {

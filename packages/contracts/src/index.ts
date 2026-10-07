@@ -10,3 +10,4 @@ export interface HealthContract {
   service: 'krow-api';
   timestamp: string;
 }
+export type * from './realtime.js';

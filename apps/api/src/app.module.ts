@@ -11,6 +11,8 @@ import { BookingsModule } from './modules/bookings/bookings.module.js';
 import { MapsModule } from './modules/maps/maps.module.js';
 import { RoutesModule } from './modules/routes/routes.module.js';
 import { ReportsModule } from './modules/reports/reports.module.js'
+import { TransportStopsModule } from './modules/transport-stops/transport-stops.module.js';
+import { RideRuntimeModule } from './modules/ride-runtime/ride-runtime.module.js';
 
 @Module({
   imports: [
@@ -24,6 +26,8 @@ import { ReportsModule } from './modules/reports/reports.module.js'
     MapsModule,
     RoutesModule,
     ReportsModule,
+    TransportStopsModule,
+    RideRuntimeModule
   ],
   controllers: [AppController],
 })

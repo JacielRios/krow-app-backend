@@ -9,6 +9,7 @@ describe('BookingsService commands', () => {
     email: 'user@example.com',
     accessToken: 'access-token',
     userMetadata: {},
+    appMetadata: {},
   };
 
   function createService() {
