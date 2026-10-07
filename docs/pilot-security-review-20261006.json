@@ -1,0 +1,521 @@
+{
+  "auditedAt": "2026-10-06",
+  "scope": "Read-only metadata; no Supabase mutations or account records.",
+  "user_columns": [
+    {
+      "name": "id",
+      "type": "bigint",
+      "nullable": "NO"
+    },
+    {
+      "name": "uuid",
+      "type": "uuid",
+      "nullable": "NO"
+    },
+    {
+      "name": "full_name",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "name": "email_address",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "name": "institutional_id",
+      "type": "character varying",
+      "nullable": "YES"
+    },
+    {
+      "name": "academic_program",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "name": "academic_period",
+      "type": "bigint",
+      "nullable": "YES"
+    },
+    {
+      "name": "profile_photo",
+      "type": "character varying",
+      "nullable": "YES"
+    },
+    {
+      "name": "rating",
+      "type": "double precision",
+      "nullable": "YES"
+    },
+    {
+      "name": "is_active",
+      "type": "boolean",
+      "nullable": "YES"
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "nullable": "NO"
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "nullable": "YES"
+    },
+    {
+      "name": "deleted_at",
+      "type": "timestamp with time zone",
+      "nullable": "YES"
+    }
+  ],
+  "postgres_version": "17.6",
+  "storage_bucket_count": 0,
+  "tracking_schema_exists": false,
+  "direct_client_privileges": [
+    {
+      "role": "anon",
+      "table": "payment_methods",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "role": "anon",
+      "table": "payment_methods",
+      "privilege": "REFERENCES"
+    },
+    {
+      "role": "anon",
+      "table": "payment_methods",
+      "privilege": "TRIGGER"
+    },
+    {
+      "role": "authenticated",
+      "table": "payment_methods",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "role": "authenticated",
+      "table": "payment_methods",
+      "privilege": "REFERENCES"
+    },
+    {
+      "role": "authenticated",
+      "table": "payment_methods",
+      "privilege": "TRIGGER"
+    },
+    {
+      "role": "anon",
+      "table": "payments",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "role": "anon",
+      "table": "payments",
+      "privilege": "REFERENCES"
+    },
+    {
+      "role": "anon",
+      "table": "payments",
+      "privilege": "TRIGGER"
+    },
+    {
+      "role": "authenticated",
+      "table": "payments",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "role": "authenticated",
+      "table": "payments",
+      "privilege": "REFERENCES"
+    },
+    {
+      "role": "authenticated",
+      "table": "payments",
+      "privilege": "TRIGGER"
+    },
+    {
+      "role": "anon",
+      "table": "chats",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "role": "anon",
+      "table": "chats",
+      "privilege": "REFERENCES"
+    },
+    {
+      "role": "anon",
+      "table": "chats",
+      "privilege": "TRIGGER"
+    },
+    {
+      "role": "authenticated",
+      "table": "chats",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "role": "authenticated",
+      "table": "chats",
+      "privilege": "REFERENCES"
+    },
+    {
+      "role": "authenticated",
+      "table": "chats",
+      "privilege": "TRIGGER"
+    },
+    {
+      "role": "anon",
+      "table": "chat_messages",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "role": "anon",
+      "table": "chat_messages",
+      "privilege": "REFERENCES"
+    },
+    {
+      "role": "anon",
+      "table": "chat_messages",
+      "privilege": "TRIGGER"
+    },
+    {
+      "role": "authenticated",
+      "table": "chat_messages",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "role": "authenticated",
+      "table": "chat_messages",
+      "privilege": "REFERENCES"
+    },
+    {
+      "role": "authenticated",
+      "table": "chat_messages",
+      "privilege": "TRIGGER"
+    },
+    {
+      "role": "anon",
+      "table": "bookings",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "role": "anon",
+      "table": "bookings",
+      "privilege": "REFERENCES"
+    },
+    {
+      "role": "anon",
+      "table": "bookings",
+      "privilege": "TRIGGER"
+    },
+    {
+      "role": "authenticated",
+      "table": "bookings",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "role": "authenticated",
+      "table": "bookings",
+      "privilege": "REFERENCES"
+    },
+    {
+      "role": "authenticated",
+      "table": "bookings",
+      "privilege": "TRIGGER"
+    },
+    {
+      "role": "anon",
+      "table": "ride_reviews",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "role": "anon",
+      "table": "ride_reviews",
+      "privilege": "REFERENCES"
+    },
+    {
+      "role": "anon",
+      "table": "ride_reviews",
+      "privilege": "TRIGGER"
+    },
+    {
+      "role": "authenticated",
+      "table": "ride_reviews",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "role": "authenticated",
+      "table": "ride_reviews",
+      "privilege": "REFERENCES"
+    },
+    {
+      "role": "authenticated",
+      "table": "ride_reviews",
+      "privilege": "TRIGGER"
+    },
+    {
+      "role": "anon",
+      "table": "ride_status_history",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "role": "anon",
+      "table": "ride_status_history",
+      "privilege": "REFERENCES"
+    },
+    {
+      "role": "anon",
+      "table": "ride_status_history",
+      "privilege": "TRIGGER"
+    },
+    {
+      "role": "authenticated",
+      "table": "ride_status_history",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "role": "authenticated",
+      "table": "ride_status_history",
+      "privilege": "REFERENCES"
+    },
+    {
+      "role": "authenticated",
+      "table": "ride_status_history",
+      "privilege": "TRIGGER"
+    },
+    {
+      "role": "anon",
+      "table": "users",
+      "privilege": "INSERT"
+    },
+    {
+      "role": "anon",
+      "table": "users",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "anon",
+      "table": "users",
+      "privilege": "UPDATE"
+    },
+    {
+      "role": "anon",
+      "table": "users",
+      "privilege": "DELETE"
+    },
+    {
+      "role": "anon",
+      "table": "users",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "role": "anon",
+      "table": "users",
+      "privilege": "REFERENCES"
+    },
+    {
+      "role": "anon",
+      "table": "users",
+      "privilege": "TRIGGER"
+    },
+    {
+      "role": "authenticated",
+      "table": "users",
+      "privilege": "INSERT"
+    },
+    {
+      "role": "authenticated",
+      "table": "users",
+      "privilege": "SELECT"
+    },
+    {
+      "role": "authenticated",
+      "table": "users",
+      "privilege": "UPDATE"
+    },
+    {
+      "role": "authenticated",
+      "table": "users",
+      "privilege": "DELETE"
+    },
+    {
+      "role": "authenticated",
+      "table": "users",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "role": "authenticated",
+      "table": "users",
+      "privilege": "REFERENCES"
+    },
+    {
+      "role": "authenticated",
+      "table": "users",
+      "privilege": "TRIGGER"
+    },
+    {
+      "role": "anon",
+      "table": "driver_profiles",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "role": "anon",
+      "table": "driver_profiles",
+      "privilege": "REFERENCES"
+    },
+    {
+      "role": "anon",
+      "table": "driver_profiles",
+      "privilege": "TRIGGER"
+    },
+    {
+      "role": "authenticated",
+      "table": "driver_profiles",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "role": "authenticated",
+      "table": "driver_profiles",
+      "privilege": "REFERENCES"
+    },
+    {
+      "role": "authenticated",
+      "table": "driver_profiles",
+      "privilege": "TRIGGER"
+    },
+    {
+      "role": "anon",
+      "table": "vehicles",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "role": "anon",
+      "table": "vehicles",
+      "privilege": "REFERENCES"
+    },
+    {
+      "role": "anon",
+      "table": "vehicles",
+      "privilege": "TRIGGER"
+    },
+    {
+      "role": "authenticated",
+      "table": "vehicles",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "role": "authenticated",
+      "table": "vehicles",
+      "privilege": "REFERENCES"
+    },
+    {
+      "role": "authenticated",
+      "table": "vehicles",
+      "privilege": "TRIGGER"
+    },
+    {
+      "role": "anon",
+      "table": "rides",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "role": "anon",
+      "table": "rides",
+      "privilege": "REFERENCES"
+    },
+    {
+      "role": "anon",
+      "table": "rides",
+      "privilege": "TRIGGER"
+    },
+    {
+      "role": "authenticated",
+      "table": "rides",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "role": "authenticated",
+      "table": "rides",
+      "privilege": "REFERENCES"
+    },
+    {
+      "role": "authenticated",
+      "table": "rides",
+      "privilege": "TRIGGER"
+    },
+    {
+      "role": "anon",
+      "table": "ride_stops",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "role": "anon",
+      "table": "ride_stops",
+      "privilege": "REFERENCES"
+    },
+    {
+      "role": "anon",
+      "table": "ride_stops",
+      "privilege": "TRIGGER"
+    },
+    {
+      "role": "authenticated",
+      "table": "ride_stops",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "role": "authenticated",
+      "table": "ride_stops",
+      "privilege": "REFERENCES"
+    },
+    {
+      "role": "authenticated",
+      "table": "ride_stops",
+      "privilege": "TRIGGER"
+    },
+    {
+      "role": "authenticated",
+      "table": "favorite_routes",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "role": "authenticated",
+      "table": "favorite_routes",
+      "privilege": "REFERENCES"
+    },
+    {
+      "role": "authenticated",
+      "table": "favorite_routes",
+      "privilege": "TRIGGER"
+    },
+    {
+      "role": "authenticated",
+      "table": "favorite_route_stops",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "role": "authenticated",
+      "table": "favorite_route_stops",
+      "privilege": "REFERENCES"
+    },
+    {
+      "role": "authenticated",
+      "table": "favorite_route_stops",
+      "privilege": "TRIGGER"
+    },
+    {
+      "role": "authenticated",
+      "table": "transport_stops",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "role": "authenticated",
+      "table": "transport_stops",
+      "privilege": "REFERENCES"
+    },
+    {
+      "role": "authenticated",
+      "table": "transport_stops",
+      "privilege": "TRIGGER"
+    }
+  ]
+}

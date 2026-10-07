@@ -1,8 +1,24 @@
 const ITEMS = [
-  { icon: <img src="/img/ahorro-de-dinero.png"></img>, title: "Ahorra en cada viaje", text: "Divide el costo de la gasolina y el peaje con quienes van hacia tu misma ruta." },
-  { icon: <img src="/img/proteger.png"></img>, title: "Viaja con seguridad", text: "Conductores verificados, calificaciones y seguimiento del viaje en tiempo real." },
-  { icon: <img src="/img/el-planeta-tierra.png"></img>, title: "Reduce tu huella", text: "Menos autos en la calle significa menos tráfico y menos emisiones por persona." },
-  { icon: <img src="/img/gestion-del-tiempo.png"></img>, title: "Ahorra tiempo", text: "Encuentra viajes compatibles con tu horario en segundos, sin complicaciones." },
+  {
+    icon: <img src="/img/ahorro-de-dinero.png" alt="" />,
+    title: 'Comparte el costo',
+    text: 'Consulta el precio por asiento antes de reservar y paga en efectivo al conductor.',
+  },
+  {
+    icon: <img src="/img/proteger.png" alt="" />,
+    title: 'Sigue tu trayecto',
+    text: 'Perfil del conductor, calificaciones y seguimiento del vehículo durante el viaje.',
+  },
+  {
+    icon: <img src="/img/el-planeta-tierra.png" alt="" />,
+    title: 'Comparte la ruta',
+    text: 'Aprovecha los asientos disponibles en viajes que otros integrantes de tu comunidad ya realizarán.',
+  },
+  {
+    icon: <img src="/img/gestion-del-tiempo.png" alt="" />,
+    title: 'Organiza tu salida',
+    text: 'Consulta horarios y paradas de los viajes que salen del Instituto Tecnológico de Nuevo León.',
+  },
 ];
 
 export function ValueProps() {
@@ -15,7 +31,9 @@ export function ValueProps() {
       <div className="value-grid">
         {ITEMS.map((it) => (
           <article key={it.title} className="value-card">
-            <div className="icon" aria-hidden="true">{it.icon}</div>
+            <div className="icon" aria-hidden="true">
+              {it.icon}
+            </div>
             <h3>{it.title}</h3>
             <p>{it.text}</p>
           </article>

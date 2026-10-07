@@ -1,0 +1,104 @@
+{
+  "checkedAt": "2026-10-07T17:26:37.812Z",
+  "api": "https://krow-api-production.up.railway.app/v1",
+  "checks": [
+    {
+      "path": "/health/ready",
+      "status": 200,
+      "expected": 200,
+      "ok": true
+    },
+    {
+      "path": "/admin/me",
+      "status": 401,
+      "expected": 401,
+      "ok": true
+    },
+    {
+      "path": "/reports/dashboard-summary?from=2026-10-01&to=2026-10-07",
+      "status": 401,
+      "expected": 401,
+      "ok": true
+    },
+    {
+      "path": "/admin/me",
+      "status": 200,
+      "expected": 200,
+      "ok": true
+    },
+    {
+      "path": "/admin/drivers?pageSize=10",
+      "status": 200,
+      "expected": 200,
+      "ok": true
+    },
+    {
+      "path": "/admin/vehicles?pageSize=10",
+      "status": 200,
+      "expected": 200,
+      "ok": true
+    },
+    {
+      "path": "/admin/documents",
+      "status": 200,
+      "expected": 200,
+      "ok": true
+    },
+    {
+      "path": "/admin/audit",
+      "status": 200,
+      "expected": 200,
+      "ok": true
+    },
+    {
+      "path": "/admin/rides?pageSize=10",
+      "status": 200,
+      "expected": 200,
+      "ok": true
+    },
+    {
+      "path": "/admin/rides/a9826096-c748-4312-bad5-61417db029df",
+      "status": 200,
+      "expected": 200,
+      "ok": true
+    },
+    {
+      "path": "/reports/dashboard-summary?from=2026-10-01&to=2026-10-07",
+      "status": 200,
+      "expected": 200,
+      "ok": true
+    },
+    {
+      "path": "/reports/dashboard-summary?from=2026-02-30&to=2026-03-01",
+      "status": 400,
+      "expected": 400,
+      "ok": true
+    },
+    {
+      "path": "/admin/rides?from=2026-10-08&to=2026-10-07",
+      "status": 400,
+      "expected": 400,
+      "ok": true
+    },
+    {
+      "path": "/admin/drivers/a3f71c69-3a4e-414b-ba83-3c052991f537",
+      "status": 200,
+      "expected": 200,
+      "ok": true
+    },
+    {
+      "path": "CORS local web",
+      "status": 204,
+      "ok": true
+    }
+  ],
+  "dashboard": {
+    "totalTrips": 5,
+    "transportedPassengers": 1,
+    "reservedPassengers": 1,
+    "revenue": 20,
+    "paid": 20,
+    "pending": 0,
+    "occupancy": 6.7
+  }
+}

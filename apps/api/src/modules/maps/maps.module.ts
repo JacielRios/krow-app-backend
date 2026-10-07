@@ -6,6 +6,6 @@ import { MapsRateLimitGuard } from './presentation/maps-rate-limit.guard.js';
 @Module({
   controllers: [MapsController],
   providers: [GoogleMapsService, MapsRateLimitGuard],
-  exports: [GoogleMapsService],
+  exports: [GoogleMapsService, MapsRateLimitGuard],
 })
 export class MapsModule {}

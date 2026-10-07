@@ -1,0 +1,27 @@
+# Deploy the web with workspace manifests and shared packages, without local data.
+.git
+.github
+.codex
+.agents
+.tmp
+.temp
+.vercel
+artifacts
+docs
+supabase
+scripts
+apps/api/src
+apps/api/test
+**/node_modules
+**/dist
+**/.next
+**/coverage
+**/*.tsbuildinfo
+**/*.log
+**/.env
+**/.env.*
+**/*.pem
+**/*.key
+**/*.dump
+**/*service-account*.json
+**/*serviceAccount*.json

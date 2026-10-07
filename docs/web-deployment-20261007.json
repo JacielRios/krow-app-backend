@@ -1,0 +1,96 @@
+{
+  "checkedAt": "2026-10-07T17:53:09.730Z",
+  "web": "https://krow-web-gamma.vercel.app",
+  "login": "https://krow-web-gamma.vercel.app/admin/login",
+  "api": "https://krow-api-production.up.railway.app/v1",
+  "hosting": {
+    "provider": "Vercel",
+    "plan": "hobby",
+    "project": "krow-web",
+    "projectId": "prj_s7yeuJhbpikvoCYOWzmQWdxVHFSl",
+    "teamId": "team_VxqXEtJ0YCPQPEyn1w5IxNoH",
+    "deploymentId": "dpl_2yQTr3UD6ajoQcZHBvpj8t9oENWx",
+    "status": "READY",
+    "node": "24.x",
+    "rootDirectory": "apps/web",
+    "stagedBeforePromotion": true,
+    "source": "local working tree based on 6bb3cdb",
+    "paidPlanActivated": false
+  },
+  "railwayCorsDeployment": {
+    "id": "8b60670a-629c-45e6-932b-dab7421ba4a7",
+    "status": "SUCCESS"
+  },
+  "uploaded": {
+    "files": 110,
+    "bytes": 918179,
+    "privateFiles": 0,
+    "databaseCredentials": 0
+  },
+  "configuredVariableNames": [
+    "NEXT_PUBLIC_API_URL",
+    "NEXT_PUBLIC_SUPABASE_URL",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY"
+  ],
+  "browser": {
+    "anonymousDashboardProtected": true,
+    "realAdminLogin": true,
+    "dashboardLoadedPublishedApiData": true,
+    "historyLoaded": true,
+    "dynamicRideDetailLoaded": true,
+    "realDataModified": false
+  },
+  "checks": [
+    {
+      "path": "/",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "path": "/admin/login",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "path": "/contacto",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "path": "/privacidad",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "path": "/terminos",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "path": "/img/Logo_KROW.png",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "path": "/img/Viaje_KROW.jpg",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "path": "API readiness",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "path": "CORS web → API",
+      "status": 204,
+      "allowOrigin": "https://krow-web-gamma.vercel.app",
+      "ok": true
+    },
+    {
+      "path": "Anonymous admin API",
+      "status": 401,
+      "ok": true
+    }
+  ]
+}

@@ -20,13 +20,19 @@
     "start:web": "npm run start --workspace @krow/web -- -p 3001",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
-    "test": "npm run test --workspace @krow/api",
-    "test:e2e": "npm run test:e2e --workspace @krow/api",
+    "test": "npm run test --workspace @krow/api --",
+    "test:e2e": "npm run test:e2e --workspace @krow/api --",
     "test:stops-import": "node --test scripts/transport-stops-csv.test.mjs",
+    "test:migrations": "node scripts/verify-migration-ledger.mjs",
     "stops:import": "node scripts/import-transport-stops.mjs",
-    "format": "npm run format --workspaces --if-present"
+    "format": "npm run format --workspaces --if-present",
+    "test:web": "npm run test --workspace @krow/web --"
   },
   "devDependencies": {
+    "picomatch": "4.0.7",
     "supabase": "2.117.0"
+  },
+  "overrides": {
+    "picomatch@4.0.2": "4.0.7"
   }
 }

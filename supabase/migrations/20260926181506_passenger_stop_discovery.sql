@@ -95,8 +95,8 @@ begin
     c.address,
     c.municipality,
     c.stop_type,
-    c.latitude::numeric,
-    c.longitude::numeric,
+    c.latitude,
+    c.longitude,
     c.candidate_distance,
     availability.ride_count > 0,
     availability.ride_count

@@ -1,7 +1,20 @@
 const FAQS = [
-  { q: "¿Los conductores están verificados?", a: "Sí, todos pasan por un proceso de verificación de identidad y documentos antes de poder publicar viajes." },
-  { q: "¿Qué pasa si cancelo un viaje?", a: "Puedes cancelar desde la app; las políticas de cancelación se muestran antes de confirmar cada viaje." },
-  { q: "¿Cómo se manejan los pagos?", a: "Todas las tarifas de pago se gestiona dentro de la plataforma, ya sea efectivo o tarjeta." },
+  {
+    q: '¿Quién puede publicar viajes?',
+    a: 'Una cuenta debe contar con perfil de conductor autorizado y vehículo registrado. Durante el piloto, el alta se realiza con el equipo responsable.',
+  },
+  {
+    q: '¿Desde dónde salen los viajes?',
+    a: 'Desde el Instituto Tecnológico de Nuevo León. Las paradas del recorrido permiten coordinar la subida y la bajada.',
+  },
+  {
+    q: '¿Cómo se manejan los pagos?',
+    a: 'El piloto usa efectivo. El precio se muestra antes de reservar y el conductor registra su recepción en la app.',
+  },
+  {
+    q: '¿Qué necesito para seguir el vehículo?',
+    a: 'Conexión a internet. La app indica si la posición deja de actualizarse. El seguimiento se limita a los participantes del viaje.',
+  },
 ];
 
 export function TrustFaq() {

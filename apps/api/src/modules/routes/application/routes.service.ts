@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  Optional,
 } from '@nestjs/common';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { SupabaseService } from '../../../infrastructure/supabase/supabase.service.js';
@@ -9,6 +10,8 @@ import type { Database } from '../../../infrastructure/supabase/database.types.j
 import type { AuthenticatedUser } from '../../auth/domain/authenticated-user.js';
 import { GoogleMapsService } from '../../maps/infrastructure/google-maps.service.js';
 import { decodeGooglePolyline } from '../domain/polyline.js';
+import { CAMPUS_ORIGIN } from '../domain/campus-origin.js';
+import { PilotDatabase } from '../../pilot/pilot.database.js';
 import type {
   RoutePreviewRequestDto,
   SaveFavoriteRouteDto,
@@ -30,6 +33,7 @@ export class RoutesService {
   constructor(
     private readonly supabase: SupabaseService,
     private readonly maps: GoogleMapsService,
+    @Optional() private readonly pilot?: PilotDatabase,
   ) {}
 
   async preview(user: AuthenticatedUser, dto: RoutePreviewRequestDto) {
@@ -103,6 +107,10 @@ export class RoutesService {
   }
 
   async deleteFavorite(user: AuthenticatedUser, routeId: string) {
+    if (this.pilot?.enabled) {
+      await this.pilot.routeRpc(user.id, 'delete_favorite_route', [routeId]);
+      return { success: true };
+    }
     const { error } = await this.client(user).rpc('delete_favorite_route', {
       p_route_id: routeId,
     });
@@ -133,35 +141,38 @@ export class RoutesService {
     routeId?: string,
   ) {
     const computed = await this.computeWithCompatibleStops(user, {
-      origin: dto.origin,
+      origin: CAMPUS_ORIGIN,
       destination: dto.destination,
     });
+    const payload = {
+      route_id: routeId,
+      name: dto.name,
+      origin_place_id: CAMPUS_ORIGIN.placeId,
+      origin_address: CAMPUS_ORIGIN.address,
+      origin_lat: CAMPUS_ORIGIN.lat,
+      origin_lng: CAMPUS_ORIGIN.lng,
+      destination_place_id: dto.destination.placeId,
+      destination_address: dto.destination.address,
+      destination_lat: dto.destination.lat,
+      destination_lng: dto.destination.lng,
+      default_vehicle_id: dto.defaultVehicleId,
+      default_available_seats: dto.defaultAvailableSeats,
+      default_price_per_seat:
+        dto.defaultPricePerSeatCents == null
+          ? undefined
+          : dto.defaultPricePerSeatCents / 100,
+      transport_stop_ids: computed.compatibleStops.map((stop) => stop.stopId),
+      route_geojson: computed.routeGeoJson,
+    };
+    if (this.pilot?.enabled)
+      return {
+        routeId: await this.pilot.routeRpc(user.id, 'upsert_favorite_route', [
+          payload,
+        ]),
+      };
     const { data, error } = await this.client(user).rpc(
       'upsert_favorite_route',
-      {
-        p_payload: {
-          route_id: routeId,
-          name: dto.name,
-          origin_place_id: dto.origin.placeId,
-          origin_address: dto.origin.address,
-          origin_lat: dto.origin.lat,
-          origin_lng: dto.origin.lng,
-          destination_place_id: dto.destination.placeId,
-          destination_address: dto.destination.address,
-          destination_lat: dto.destination.lat,
-          destination_lng: dto.destination.lng,
-          default_vehicle_id: dto.defaultVehicleId,
-          default_available_seats: dto.defaultAvailableSeats,
-          default_price_per_seat:
-            dto.defaultPricePerSeatCents == null
-              ? undefined
-              : dto.defaultPricePerSeatCents / 100,
-          transport_stop_ids: computed.compatibleStops.map(
-            (stop) => stop.stopId,
-          ),
-          route_geojson: computed.routeGeoJson,
-        },
-      },
+      { p_payload: payload },
     );
     if (error) throw new BadRequestException(error.message);
     return { routeId: data };

@@ -1,0 +1,2196 @@
+{
+  "auditedAt": "2026-10-06",
+  "purpose": "Read-only schema metadata. Not a runnable baseline or migration ledger repair; contains no account records.",
+  "tables": [
+    {
+      "schema": "public",
+      "name": "bookings",
+      "rls": true,
+      "columns": [
+        {
+          "name": "booking_id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "not_null": true
+        },
+        {
+          "name": "ride_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "pickup_stop_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "dropoff_stop_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "seats_reserved",
+          "type": "integer",
+          "default": "1",
+          "not_null": true
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "default": "'pending'::text",
+          "not_null": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "not_null": true
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "chat_messages",
+      "rls": true,
+      "columns": [
+        {
+          "name": "message_id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "not_null": true
+        },
+        {
+          "name": "chat_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "sender_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "body",
+          "type": "text",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "media_url",
+          "type": "text",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "media_type",
+          "type": "text",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "sent_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "not_null": true
+        },
+        {
+          "name": "deleted_at",
+          "type": "timestamp with time zone",
+          "default": null,
+          "not_null": false
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "chats",
+      "rls": true,
+      "columns": [
+        {
+          "name": "chat_id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "not_null": true
+        },
+        {
+          "name": "ride_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "not_null": true
+        },
+        {
+          "name": "closed_at",
+          "type": "timestamp with time zone",
+          "default": null,
+          "not_null": false
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "driver_profiles",
+      "rls": true,
+      "columns": [
+        {
+          "name": "driver_id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "not_null": true
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "license_number",
+          "type": "text",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "license_expiry",
+          "type": "date",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "rating",
+          "type": "numeric(4,2)",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "default": "'pending'::text",
+          "not_null": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "not_null": true
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "favorite_route_stops",
+      "rls": true,
+      "columns": [
+        {
+          "name": "route_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "transport_stop_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "stop_order",
+          "type": "integer",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "route_fraction",
+          "type": "double precision",
+          "default": null,
+          "not_null": true
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "favorite_routes",
+      "rls": true,
+      "columns": [
+        {
+          "name": "route_id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "not_null": true
+        },
+        {
+          "name": "driver_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "origin_place_id",
+          "type": "text",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "origin_address",
+          "type": "text",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "origin_lat",
+          "type": "double precision",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "origin_lng",
+          "type": "double precision",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "destination_place_id",
+          "type": "text",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "destination_address",
+          "type": "text",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "destination_lat",
+          "type": "double precision",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "destination_lng",
+          "type": "double precision",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "default_vehicle_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "default_available_seats",
+          "type": "integer",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "default_price_per_seat",
+          "type": "numeric(10,2)",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "not_null": true
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "not_null": true
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "payment_methods",
+      "rls": true,
+      "columns": [
+        {
+          "name": "payment_method_id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "not_null": true
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "provider",
+          "type": "text",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "last_four",
+          "type": "text",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "brand",
+          "type": "text",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "is_default",
+          "type": "boolean",
+          "default": "false",
+          "not_null": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "not_null": true
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "payments",
+      "rls": true,
+      "columns": [
+        {
+          "name": "payment_id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "not_null": true
+        },
+        {
+          "name": "booking_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "payment_method_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "amount",
+          "type": "numeric(12,2)",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "currency",
+          "type": "text",
+          "default": "'MXN'::text",
+          "not_null": true
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "default": "'pending'::text",
+          "not_null": true
+        },
+        {
+          "name": "paid_at",
+          "type": "timestamp with time zone",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "not_null": true
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "ride_reviews",
+      "rls": true,
+      "columns": [
+        {
+          "name": "review_id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "not_null": true
+        },
+        {
+          "name": "ride_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "reviewer_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "reviewee_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "rating",
+          "type": "smallint",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "comment",
+          "type": "text",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "not_null": true
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "ride_status_history",
+      "rls": true,
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "not_null": true
+        },
+        {
+          "name": "ride_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "changed_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "not_null": true
+        },
+        {
+          "name": "previous_status",
+          "type": "text",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "actor_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "reason",
+          "type": "text",
+          "default": null,
+          "not_null": false
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "ride_stops",
+      "rls": true,
+      "columns": [
+        {
+          "name": "stop_id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "not_null": true
+        },
+        {
+          "name": "ride_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "lat",
+          "type": "numeric(12,8)",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "lng",
+          "type": "numeric(12,8)",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "address",
+          "type": "text",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "stop_order",
+          "type": "integer",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "transport_stop_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "route_version",
+          "type": "integer",
+          "default": "1",
+          "not_null": true
+        },
+        {
+          "name": "is_active",
+          "type": "boolean",
+          "default": "true",
+          "not_null": true
+        },
+        {
+          "name": "route_fraction",
+          "type": "double precision",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "location",
+          "type": "geography(Point,4326)",
+          "default": "(st_setsrid(st_makepoint((lng)::double precision, (lat)::double precision), 4326))::geography",
+          "not_null": false
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "rides",
+      "rls": true,
+      "columns": [
+        {
+          "name": "ride_id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "not_null": true
+        },
+        {
+          "name": "driver_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "vehicle_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "origin_lat",
+          "type": "numeric(12,8)",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "origin_lng",
+          "type": "numeric(12,8)",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "destination_lat",
+          "type": "numeric(12,8)",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "destination_lng",
+          "type": "numeric(12,8)",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "departure_time",
+          "type": "timestamp with time zone",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "available_seats",
+          "type": "integer",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "price_per_seat",
+          "type": "numeric(12,2)",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "default": "'scheduled'::text",
+          "not_null": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "not_null": true
+        },
+        {
+          "name": "origin_address",
+          "type": "text",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "destination_address",
+          "type": "text",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "route_polyline",
+          "type": "text",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "favorite_route_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "route_distance_meters",
+          "type": "integer",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "route_duration_seconds",
+          "type": "integer",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "route_provider",
+          "type": "text",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "route_calculated_at",
+          "type": "timestamp with time zone",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "not_null": true
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "default": "1",
+          "not_null": true
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "transport_stops",
+      "rls": true,
+      "columns": [
+        {
+          "name": "stop_id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "not_null": true
+        },
+        {
+          "name": "external_id",
+          "type": "text",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "address",
+          "type": "text",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "municipality",
+          "type": "text",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "latitude",
+          "type": "double precision",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "longitude",
+          "type": "double precision",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "location",
+          "type": "geography(Point,4326)",
+          "default": "(st_setsrid(st_makepoint(longitude, latitude), 4326))::geography",
+          "not_null": false
+        },
+        {
+          "name": "source",
+          "type": "text",
+          "default": "'krow_curated'::text",
+          "not_null": true
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "default": "true",
+          "not_null": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "not_null": true
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "not_null": true
+        },
+        {
+          "name": "stop_type",
+          "type": "text",
+          "default": "'general'::text",
+          "not_null": true
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "users",
+      "rls": true,
+      "columns": [
+        {
+          "name": "id",
+          "type": "bigint",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "uuid",
+          "type": "uuid",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "full_name",
+          "type": "text",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "email_address",
+          "type": "text",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "institutional_id",
+          "type": "character varying",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "academic_program",
+          "type": "text",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "academic_period",
+          "type": "bigint",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "profile_photo",
+          "type": "character varying",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "rating",
+          "type": "double precision",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "is_active",
+          "type": "boolean",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "not_null": true
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "deleted_at",
+          "type": "timestamp with time zone",
+          "default": null,
+          "not_null": false
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "vehicles",
+      "rls": true,
+      "columns": [
+        {
+          "name": "vehicle_id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "not_null": true
+        },
+        {
+          "name": "driver_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "license_plate",
+          "type": "text",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "brand",
+          "type": "text",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "model",
+          "type": "text",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "car_year",
+          "type": "integer",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "car_color",
+          "type": "text",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "capacity",
+          "type": "integer",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "is_active",
+          "type": "boolean",
+          "default": "true",
+          "not_null": true
+        }
+      ]
+    }
+  ],
+  "legacyRideFunctions": [
+    {
+      "proname": "cancel_ride",
+      "definition": "CREATE OR REPLACE FUNCTION public.cancel_ride(p_ride_id uuid, p_reason text DEFAULT NULL::text)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\nDECLARE\n  v_actor uuid := auth.uid();\n  v_prev  text;\n  v_seats integer;\n  v_hist_reason text;\nBEGIN\n  IF v_actor IS NULL THEN\n    RAISE EXCEPTION 'No autenticado';\n  END IF;\n\n  IF p_ride_id IS NULL THEN\n    RAISE EXCEPTION 'Argumentos invalidos';\n  END IF;\n\n  BEGIN\n    SELECT r.status\n      INTO STRICT v_prev\n      FROM public.rides r\n     WHERE r.ride_id = p_ride_id\n       FOR UPDATE;\n  EXCEPTION\n    WHEN NO_DATA_FOUND THEN\n      RAISE EXCEPTION 'El viaje no existe';\n  END;\n\n  IF NOT EXISTS (\n    SELECT 1\n      FROM public.driver_profiles dp\n      JOIN public.rides rr ON rr.driver_id = dp.driver_id\n     WHERE rr.ride_id = p_ride_id\n       AND dp.user_id = v_actor\n  ) THEN\n    RAISE EXCEPTION 'Solo el conductor puede cancelar el viaje';\n  END IF;\n\n  IF v_prev = 'cancelled' THEN\n    RETURN;\n  END IF;\n\n  PERFORM public.validate_ride_transition(v_prev, 'cancelled');\n\n  SELECT COALESCE(SUM(b.seats_reserved), 0)::integer\n    INTO v_seats\n    FROM public.bookings b\n   WHERE b.ride_id = p_ride_id\n     AND b.status = 'confirmed';\n\n  UPDATE public.bookings b\n     SET status = 'cancelled'\n   WHERE b.ride_id = p_ride_id\n     AND b.status IN ('pending', 'confirmed');\n\n  UPDATE public.rides r\n     SET status = 'cancelled',\n         available_seats = r.available_seats + v_seats\n   WHERE r.ride_id = p_ride_id;\n\n  UPDATE public.chats c\n     SET closed_at = timezone('utc', now())\n   WHERE c.ride_id = p_ride_id\n     AND c.closed_at IS NULL;\n\n  v_hist_reason\n    := COALESCE(\n       NULLIF(btrim(COALESCE(p_reason, '')), ''),\n       'ride_cancelled_by_driver'\n     );\n\n  INSERT INTO public.ride_status_history (\n    ride_id,\n    status,\n    previous_status,\n    actor_id,\n    reason\n  )\n  VALUES (\n    p_ride_id,\n    'cancelled',\n    v_prev,\n    v_actor,\n    v_hist_reason\n  );\nEND;\n$function$\n"
+    },
+    {
+      "proname": "complete_ride",
+      "definition": "CREATE OR REPLACE FUNCTION public.complete_ride(p_ride_id uuid)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public', 'extensions'\nAS $function$\nDECLARE\n  v_actor uuid := auth.uid();\n  v_prev  text;\n  v_remaining integer;\nBEGIN\n  IF v_actor IS NULL THEN\n    RAISE EXCEPTION 'No autenticado';\n  END IF;\n\n  IF p_ride_id IS NULL THEN\n    RAISE EXCEPTION 'Argumentos invalidos';\n  END IF;\n\n  -- Lock the ride row\n  BEGIN\n    SELECT r.status\n      INTO STRICT v_prev\n      FROM public.rides r\n     WHERE r.ride_id = p_ride_id\n       FOR UPDATE;\n  EXCEPTION\n    WHEN NO_DATA_FOUND THEN\n      RAISE EXCEPTION 'El viaje no existe';\n  END;\n\n  -- Only driver can complete\n  IF NOT EXISTS (\n    SELECT 1\n      FROM public.driver_profiles dp\n      JOIN public.rides rr ON rr.driver_id = dp.driver_id\n     WHERE rr.ride_id = p_ride_id\n       AND dp.user_id = v_actor\n  ) THEN\n    RAISE EXCEPTION 'Solo el conductor puede finalizar el viaje';\n  END IF;\n\n  -- Idempotent\n  IF v_prev = 'completed' THEN\n    RETURN;\n  END IF;\n\n  -- Validate transition\n  PERFORM public.validate_ride_transition(v_prev, 'completed');\n\n  -- Check remaining active bookings\n  SELECT COUNT(*)::integer\n    INTO v_remaining\n    FROM public.bookings b\n   WHERE b.ride_id = p_ride_id\n     AND b.status IN ('confirmed', 'in_progress');\n\n  -- Force-complete any remaining active bookings\n  IF v_remaining > 0 THEN\n    UPDATE public.bookings b\n       SET status = 'completed'\n     WHERE b.ride_id = p_ride_id\n       AND b.status IN ('confirmed', 'in_progress');\n  END IF;\n\n  -- Complete the ride\n  UPDATE public.rides SET status = 'completed' WHERE ride_id = p_ride_id;\n\n  -- Close chat\n  UPDATE public.chats c\n     SET closed_at = timezone('utc', now())\n   WHERE c.ride_id = p_ride_id\n     AND c.closed_at IS NULL;\n\n  -- History\n  INSERT INTO public.ride_status_history (\n    ride_id, status, previous_status, actor_id, reason\n  )\n  VALUES (\n    p_ride_id, 'completed', v_prev, v_actor, 'manual_complete_by_driver'\n  );\nEND;\n$function$\n"
+    },
+    {
+      "proname": "complete_stop",
+      "definition": "CREATE OR REPLACE FUNCTION public.complete_stop(p_booking_id uuid)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\nDECLARE\n  v_actor     uuid := auth.uid();\n  v_booking   public.bookings%ROWTYPE;\n  v_ride_id   uuid;\n  v_prev_ride text;\n  v_remain    integer;\nBEGIN\n  IF v_actor IS NULL THEN\n    RAISE EXCEPTION 'No autenticado';\n  END IF;\n\n  IF p_booking_id IS NULL THEN\n    RAISE EXCEPTION 'Argumentos invalidos';\n  END IF;\n\n  SELECT b.*\n    INTO v_booking\n    FROM public.bookings b\n   WHERE b.booking_id = p_booking_id;\n\n  IF NOT FOUND THEN\n    RAISE EXCEPTION 'La reserva no existe';\n  END IF;\n\n  v_ride_id := v_booking.ride_id;\n\n  SELECT r.status\n    INTO STRICT v_prev_ride\n    FROM public.rides r\n   WHERE r.ride_id = v_ride_id\n     FOR UPDATE;\n\n  SELECT b.*\n    INTO v_booking\n    FROM public.bookings b\n   WHERE b.booking_id = p_booking_id\n     FOR UPDATE;\n\n  IF NOT EXISTS (\n    SELECT 1\n      FROM public.driver_profiles dp\n      JOIN public.rides rr ON rr.driver_id = dp.driver_id\n     WHERE rr.ride_id = v_ride_id\n       AND dp.user_id = v_actor\n  ) THEN\n    RAISE EXCEPTION 'Solo el conductor puede completar paradas';\n  END IF;\n\n  IF v_booking.status = 'completed' THEN\n    RETURN;\n  END IF;\n\n  IF v_booking.status NOT IN ('confirmed', 'in_progress') THEN\n    RAISE EXCEPTION 'Estado de reserva invalido para esta accion';\n  END IF;\n\n  IF v_booking.status = 'confirmed' THEN\n    PERFORM public.validate_booking_transition('confirmed', 'in_progress');\n    UPDATE public.bookings b\n       SET status = 'in_progress'\n     WHERE b.booking_id = p_booking_id;\n\n    SELECT b.*\n      INTO v_booking\n      FROM public.bookings b\n     WHERE b.booking_id = p_booking_id;\n  END IF;\n\n  PERFORM public.validate_booking_transition(v_booking.status, 'completed');\n\n  UPDATE public.bookings b\n     SET status = 'completed'\n   WHERE b.booking_id = p_booking_id;\n\n  SELECT COUNT(*)::integer\n    INTO v_remain\n    FROM public.bookings b\n   WHERE b.ride_id = v_ride_id\n     AND b.status IN ('confirmed', 'in_progress');\n\n  IF v_remain = 0 THEN\n    PERFORM public.validate_ride_transition(v_prev_ride, 'completed');\n    UPDATE public.rides SET status = 'completed' WHERE ride_id = v_ride_id;\n\n    INSERT INTO public.ride_status_history (\n      ride_id,\n      status,\n      previous_status,\n      actor_id,\n      reason\n    )\n    VALUES (\n      v_ride_id,\n      'completed',\n      v_prev_ride,\n      v_actor,\n      NULL\n    );\n\n    UPDATE public.chats c\n       SET closed_at = timezone('utc', now())\n     WHERE c.ride_id = v_ride_id\n       AND c.closed_at IS NULL;\n  END IF;\nEND;\n$function$\n"
+    },
+    {
+      "proname": "create_ride_v2",
+      "definition": "CREATE OR REPLACE FUNCTION public.create_ride_v2(p_payload jsonb)\n RETURNS uuid\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  v_actor uuid := auth.uid();\n  v_driver_id uuid;\n  v_vehicle_id uuid;\n  v_vehicle_capacity integer;\n  v_favorite_route_id uuid;\n  v_ride_id uuid;\n  v_stop_ids uuid[];\n  v_selected_count integer;\n  v_available_seats integer;\n  v_price numeric;\n  v_departure timestamptz;\nbegin\n  if v_actor is null then raise exception 'No autenticado'; end if;\n  select dp.driver_id into v_driver_id\n  from public.driver_profiles dp\n  where dp.user_id = v_actor and dp.status = 'approved';\n  if v_driver_id is null then\n    raise exception 'Se requiere un perfil de conductor aprobado';\n  end if;\n  v_vehicle_id := (p_payload->>'vehicle_id')::uuid;\n  select v.capacity into v_vehicle_capacity\n  from public.vehicles v\n  where v.vehicle_id = v_vehicle_id\n    and v.driver_id = v_driver_id and v.is_active;\n  if v_vehicle_capacity is null then raise exception 'Vehiculo no valido'; end if;\n  v_available_seats := (p_payload->>'available_seats')::integer;\n  if v_available_seats < 1\n     or v_available_seats > greatest(v_vehicle_capacity - 1, 0) then\n    raise exception 'Los asientos exceden la capacidad disponible';\n  end if;\n  v_price := (p_payload->>'price_per_seat')::numeric;\n  if v_price <= 0 then raise exception 'El precio debe ser mayor que cero'; end if;\n  v_departure := (p_payload->>'departure_time')::timestamptz;\n  if v_departure < now() + interval '15 minutes' then\n    raise exception 'La salida debe programarse con al menos 15 minutos';\n  end if;\n\n  v_favorite_route_id := nullif(p_payload->>'favorite_route_id', '')::uuid;\n  if v_favorite_route_id is not null and not exists (\n    select 1 from public.favorite_routes fr\n    where fr.route_id = v_favorite_route_id and fr.driver_id = v_driver_id\n  ) then\n    raise exception 'Ruta favorita no valida';\n  end if;\n  select coalesce(array_agg(item.value::uuid order by item.ordinality), '{}'::uuid[])\n    into v_stop_ids\n  from jsonb_array_elements_text(\n    coalesce(p_payload->'transport_stop_ids', '[]'::jsonb)\n  ) with ordinality as item(value, ordinality);\n  if cardinality(v_stop_ids) < 2 then raise exception 'Selecciona al menos dos paradas'; end if;\n  if cardinality(v_stop_ids) <> (\n    select count(distinct selected_id) from unnest(v_stop_ids) as selected_id\n  ) then raise exception 'Las paradas no pueden repetirse'; end if;\n  select count(*) into v_selected_count\n  from private.route_stop_selection(p_payload->'route_geojson', v_stop_ids, 500);\n  if v_selected_count <> cardinality(v_stop_ids) then\n    raise exception 'Una o mas paradas no pertenecen al corredor de la ruta';\n  end if;\n\n  insert into public.rides (\n    driver_id, vehicle_id, favorite_route_id,\n    origin_lat, origin_lng, destination_lat, destination_lng,\n    origin_address, destination_address, route_polyline,\n    route_distance_meters, route_duration_seconds, route_provider,\n    route_calculated_at, departure_time, available_seats,\n    price_per_seat, status\n  ) values (\n    v_driver_id, v_vehicle_id, v_favorite_route_id,\n    (p_payload->>'origin_lat')::numeric, (p_payload->>'origin_lng')::numeric,\n    (p_payload->>'destination_lat')::numeric,\n    (p_payload->>'destination_lng')::numeric,\n    nullif(p_payload->>'origin_address', ''),\n    nullif(p_payload->>'destination_address', ''),\n    p_payload->>'route_polyline',\n    (p_payload->>'route_distance_meters')::integer,\n    (p_payload->>'route_duration_seconds')::integer,\n    coalesce(nullif(p_payload->>'route_provider', ''), 'google'),\n    coalesce((p_payload->>'route_calculated_at')::timestamptz, now()),\n    v_departure, v_available_seats, v_price, 'scheduled'\n  ) returning ride_id into v_ride_id;\n  insert into public.ride_stops (\n    ride_id, transport_stop_id, lat, lng, address,\n    stop_order, route_version, is_active, route_fraction\n  )\n  select v_ride_id, ts.stop_id, ts.latitude, ts.longitude,\n    coalesce(nullif(ts.address, ''), ts.name),\n    selection.stop_order, 1, true, selection.route_fraction\n  from private.route_stop_selection(\n    p_payload->'route_geojson', v_stop_ids, 500\n  ) selection\n  join public.transport_stops ts on ts.stop_id = selection.stop_id;\n  insert into public.ride_status_history (\n    ride_id, status, previous_status, actor_id, reason\n  ) values (\n    v_ride_id, 'scheduled', null, v_actor, 'ride_created_with_catalog_stops'\n  );\n  return v_ride_id;\nend;\n$function$\n"
+    },
+    {
+      "proname": "handle_new_user",
+      "definition": "CREATE OR REPLACE FUNCTION public.handle_new_user()\n RETURNS trigger\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public', 'extensions'\nAS $function$\r\nbegin\r\n  insert into public.users (uuid, full_name, email_address, profile_photo)\r\n  values (\r\n    new.id, \r\n    new.raw_user_meta_data->>'full_name', \r\n    new.email, \r\n    new.raw_user_meta_data->>'avatar_url'\r\n  );\r\n  return new;\r\nend;\r\n$function$\n"
+    },
+    {
+      "proname": "start_ride",
+      "definition": "CREATE OR REPLACE FUNCTION public.start_ride(p_ride_id uuid)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\nDECLARE\n  v_actor uuid := auth.uid();\n  v_prev  text;\nBEGIN\n  IF v_actor IS NULL THEN\n    RAISE EXCEPTION 'No autenticado';\n  END IF;\n\n  IF p_ride_id IS NULL THEN\n    RAISE EXCEPTION 'Argumentos invalidos';\n  END IF;\n\n  BEGIN\n    SELECT r.status\n      INTO STRICT v_prev\n      FROM public.rides r\n     WHERE r.ride_id = p_ride_id\n       FOR UPDATE;\n  EXCEPTION\n    WHEN NO_DATA_FOUND THEN\n      RAISE EXCEPTION 'El viaje no existe';\n  END;\n\n  IF NOT EXISTS (\n    SELECT 1\n      FROM public.driver_profiles dp\n      JOIN public.rides rr ON rr.driver_id = dp.driver_id\n     WHERE rr.ride_id = p_ride_id\n       AND dp.user_id = v_actor\n  ) THEN\n    RAISE EXCEPTION 'Solo el conductor puede iniciar el viaje';\n  END IF;\n\n  IF v_prev = 'in_progress' THEN\n    RETURN;\n  END IF;\n\n  IF NOT EXISTS (\n    SELECT 1\n      FROM public.bookings b\n     WHERE b.ride_id = p_ride_id\n       AND b.status = 'confirmed'\n  ) THEN\n    RAISE EXCEPTION 'Se requiere al menos una reserva confirmada';\n  END IF;\n\n  PERFORM public.validate_ride_transition(v_prev, 'in_progress');\n\n  UPDATE public.rides SET status = 'in_progress' WHERE ride_id = p_ride_id;\n\n  UPDATE public.bookings b\n     SET status = 'rejected'\n   WHERE b.ride_id = p_ride_id\n     AND b.status = 'pending';\n\n  INSERT INTO public.chats AS c (ride_id)\n  VALUES (p_ride_id)\n  ON CONFLICT (ride_id) DO NOTHING;\n\n  INSERT INTO public.ride_status_history (\n    ride_id,\n    status,\n    previous_status,\n    actor_id,\n    reason\n  )\n  VALUES (p_ride_id, 'in_progress', v_prev, v_actor, NULL);\nEND;\n$function$\n"
+    },
+    {
+      "proname": "update_booking_status",
+      "definition": "CREATE OR REPLACE FUNCTION public.update_booking_status(p_booking_id uuid, p_new_status text, p_reason text DEFAULT NULL::text)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\nDECLARE\n  v_actor     uuid := auth.uid();\n  v_booking   public.bookings%ROWTYPE;\n  v_ride      public.rides%ROWTYPE;\n  v_prev_ride text;\n  v_is_driver boolean;\n  v_is_owner  boolean;\nBEGIN\n  IF v_actor IS NULL THEN\n    RAISE EXCEPTION 'No autenticado';\n  END IF;\n\n  IF p_booking_id IS NULL OR p_new_status IS NULL THEN\n    RAISE EXCEPTION 'Argumentos invalidos';\n  END IF;\n\n  SELECT *\n    INTO v_booking\n    FROM public.bookings b\n   WHERE b.booking_id = p_booking_id;\n\n  IF NOT FOUND THEN\n    RAISE EXCEPTION 'La reserva no existe';\n  END IF;\n\n  SELECT *\n    INTO v_ride\n    FROM public.rides r\n   WHERE r.ride_id = v_booking.ride_id\n     FOR UPDATE;\n\n  SELECT *\n    INTO v_booking\n    FROM public.bookings b\n   WHERE b.booking_id = p_booking_id\n     FOR UPDATE;\n\n  IF v_booking.status = p_new_status THEN\n    RETURN;\n  END IF;\n\n  v_prev_ride := v_ride.status;\n\n  SELECT EXISTS (\n           SELECT 1\n             FROM public.driver_profiles dp\n            WHERE dp.driver_id = v_ride.driver_id\n              AND dp.user_id = v_actor\n         )\n    INTO v_is_driver;\n\n  v_is_owner := v_booking.user_id = v_actor;\n\n  IF NOT (v_is_driver OR v_is_owner) THEN\n    RAISE EXCEPTION 'No tienes permiso para modificar esta reserva';\n  END IF;\n\n  IF v_is_driver THEN\n    IF p_new_status NOT IN ('confirmed', 'rejected') THEN\n      RAISE EXCEPTION 'Estado no permitido para el conductor';\n    END IF;\n  ELSIF p_new_status <> 'cancelled' THEN\n    RAISE EXCEPTION 'Solo el pasajero puede cancelar desde el cliente';\n  END IF;\n\n  PERFORM public.validate_booking_transition(v_booking.status, p_new_status);\n\n  IF p_new_status = 'confirmed' THEN\n    IF v_booking.status <> 'pending' THEN\n      RAISE EXCEPTION 'Solo se pueden confirmar reservas pendientes';\n    END IF;\n\n    IF v_ride.available_seats < v_booking.seats_reserved THEN\n      RAISE EXCEPTION 'Ya no hay suficientes asientos disponibles';\n    END IF;\n\n    UPDATE public.bookings b\n       SET status = 'confirmed'\n     WHERE b.booking_id = p_booking_id;\n\n    UPDATE public.rides r\n       SET available_seats = r.available_seats - v_booking.seats_reserved\n     WHERE r.ride_id = v_booking.ride_id\n    RETURNING * INTO v_ride;\n\n    IF v_ride.available_seats = 0 THEN\n      IF v_prev_ride IS DISTINCT FROM 'full' THEN\n        PERFORM public.validate_ride_transition(v_prev_ride, 'full');\n        UPDATE public.rides r SET status = 'full' WHERE r.ride_id = v_booking.ride_id;\n        INSERT INTO public.ride_status_history (\n          ride_id,\n          status,\n          previous_status,\n          actor_id,\n          reason\n        )\n        VALUES (\n          v_booking.ride_id,\n          'full',\n          v_prev_ride,\n          v_actor,\n          p_reason\n        );\n      END IF;\n    END IF;\n\n    RETURN;\n  END IF;\n\n  IF p_new_status = 'rejected' THEN\n    UPDATE public.bookings b\n       SET status = 'rejected'\n     WHERE b.booking_id = p_booking_id;\n    RETURN;\n  END IF;\n\n  IF p_new_status = 'cancelled' THEN\n    IF v_booking.status = 'confirmed' THEN\n      UPDATE public.rides r\n         SET available_seats = r.available_seats + v_booking.seats_reserved\n       WHERE r.ride_id = v_booking.ride_id;\n\n      IF v_prev_ride = 'full' THEN\n        PERFORM public.validate_ride_transition('full', 'scheduled');\n        UPDATE public.rides r\n           SET status = 'scheduled'\n         WHERE r.ride_id = v_booking.ride_id;\n        INSERT INTO public.ride_status_history (\n          ride_id,\n          status,\n          previous_status,\n          actor_id,\n          reason\n        )\n        VALUES (\n          v_booking.ride_id,\n          'scheduled',\n          'full',\n          v_actor,\n          p_reason\n        );\n      END IF;\n    END IF;\n\n    UPDATE public.bookings b\n       SET status = 'cancelled'\n     WHERE b.booking_id = p_booking_id;\n    RETURN;\n  END IF;\n\n  RAISE EXCEPTION 'Estado de destino no soportado';\nEND;\n$function$\n"
+    },
+    {
+      "proname": "upsert_favorite_route",
+      "definition": "CREATE OR REPLACE FUNCTION public.upsert_favorite_route(p_payload jsonb)\n RETURNS uuid\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  v_actor uuid := auth.uid();\n  v_driver_id uuid;\n  v_route_id uuid;\n  v_stop_ids uuid[];\n  v_selected_count integer;\n  v_default_vehicle_id uuid;\n  v_default_capacity integer;\n  v_default_seats integer;\n  v_default_price numeric;\n  v_route_name text;\nbegin\n  if v_actor is null then raise exception 'No autenticado'; end if;\n  select dp.driver_id into v_driver_id\n  from public.driver_profiles dp\n  where dp.user_id = v_actor and dp.status = 'approved';\n  if v_driver_id is null then\n    raise exception 'Se requiere un perfil de conductor aprobado';\n  end if;\n\n  v_route_name := btrim(coalesce(p_payload->>'name', ''));\n  if length(v_route_name) < 1 or length(v_route_name) > 80 then\n    raise exception 'El nombre de la ruta no es valido';\n  end if;\n  select coalesce(array_agg(item.value::uuid order by item.ordinality), '{}'::uuid[])\n    into v_stop_ids\n  from jsonb_array_elements_text(\n    coalesce(p_payload->'transport_stop_ids', '[]'::jsonb)\n  ) with ordinality as item(value, ordinality);\n  if cardinality(v_stop_ids) < 2 then\n    raise exception 'Selecciona al menos dos paradas';\n  end if;\n  if cardinality(v_stop_ids) <> (\n    select count(distinct selected_id) from unnest(v_stop_ids) as selected_id\n  ) then\n    raise exception 'Las paradas no pueden repetirse';\n  end if;\n  select count(*) into v_selected_count\n  from private.route_stop_selection(p_payload->'route_geojson', v_stop_ids, 500);\n  if v_selected_count <> cardinality(v_stop_ids) then\n    raise exception 'Una o mas paradas no pertenecen al corredor de la ruta';\n  end if;\n\n  v_default_vehicle_id := nullif(p_payload->>'default_vehicle_id', '')::uuid;\n  v_default_seats := nullif(p_payload->>'default_available_seats', '')::integer;\n  v_default_price := nullif(p_payload->>'default_price_per_seat', '')::numeric;\n  if v_default_vehicle_id is not null then\n    select v.capacity into v_default_capacity\n    from public.vehicles v\n    where v.vehicle_id = v_default_vehicle_id\n      and v.driver_id = v_driver_id and v.is_active;\n    if v_default_capacity is null then\n      raise exception 'El vehiculo predeterminado no es valido';\n    end if;\n    if v_default_seats is not null\n       and v_default_seats > greatest(v_default_capacity - 1, 0) then\n      raise exception 'Los asientos exceden la capacidad del vehiculo';\n    end if;\n  end if;\n  if v_default_seats is not null and v_default_seats < 1 then\n    raise exception 'La cantidad predeterminada de asientos no es valida';\n  end if;\n  if v_default_price is not null and v_default_price <= 0 then\n    raise exception 'El precio predeterminado debe ser mayor que cero';\n  end if;\n\n  v_route_id := nullif(p_payload->>'route_id', '')::uuid;\n  if v_route_id is null then\n    insert into public.favorite_routes (\n      driver_id, name, origin_place_id, origin_address, origin_lat, origin_lng,\n      destination_place_id, destination_address, destination_lat, destination_lng,\n      default_vehicle_id, default_available_seats, default_price_per_seat\n    ) values (\n      v_driver_id, v_route_name,\n      nullif(p_payload->>'origin_place_id', ''), p_payload->>'origin_address',\n      (p_payload->>'origin_lat')::double precision,\n      (p_payload->>'origin_lng')::double precision,\n      nullif(p_payload->>'destination_place_id', ''), p_payload->>'destination_address',\n      (p_payload->>'destination_lat')::double precision,\n      (p_payload->>'destination_lng')::double precision,\n      v_default_vehicle_id, v_default_seats, v_default_price\n    ) returning route_id into v_route_id;\n  else\n    perform 1 from public.favorite_routes fr\n    where fr.route_id = v_route_id and fr.driver_id = v_driver_id for update;\n    if not found then raise exception 'Ruta favorita no encontrada'; end if;\n    update public.favorite_routes\n    set name = v_route_name,\n        origin_place_id = nullif(p_payload->>'origin_place_id', ''),\n        origin_address = p_payload->>'origin_address',\n        origin_lat = (p_payload->>'origin_lat')::double precision,\n        origin_lng = (p_payload->>'origin_lng')::double precision,\n        destination_place_id = nullif(p_payload->>'destination_place_id', ''),\n        destination_address = p_payload->>'destination_address',\n        destination_lat = (p_payload->>'destination_lat')::double precision,\n        destination_lng = (p_payload->>'destination_lng')::double precision,\n        default_vehicle_id = v_default_vehicle_id,\n        default_available_seats = v_default_seats,\n        default_price_per_seat = v_default_price,\n        updated_at = now()\n    where route_id = v_route_id;\n    delete from public.favorite_route_stops where route_id = v_route_id;\n  end if;\n  insert into public.favorite_route_stops (\n    route_id, transport_stop_id, stop_order, route_fraction\n  )\n  select v_route_id, selection.stop_id, selection.stop_order, selection.route_fraction\n  from private.route_stop_selection(\n    p_payload->'route_geojson', v_stop_ids, 500\n  ) selection;\n  return v_route_id;\nend;\n$function$\n"
+    }
+  ],
+  "rideTriggers": [
+    {
+      "relname": "bookings",
+      "tgname": "bookings_validate_catalog_stops",
+      "trigger_definition": "CREATE TRIGGER bookings_validate_catalog_stops BEFORE INSERT OR UPDATE OF pickup_stop_id, dropoff_stop_id, ride_id ON public.bookings FOR EACH ROW EXECUTE FUNCTION private.validate_catalog_booking_stops()",
+      "function_definition": "CREATE OR REPLACE FUNCTION private.validate_catalog_booking_stops()\n RETURNS trigger\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  v_version integer;\n  v_pickup_order integer;\n  v_dropoff_order integer;\nbegin\n  select r.version into v_version\n  from public.rides r\n  where r.ride_id = new.ride_id and r.route_provider is not null;\n\n  -- Historical rides may still use their original non-catalog stops.\n  if v_version is null then return new; end if;\n\n  select rs.stop_order into v_pickup_order\n  from public.ride_stops rs\n  join public.transport_stops ts\n    on ts.stop_id = rs.transport_stop_id and ts.active\n  where rs.stop_id = new.pickup_stop_id\n    and rs.ride_id = new.ride_id\n    and rs.route_version = v_version and rs.is_active\n  for share of ts;\n\n  select rs.stop_order into v_dropoff_order\n  from public.ride_stops rs\n  join public.transport_stops ts\n    on ts.stop_id = rs.transport_stop_id and ts.active\n  where rs.stop_id = new.dropoff_stop_id\n    and rs.ride_id = new.ride_id\n    and rs.route_version = v_version and rs.is_active\n  for share of ts;\n\n  if v_pickup_order is null or v_dropoff_order is null\n     or v_pickup_order >= v_dropoff_order then\n    raise exception 'Las paradas de la reserva no están activas u ordenadas';\n  end if;\n  return new;\nend;\n$function$\n"
+    },
+    {
+      "relname": "bookings",
+      "tgname": "bookings_validate_stops_same_ride",
+      "trigger_definition": "CREATE TRIGGER bookings_validate_stops_same_ride BEFORE INSERT OR UPDATE ON public.bookings FOR EACH ROW EXECUTE FUNCTION validate_booking_stops_same_ride()",
+      "function_definition": "CREATE OR REPLACE FUNCTION public.validate_booking_stops_same_ride()\n RETURNS trigger\n LANGUAGE plpgsql\n SET search_path TO 'public'\nAS $function$\r\nbegin\r\n  if not exists (\r\n    select 1\r\n    from public.ride_stops ps\r\n    join public.ride_stops ds on ds.stop_id = new.dropoff_stop_id\r\n    where ps.stop_id = new.pickup_stop_id\r\n      and ps.ride_id = new.ride_id\r\n      and ds.ride_id = new.ride_id\r\n  ) then\r\n    raise exception 'Pickup and dropoff stops must belong to the booking ride';\r\n  end if;\r\n\r\n  return new;\r\nend;\r\n$function$\n"
+    },
+    {
+      "relname": "rides",
+      "tgname": "rides_validate_vehicle_driver",
+      "trigger_definition": "CREATE TRIGGER rides_validate_vehicle_driver BEFORE INSERT OR UPDATE ON public.rides FOR EACH ROW EXECUTE FUNCTION validate_ride_vehicle_driver()",
+      "function_definition": "CREATE OR REPLACE FUNCTION public.validate_ride_vehicle_driver()\n RETURNS trigger\n LANGUAGE plpgsql\n SET search_path TO 'public'\nAS $function$\r\nbegin\r\n  if not exists (\r\n    select 1\r\n    from public.vehicles v\r\n    where v.vehicle_id = new.vehicle_id\r\n      and v.driver_id = new.driver_id\r\n  ) then\r\n    raise exception 'The selected vehicle does not belong to the driver';\r\n  end if;\r\n\r\n  return new;\r\nend;\r\n$function$\n"
+    }
+  ],
+  "catalog": [
+    {
+      "catalog": {
+        "constraints": [
+          {
+            "table": "transport_stops",
+            "name": "transport_stops_stop_type_check",
+            "definition": "CHECK ((stop_type = ANY (ARRAY['general'::text, 'official_boarding_zone'::text])))"
+          },
+          {
+            "table": "ride_reviews",
+            "name": "ride_reviews_reviewer_id_fkey",
+            "definition": "FOREIGN KEY (reviewer_id) REFERENCES users(uuid)"
+          },
+          {
+            "table": "ride_reviews",
+            "name": "ride_reviews_reviewee_id_fkey",
+            "definition": "FOREIGN KEY (reviewee_id) REFERENCES users(uuid)"
+          },
+          {
+            "table": "users",
+            "name": "users_pkey",
+            "definition": "PRIMARY KEY (id)"
+          },
+          {
+            "table": "users",
+            "name": "users_uuid_key",
+            "definition": "UNIQUE (uuid)"
+          },
+          {
+            "table": "users",
+            "name": "users_email_address_key",
+            "definition": "UNIQUE (email_address)"
+          },
+          {
+            "table": "users",
+            "name": "users_institutional_id_key",
+            "definition": "UNIQUE (institutional_id)"
+          },
+          {
+            "table": "users",
+            "name": "users_uuid_fkey",
+            "definition": "FOREIGN KEY (uuid) REFERENCES auth.users(id) ON DELETE CASCADE"
+          },
+          {
+            "table": "driver_profiles",
+            "name": "driver_profiles_status_chk",
+            "definition": "CHECK ((status = ANY (ARRAY['pending'::text, 'approved'::text, 'rejected'::text, 'suspended'::text])))"
+          },
+          {
+            "table": "driver_profiles",
+            "name": "driver_profiles_pkey",
+            "definition": "PRIMARY KEY (driver_id)"
+          },
+          {
+            "table": "driver_profiles",
+            "name": "driver_profiles_user_id_key",
+            "definition": "UNIQUE (user_id)"
+          },
+          {
+            "table": "driver_profiles",
+            "name": "driver_profiles_user_id_fkey",
+            "definition": "FOREIGN KEY (user_id) REFERENCES users(uuid) ON DELETE CASCADE"
+          },
+          {
+            "table": "vehicles",
+            "name": "vehicles_pkey",
+            "definition": "PRIMARY KEY (vehicle_id)"
+          },
+          {
+            "table": "vehicles",
+            "name": "vehicles_license_plate_key",
+            "definition": "UNIQUE (license_plate)"
+          },
+          {
+            "table": "vehicles",
+            "name": "vehicles_driver_id_fkey",
+            "definition": "FOREIGN KEY (driver_id) REFERENCES driver_profiles(driver_id) ON DELETE CASCADE"
+          },
+          {
+            "table": "rides",
+            "name": "rides_pkey",
+            "definition": "PRIMARY KEY (ride_id)"
+          },
+          {
+            "table": "rides",
+            "name": "rides_driver_id_fkey",
+            "definition": "FOREIGN KEY (driver_id) REFERENCES driver_profiles(driver_id) ON DELETE RESTRICT"
+          },
+          {
+            "table": "rides",
+            "name": "rides_vehicle_id_fkey",
+            "definition": "FOREIGN KEY (vehicle_id) REFERENCES vehicles(vehicle_id) ON DELETE RESTRICT"
+          },
+          {
+            "table": "ride_stops",
+            "name": "ride_stops_pkey",
+            "definition": "PRIMARY KEY (stop_id)"
+          },
+          {
+            "table": "ride_stops",
+            "name": "ride_stops_ride_id_fkey",
+            "definition": "FOREIGN KEY (ride_id) REFERENCES rides(ride_id) ON DELETE CASCADE"
+          },
+          {
+            "table": "chats",
+            "name": "chats_pkey",
+            "definition": "PRIMARY KEY (chat_id)"
+          },
+          {
+            "table": "chats",
+            "name": "chats_ride_id_key",
+            "definition": "UNIQUE (ride_id)"
+          },
+          {
+            "table": "chats",
+            "name": "chats_ride_id_fkey",
+            "definition": "FOREIGN KEY (ride_id) REFERENCES rides(ride_id) ON DELETE CASCADE"
+          },
+          {
+            "table": "bookings",
+            "name": "bookings_pkey",
+            "definition": "PRIMARY KEY (booking_id)"
+          },
+          {
+            "table": "bookings",
+            "name": "bookings_ride_id_fkey",
+            "definition": "FOREIGN KEY (ride_id) REFERENCES rides(ride_id) ON DELETE CASCADE"
+          },
+          {
+            "table": "bookings",
+            "name": "bookings_user_id_fkey",
+            "definition": "FOREIGN KEY (user_id) REFERENCES users(uuid) ON DELETE CASCADE"
+          },
+          {
+            "table": "bookings",
+            "name": "bookings_pickup_stop_id_fkey",
+            "definition": "FOREIGN KEY (pickup_stop_id) REFERENCES ride_stops(stop_id) ON DELETE RESTRICT"
+          },
+          {
+            "table": "bookings",
+            "name": "bookings_dropoff_stop_id_fkey",
+            "definition": "FOREIGN KEY (dropoff_stop_id) REFERENCES ride_stops(stop_id) ON DELETE RESTRICT"
+          },
+          {
+            "table": "chat_messages",
+            "name": "chat_messages_pkey",
+            "definition": "PRIMARY KEY (message_id)"
+          },
+          {
+            "table": "chat_messages",
+            "name": "chat_messages_chat_id_fkey",
+            "definition": "FOREIGN KEY (chat_id) REFERENCES chats(chat_id) ON DELETE CASCADE"
+          },
+          {
+            "table": "chat_messages",
+            "name": "chat_messages_sender_id_fkey",
+            "definition": "FOREIGN KEY (sender_id) REFERENCES users(uuid) ON DELETE CASCADE"
+          },
+          {
+            "table": "ride_status_history",
+            "name": "ride_status_history_pkey",
+            "definition": "PRIMARY KEY (id)"
+          },
+          {
+            "table": "ride_status_history",
+            "name": "ride_status_history_ride_id_fkey",
+            "definition": "FOREIGN KEY (ride_id) REFERENCES rides(ride_id) ON DELETE CASCADE"
+          },
+          {
+            "table": "payment_methods",
+            "name": "payment_methods_type_chk",
+            "definition": "CHECK ((type = ANY (ARRAY['card'::text, 'cash'::text, 'wallet'::text])))"
+          },
+          {
+            "table": "payment_methods",
+            "name": "payment_methods_pkey",
+            "definition": "PRIMARY KEY (payment_method_id)"
+          },
+          {
+            "table": "payment_methods",
+            "name": "payment_methods_user_id_fkey",
+            "definition": "FOREIGN KEY (user_id) REFERENCES users(uuid) ON DELETE CASCADE"
+          },
+          {
+            "table": "payments",
+            "name": "payments_status_chk",
+            "definition": "CHECK ((status = ANY (ARRAY['pending'::text, 'paid'::text, 'failed'::text, 'refunded'::text])))"
+          },
+          {
+            "table": "payments",
+            "name": "payments_pkey",
+            "definition": "PRIMARY KEY (payment_id)"
+          },
+          {
+            "table": "payments",
+            "name": "payments_booking_id_fkey",
+            "definition": "FOREIGN KEY (booking_id) REFERENCES bookings(booking_id) ON DELETE CASCADE"
+          },
+          {
+            "table": "payments",
+            "name": "payments_payment_method_id_fkey",
+            "definition": "FOREIGN KEY (payment_method_id) REFERENCES payment_methods(payment_method_id) ON DELETE SET NULL"
+          },
+          {
+            "table": "rides",
+            "name": "rides_available_seats_positive",
+            "definition": "CHECK ((available_seats >= 0))"
+          },
+          {
+            "table": "rides",
+            "name": "rides_status_check",
+            "definition": "CHECK ((status = ANY (ARRAY['scheduled'::text, 'full'::text, 'in_progress'::text, 'completed'::text, 'cancelled'::text])))"
+          },
+          {
+            "table": "bookings",
+            "name": "bookings_status_check",
+            "definition": "CHECK ((status = ANY (ARRAY['pending'::text, 'confirmed'::text, 'rejected'::text, 'cancelled'::text, 'in_progress'::text, 'completed'::text])))"
+          },
+          {
+            "table": "ride_status_history",
+            "name": "ride_status_history_actor_id_fkey",
+            "definition": "FOREIGN KEY (actor_id) REFERENCES auth.users(id)"
+          },
+          {
+            "table": "ride_status_history",
+            "name": "ride_status_history_status_check",
+            "definition": "CHECK ((status = ANY (ARRAY['created'::text, 'scheduled'::text, 'full'::text, 'in_progress'::text, 'completed'::text, 'cancelled'::text])))"
+          },
+          {
+            "table": "ride_reviews",
+            "name": "ride_reviews_rating_check",
+            "definition": "CHECK (((rating >= 1) AND (rating <= 5)))"
+          },
+          {
+            "table": "ride_reviews",
+            "name": "ride_reviews_pkey",
+            "definition": "PRIMARY KEY (review_id)"
+          },
+          {
+            "table": "ride_reviews",
+            "name": "ride_reviews_ride_id_reviewer_id_reviewee_id_key",
+            "definition": "UNIQUE (ride_id, reviewer_id, reviewee_id)"
+          },
+          {
+            "table": "ride_reviews",
+            "name": "ride_reviews_ride_id_fkey",
+            "definition": "FOREIGN KEY (ride_id) REFERENCES rides(ride_id)"
+          },
+          {
+            "table": "transport_stops",
+            "name": "transport_stops_latitude_check",
+            "definition": "CHECK (((latitude >= ('-90'::integer)::double precision) AND (latitude <= (90)::double precision)))"
+          },
+          {
+            "table": "transport_stops",
+            "name": "transport_stops_longitude_check",
+            "definition": "CHECK (((longitude >= ('-180'::integer)::double precision) AND (longitude <= (180)::double precision)))"
+          },
+          {
+            "table": "transport_stops",
+            "name": "transport_stops_external_id_not_blank",
+            "definition": "CHECK ((length(btrim(external_id)) > 0))"
+          },
+          {
+            "table": "transport_stops",
+            "name": "transport_stops_name_not_blank",
+            "definition": "CHECK ((length(btrim(name)) > 0))"
+          },
+          {
+            "table": "transport_stops",
+            "name": "transport_stops_pkey",
+            "definition": "PRIMARY KEY (stop_id)"
+          },
+          {
+            "table": "transport_stops",
+            "name": "transport_stops_external_id_key",
+            "definition": "UNIQUE (external_id)"
+          },
+          {
+            "table": "favorite_routes",
+            "name": "favorite_routes_name_check",
+            "definition": "CHECK (((length(btrim(name)) >= 1) AND (length(btrim(name)) <= 80)))"
+          },
+          {
+            "table": "favorite_routes",
+            "name": "favorite_routes_origin_lat_check",
+            "definition": "CHECK (((origin_lat >= ('-90'::integer)::double precision) AND (origin_lat <= (90)::double precision)))"
+          },
+          {
+            "table": "favorite_routes",
+            "name": "favorite_routes_origin_lng_check",
+            "definition": "CHECK (((origin_lng >= ('-180'::integer)::double precision) AND (origin_lng <= (180)::double precision)))"
+          },
+          {
+            "table": "favorite_routes",
+            "name": "favorite_routes_destination_lat_check",
+            "definition": "CHECK (((destination_lat >= ('-90'::integer)::double precision) AND (destination_lat <= (90)::double precision)))"
+          },
+          {
+            "table": "favorite_routes",
+            "name": "favorite_routes_destination_lng_check",
+            "definition": "CHECK (((destination_lng >= ('-180'::integer)::double precision) AND (destination_lng <= (180)::double precision)))"
+          },
+          {
+            "table": "favorite_routes",
+            "name": "favorite_routes_default_available_seats_check",
+            "definition": "CHECK (((default_available_seats IS NULL) OR (default_available_seats >= 1)))"
+          },
+          {
+            "table": "favorite_routes",
+            "name": "favorite_routes_default_price_per_seat_check",
+            "definition": "CHECK (((default_price_per_seat IS NULL) OR (default_price_per_seat > (0)::numeric)))"
+          },
+          {
+            "table": "favorite_routes",
+            "name": "favorite_routes_pkey",
+            "definition": "PRIMARY KEY (route_id)"
+          },
+          {
+            "table": "favorite_routes",
+            "name": "favorite_routes_driver_id_fkey",
+            "definition": "FOREIGN KEY (driver_id) REFERENCES driver_profiles(driver_id) ON DELETE CASCADE"
+          },
+          {
+            "table": "favorite_routes",
+            "name": "favorite_routes_default_vehicle_id_fkey",
+            "definition": "FOREIGN KEY (default_vehicle_id) REFERENCES vehicles(vehicle_id) ON DELETE SET NULL"
+          },
+          {
+            "table": "favorite_route_stops",
+            "name": "favorite_route_stops_stop_order_check",
+            "definition": "CHECK ((stop_order >= 1))"
+          },
+          {
+            "table": "favorite_route_stops",
+            "name": "favorite_route_stops_route_fraction_check",
+            "definition": "CHECK (((route_fraction >= (0)::double precision) AND (route_fraction <= (1)::double precision)))"
+          },
+          {
+            "table": "favorite_route_stops",
+            "name": "favorite_route_stops_pkey",
+            "definition": "PRIMARY KEY (route_id, stop_order)"
+          },
+          {
+            "table": "favorite_route_stops",
+            "name": "favorite_route_stops_route_id_transport_stop_id_key",
+            "definition": "UNIQUE (route_id, transport_stop_id)"
+          },
+          {
+            "table": "favorite_route_stops",
+            "name": "favorite_route_stops_route_id_fkey",
+            "definition": "FOREIGN KEY (route_id) REFERENCES favorite_routes(route_id) ON DELETE CASCADE"
+          },
+          {
+            "table": "favorite_route_stops",
+            "name": "favorite_route_stops_transport_stop_id_fkey",
+            "definition": "FOREIGN KEY (transport_stop_id) REFERENCES transport_stops(stop_id) ON DELETE RESTRICT"
+          },
+          {
+            "table": "rides",
+            "name": "rides_favorite_route_id_fkey",
+            "definition": "FOREIGN KEY (favorite_route_id) REFERENCES favorite_routes(route_id) ON DELETE SET NULL"
+          },
+          {
+            "table": "rides",
+            "name": "rides_route_distance_meters_check",
+            "definition": "CHECK (((route_distance_meters IS NULL) OR (route_distance_meters >= 0)))"
+          },
+          {
+            "table": "rides",
+            "name": "rides_route_duration_seconds_check",
+            "definition": "CHECK (((route_duration_seconds IS NULL) OR (route_duration_seconds >= 0)))"
+          },
+          {
+            "table": "rides",
+            "name": "rides_version_check",
+            "definition": "CHECK ((version >= 1))"
+          },
+          {
+            "table": "ride_stops",
+            "name": "ride_stops_transport_stop_id_fkey",
+            "definition": "FOREIGN KEY (transport_stop_id) REFERENCES transport_stops(stop_id) ON DELETE RESTRICT"
+          },
+          {
+            "table": "ride_stops",
+            "name": "ride_stops_route_version_check",
+            "definition": "CHECK ((route_version >= 1))"
+          },
+          {
+            "table": "ride_stops",
+            "name": "ride_stops_route_fraction_check",
+            "definition": "CHECK (((route_fraction IS NULL) OR ((route_fraction >= (0)::double precision) AND (route_fraction <= (1)::double precision))))"
+          },
+          {
+            "table": "ride_stops",
+            "name": "ride_stops_ride_version_order_key",
+            "definition": "UNIQUE (ride_id, route_version, stop_order)"
+          }
+        ],
+        "indexes": [
+          {
+            "table": "payment_methods",
+            "definition": "CREATE UNIQUE INDEX payment_methods_pkey ON public.payment_methods USING btree (payment_method_id)"
+          },
+          {
+            "table": "payment_methods",
+            "definition": "CREATE INDEX idx_payment_methods_user_id ON public.payment_methods USING btree (user_id)"
+          },
+          {
+            "table": "payments",
+            "definition": "CREATE UNIQUE INDEX payments_pkey ON public.payments USING btree (payment_id)"
+          },
+          {
+            "table": "payments",
+            "definition": "CREATE INDEX idx_payments_booking_id ON public.payments USING btree (booking_id)"
+          },
+          {
+            "table": "payments",
+            "definition": "CREATE INDEX payments_payment_method_id_idx ON public.payments USING btree (payment_method_id)"
+          },
+          {
+            "table": "chats",
+            "definition": "CREATE UNIQUE INDEX chats_pkey ON public.chats USING btree (chat_id)"
+          },
+          {
+            "table": "chats",
+            "definition": "CREATE UNIQUE INDEX chats_ride_id_key ON public.chats USING btree (ride_id)"
+          },
+          {
+            "table": "chats",
+            "definition": "CREATE INDEX idx_chats_ride_id ON public.chats USING btree (ride_id)"
+          },
+          {
+            "table": "chat_messages",
+            "definition": "CREATE UNIQUE INDEX chat_messages_pkey ON public.chat_messages USING btree (message_id)"
+          },
+          {
+            "table": "chat_messages",
+            "definition": "CREATE INDEX idx_chat_messages_chat_id ON public.chat_messages USING btree (chat_id)"
+          },
+          {
+            "table": "chat_messages",
+            "definition": "CREATE INDEX idx_chat_messages_chat_created ON public.chat_messages USING btree (chat_id, sent_at)"
+          },
+          {
+            "table": "chat_messages",
+            "definition": "CREATE INDEX chat_messages_sender_id_idx ON public.chat_messages USING btree (sender_id)"
+          },
+          {
+            "table": "bookings",
+            "definition": "CREATE INDEX bookings_pickup_stop_id_idx ON public.bookings USING btree (pickup_stop_id)"
+          },
+          {
+            "table": "bookings",
+            "definition": "CREATE INDEX bookings_dropoff_stop_id_idx ON public.bookings USING btree (dropoff_stop_id)"
+          },
+          {
+            "table": "bookings",
+            "definition": "CREATE UNIQUE INDEX bookings_pkey ON public.bookings USING btree (booking_id)"
+          },
+          {
+            "table": "bookings",
+            "definition": "CREATE UNIQUE INDEX bookings_one_active_per_user_ride ON public.bookings USING btree (ride_id, user_id) WHERE (status <> 'cancelled'::text)"
+          },
+          {
+            "table": "bookings",
+            "definition": "CREATE INDEX idx_bookings_ride_id ON public.bookings USING btree (ride_id)"
+          },
+          {
+            "table": "bookings",
+            "definition": "CREATE INDEX idx_bookings_user_id ON public.bookings USING btree (user_id)"
+          },
+          {
+            "table": "bookings",
+            "definition": "CREATE INDEX idx_bookings_ride_status ON public.bookings USING btree (ride_id, status)"
+          },
+          {
+            "table": "ride_reviews",
+            "definition": "CREATE UNIQUE INDEX ride_reviews_pkey ON public.ride_reviews USING btree (review_id)"
+          },
+          {
+            "table": "ride_reviews",
+            "definition": "CREATE UNIQUE INDEX ride_reviews_ride_id_reviewer_id_reviewee_id_key ON public.ride_reviews USING btree (ride_id, reviewer_id, reviewee_id)"
+          },
+          {
+            "table": "ride_reviews",
+            "definition": "CREATE INDEX idx_ride_reviews_reviewee ON public.ride_reviews USING btree (reviewee_id)"
+          },
+          {
+            "table": "ride_reviews",
+            "definition": "CREATE INDEX ride_reviews_reviewer_id_idx ON public.ride_reviews USING btree (reviewer_id)"
+          },
+          {
+            "table": "ride_status_history",
+            "definition": "CREATE INDEX ride_status_history_ride_id_idx ON public.ride_status_history USING btree (ride_id, changed_at DESC)"
+          },
+          {
+            "table": "ride_status_history",
+            "definition": "CREATE UNIQUE INDEX ride_status_history_pkey ON public.ride_status_history USING btree (id)"
+          },
+          {
+            "table": "ride_status_history",
+            "definition": "CREATE INDEX ride_status_history_actor_id_idx ON public.ride_status_history USING btree (actor_id)"
+          },
+          {
+            "table": "users",
+            "definition": "CREATE UNIQUE INDEX users_pkey ON public.users USING btree (id)"
+          },
+          {
+            "table": "users",
+            "definition": "CREATE UNIQUE INDEX users_uuid_key ON public.users USING btree (uuid)"
+          },
+          {
+            "table": "users",
+            "definition": "CREATE UNIQUE INDEX users_email_address_key ON public.users USING btree (email_address)"
+          },
+          {
+            "table": "users",
+            "definition": "CREATE UNIQUE INDEX users_institutional_id_key ON public.users USING btree (institutional_id)"
+          },
+          {
+            "table": "driver_profiles",
+            "definition": "CREATE UNIQUE INDEX driver_profiles_pkey ON public.driver_profiles USING btree (driver_id)"
+          },
+          {
+            "table": "driver_profiles",
+            "definition": "CREATE UNIQUE INDEX driver_profiles_user_id_key ON public.driver_profiles USING btree (user_id)"
+          },
+          {
+            "table": "driver_profiles",
+            "definition": "CREATE INDEX idx_driver_profiles_user_id ON public.driver_profiles USING btree (user_id)"
+          },
+          {
+            "table": "vehicles",
+            "definition": "CREATE UNIQUE INDEX vehicles_pkey ON public.vehicles USING btree (vehicle_id)"
+          },
+          {
+            "table": "vehicles",
+            "definition": "CREATE UNIQUE INDEX vehicles_license_plate_key ON public.vehicles USING btree (license_plate)"
+          },
+          {
+            "table": "vehicles",
+            "definition": "CREATE INDEX idx_vehicles_driver_id ON public.vehicles USING btree (driver_id)"
+          },
+          {
+            "table": "rides",
+            "definition": "CREATE INDEX rides_vehicle_id_idx ON public.rides USING btree (vehicle_id)"
+          },
+          {
+            "table": "rides",
+            "definition": "CREATE INDEX rides_favorite_route_id_idx ON public.rides USING btree (favorite_route_id) WHERE (favorite_route_id IS NOT NULL)"
+          },
+          {
+            "table": "rides",
+            "definition": "CREATE INDEX rides_driver_upcoming_idx ON public.rides USING btree (driver_id, departure_time) WHERE (status = ANY (ARRAY['scheduled'::text, 'full'::text, 'in_progress'::text]))"
+          },
+          {
+            "table": "rides",
+            "definition": "CREATE INDEX rides_search_status_departure_idx ON public.rides USING btree (status, departure_time)"
+          },
+          {
+            "table": "rides",
+            "definition": "CREATE UNIQUE INDEX rides_pkey ON public.rides USING btree (ride_id)"
+          },
+          {
+            "table": "rides",
+            "definition": "CREATE INDEX idx_rides_driver_id ON public.rides USING btree (driver_id)"
+          },
+          {
+            "table": "rides",
+            "definition": "CREATE INDEX idx_rides_departure ON public.rides USING btree (departure_time)"
+          },
+          {
+            "table": "rides",
+            "definition": "CREATE INDEX rides_scheduled_departure_idx ON public.rides USING btree (departure_time) WHERE (status = 'scheduled'::text)"
+          },
+          {
+            "table": "rides",
+            "definition": "CREATE INDEX idx_rides_driver_status_departure ON public.rides USING btree (driver_id, status, departure_time)"
+          },
+          {
+            "table": "ride_stops",
+            "definition": "CREATE UNIQUE INDEX ride_stops_ride_version_order_key ON public.ride_stops USING btree (ride_id, route_version, stop_order)"
+          },
+          {
+            "table": "ride_stops",
+            "definition": "CREATE UNIQUE INDEX ride_stops_current_catalog_stop_uidx ON public.ride_stops USING btree (ride_id, transport_stop_id) WHERE (is_active AND (transport_stop_id IS NOT NULL))"
+          },
+          {
+            "table": "ride_stops",
+            "definition": "CREATE INDEX ride_stops_location_gix ON public.ride_stops USING gist (location)"
+          },
+          {
+            "table": "ride_stops",
+            "definition": "CREATE INDEX ride_stops_current_ride_order_idx ON public.ride_stops USING btree (ride_id, stop_order) WHERE is_active"
+          },
+          {
+            "table": "ride_stops",
+            "definition": "CREATE INDEX ride_stops_transport_stop_id_idx ON public.ride_stops USING btree (transport_stop_id) WHERE (transport_stop_id IS NOT NULL)"
+          },
+          {
+            "table": "ride_stops",
+            "definition": "CREATE UNIQUE INDEX ride_stops_pkey ON public.ride_stops USING btree (stop_id)"
+          },
+          {
+            "table": "ride_stops",
+            "definition": "CREATE INDEX idx_ride_stops_ride_id ON public.ride_stops USING btree (ride_id)"
+          },
+          {
+            "table": "favorite_routes",
+            "definition": "CREATE UNIQUE INDEX favorite_routes_pkey ON public.favorite_routes USING btree (route_id)"
+          },
+          {
+            "table": "favorite_routes",
+            "definition": "CREATE UNIQUE INDEX favorite_routes_driver_name_uidx ON public.favorite_routes USING btree (driver_id, lower(name))"
+          },
+          {
+            "table": "favorite_routes",
+            "definition": "CREATE INDEX favorite_routes_driver_id_idx ON public.favorite_routes USING btree (driver_id, updated_at DESC)"
+          },
+          {
+            "table": "favorite_routes",
+            "definition": "CREATE INDEX favorite_routes_default_vehicle_id_idx ON public.favorite_routes USING btree (default_vehicle_id) WHERE (default_vehicle_id IS NOT NULL)"
+          },
+          {
+            "table": "favorite_route_stops",
+            "definition": "CREATE UNIQUE INDEX favorite_route_stops_pkey ON public.favorite_route_stops USING btree (route_id, stop_order)"
+          },
+          {
+            "table": "favorite_route_stops",
+            "definition": "CREATE UNIQUE INDEX favorite_route_stops_route_id_transport_stop_id_key ON public.favorite_route_stops USING btree (route_id, transport_stop_id)"
+          },
+          {
+            "table": "favorite_route_stops",
+            "definition": "CREATE INDEX favorite_route_stops_stop_id_idx ON public.favorite_route_stops USING btree (transport_stop_id)"
+          },
+          {
+            "table": "transport_stops",
+            "definition": "CREATE UNIQUE INDEX transport_stops_pkey ON public.transport_stops USING btree (stop_id)"
+          },
+          {
+            "table": "transport_stops",
+            "definition": "CREATE UNIQUE INDEX transport_stops_external_id_key ON public.transport_stops USING btree (external_id)"
+          },
+          {
+            "table": "transport_stops",
+            "definition": "CREATE INDEX transport_stops_location_gix ON public.transport_stops USING gist (location)"
+          },
+          {
+            "table": "transport_stops",
+            "definition": "CREATE INDEX transport_stops_active_idx ON public.transport_stops USING btree (active, external_id)"
+          },
+          {
+            "table": "transport_stops",
+            "definition": "CREATE INDEX transport_stops_active_type_idx ON public.transport_stops USING btree (active, stop_type)"
+          }
+        ],
+        "policies": [
+          {
+            "table": "payment_methods",
+            "name": "payment_methods_all_own",
+            "roles": [
+              "authenticated"
+            ],
+            "command": "ALL",
+            "using": "(user_id = auth.uid())",
+            "check": "(user_id = auth.uid())"
+          },
+          {
+            "table": "payments",
+            "name": "payments_insert_booker",
+            "roles": [
+              "authenticated"
+            ],
+            "command": "INSERT",
+            "using": null,
+            "check": "((EXISTS ( SELECT 1\n   FROM bookings b\n  WHERE ((b.booking_id = payments.booking_id) AND (b.user_id = auth.uid())))) AND ((payment_method_id IS NULL) OR (EXISTS ( SELECT 1\n   FROM payment_methods pm\n  WHERE ((pm.payment_method_id = payments.payment_method_id) AND (pm.user_id = auth.uid()))))))"
+          },
+          {
+            "table": "payments",
+            "name": "payments_select_parties",
+            "roles": [
+              "authenticated"
+            ],
+            "command": "SELECT",
+            "using": "(EXISTS ( SELECT 1\n   FROM bookings b\n  WHERE ((b.booking_id = payments.booking_id) AND ((b.user_id = auth.uid()) OR private.is_driver_of_ride(b.ride_id)))))",
+            "check": null
+          },
+          {
+            "table": "chats",
+            "name": "chats_insert_driver",
+            "roles": [
+              "authenticated"
+            ],
+            "command": "INSERT",
+            "using": null,
+            "check": "private.is_driver_of_ride(ride_id)"
+          },
+          {
+            "table": "chats",
+            "name": "chats_select",
+            "roles": [
+              "authenticated"
+            ],
+            "command": "SELECT",
+            "using": "(EXISTS ( SELECT 1\n   FROM rides r\n  WHERE ((r.ride_id = chats.ride_id) AND private.is_ride_participant(r.ride_id))))",
+            "check": null
+          },
+          {
+            "table": "chats",
+            "name": "chats_update_parties",
+            "roles": [
+              "authenticated"
+            ],
+            "command": "UPDATE",
+            "using": "(EXISTS ( SELECT 1\n   FROM rides r\n  WHERE ((r.ride_id = chats.ride_id) AND private.is_ride_participant(r.ride_id))))",
+            "check": "(EXISTS ( SELECT 1\n   FROM rides r\n  WHERE ((r.ride_id = chats.ride_id) AND private.is_ride_participant(r.ride_id))))"
+          },
+          {
+            "table": "chat_messages",
+            "name": "chat_messages_insert",
+            "roles": [
+              "authenticated"
+            ],
+            "command": "INSERT",
+            "using": null,
+            "check": "((sender_id = auth.uid()) AND (EXISTS ( SELECT 1\n   FROM (chats c\n     JOIN rides r ON ((r.ride_id = c.ride_id)))\n  WHERE ((c.chat_id = chat_messages.chat_id) AND private.is_ride_participant(r.ride_id)))))"
+          },
+          {
+            "table": "chat_messages",
+            "name": "chat_messages_select",
+            "roles": [
+              "authenticated"
+            ],
+            "command": "SELECT",
+            "using": "(EXISTS ( SELECT 1\n   FROM (chats c\n     JOIN rides r ON ((r.ride_id = c.ride_id)))\n  WHERE ((c.chat_id = chat_messages.chat_id) AND private.is_ride_participant(r.ride_id))))",
+            "check": null
+          },
+          {
+            "table": "chat_messages",
+            "name": "chat_messages_update_sender",
+            "roles": [
+              "authenticated"
+            ],
+            "command": "UPDATE",
+            "using": "(sender_id = auth.uid())",
+            "check": "(sender_id = auth.uid())"
+          },
+          {
+            "table": "bookings",
+            "name": "bookings_insert_self",
+            "roles": [
+              "authenticated"
+            ],
+            "command": "INSERT",
+            "using": null,
+            "check": "((user_id = auth.uid()) AND (EXISTS ( SELECT 1\n   FROM ride_stops ps\n  WHERE ((ps.stop_id = bookings.pickup_stop_id) AND (ps.ride_id = ps.ride_id)))) AND (EXISTS ( SELECT 1\n   FROM ride_stops ds\n  WHERE ((ds.stop_id = bookings.dropoff_stop_id) AND (ds.ride_id = ds.ride_id)))))"
+          },
+          {
+            "table": "bookings",
+            "name": "bookings_select_parties",
+            "roles": [
+              "authenticated"
+            ],
+            "command": "SELECT",
+            "using": "((user_id = auth.uid()) OR private.is_driver_of_ride(ride_id))",
+            "check": null
+          },
+          {
+            "table": "bookings",
+            "name": "bookings_update_parties",
+            "roles": [
+              "authenticated"
+            ],
+            "command": "UPDATE",
+            "using": "((user_id = auth.uid()) OR private.is_driver_of_ride(ride_id))",
+            "check": "((user_id = auth.uid()) OR private.is_driver_of_ride(ride_id))"
+          },
+          {
+            "table": "ride_reviews",
+            "name": "ride_reviews_insert_own",
+            "roles": [
+              "public"
+            ],
+            "command": "INSERT",
+            "using": null,
+            "check": "(reviewer_id = auth.uid())"
+          },
+          {
+            "table": "ride_reviews",
+            "name": "ride_reviews_select_involved",
+            "roles": [
+              "public"
+            ],
+            "command": "SELECT",
+            "using": "((reviewer_id = auth.uid()) OR (reviewee_id = auth.uid()))",
+            "check": null
+          },
+          {
+            "table": "ride_status_history",
+            "name": "ride_status_history_insert_driver",
+            "roles": [
+              "authenticated"
+            ],
+            "command": "INSERT",
+            "using": null,
+            "check": "private.is_driver_of_ride(ride_id)"
+          },
+          {
+            "table": "ride_status_history",
+            "name": "ride_status_history_select",
+            "roles": [
+              "authenticated"
+            ],
+            "command": "SELECT",
+            "using": "private.can_view_ride(ride_id)",
+            "check": null
+          },
+          {
+            "table": "users",
+            "name": "users_insert_own",
+            "roles": [
+              "authenticated"
+            ],
+            "command": "INSERT",
+            "using": null,
+            "check": "(uuid = auth.uid())"
+          },
+          {
+            "table": "users",
+            "name": "users_select_coplanners",
+            "roles": [
+              "authenticated"
+            ],
+            "command": "SELECT",
+            "using": "((EXISTS ( SELECT 1\n   FROM (bookings my\n     JOIN bookings theirs ON ((theirs.ride_id = my.ride_id)))\n  WHERE ((my.user_id = auth.uid()) AND (theirs.user_id = users.uuid) AND (my.status <> 'cancelled'::text) AND (theirs.status <> 'cancelled'::text)))) OR (EXISTS ( SELECT 1\n   FROM ((bookings b\n     JOIN rides r ON ((r.ride_id = b.ride_id)))\n     JOIN driver_profiles dp ON ((dp.driver_id = r.driver_id)))\n  WHERE ((b.user_id = auth.uid()) AND (dp.user_id = users.uuid)))) OR (EXISTS ( SELECT 1\n   FROM ((rides r\n     JOIN driver_profiles dp ON ((dp.driver_id = r.driver_id)))\n     JOIN bookings b ON ((b.ride_id = r.ride_id)))\n  WHERE ((dp.user_id = auth.uid()) AND (b.user_id = users.uuid) AND (b.status <> 'cancelled'::text)))))",
+            "check": null
+          },
+          {
+            "table": "users",
+            "name": "users_select_own",
+            "roles": [
+              "authenticated"
+            ],
+            "command": "SELECT",
+            "using": "(uuid = auth.uid())",
+            "check": null
+          },
+          {
+            "table": "users",
+            "name": "users_update_own",
+            "roles": [
+              "authenticated"
+            ],
+            "command": "UPDATE",
+            "using": "(uuid = auth.uid())",
+            "check": "(uuid = auth.uid())"
+          },
+          {
+            "table": "driver_profiles",
+            "name": "driver_profiles_insert_own",
+            "roles": [
+              "authenticated"
+            ],
+            "command": "INSERT",
+            "using": null,
+            "check": "(user_id = auth.uid())"
+          },
+          {
+            "table": "driver_profiles",
+            "name": "driver_profiles_select_own",
+            "roles": [
+              "authenticated"
+            ],
+            "command": "SELECT",
+            "using": "(user_id = auth.uid())",
+            "check": null
+          },
+          {
+            "table": "driver_profiles",
+            "name": "driver_profiles_update_own",
+            "roles": [
+              "authenticated"
+            ],
+            "command": "UPDATE",
+            "using": "(user_id = auth.uid())",
+            "check": "(user_id = auth.uid())"
+          },
+          {
+            "table": "vehicles",
+            "name": "vehicles_all_owner",
+            "roles": [
+              "authenticated"
+            ],
+            "command": "ALL",
+            "using": "(EXISTS ( SELECT 1\n   FROM driver_profiles dp\n  WHERE ((dp.driver_id = vehicles.driver_id) AND (dp.user_id = auth.uid()))))",
+            "check": "(EXISTS ( SELECT 1\n   FROM driver_profiles dp\n  WHERE ((dp.driver_id = vehicles.driver_id) AND (dp.user_id = auth.uid()))))"
+          },
+          {
+            "table": "vehicles",
+            "name": "vehicles_select_on_visible_ride",
+            "roles": [
+              "authenticated"
+            ],
+            "command": "SELECT",
+            "using": "(EXISTS ( SELECT 1\n   FROM rides r\n  WHERE ((r.vehicle_id = vehicles.vehicle_id) AND private.can_view_ride(r.ride_id))))",
+            "check": null
+          },
+          {
+            "table": "rides",
+            "name": "rides_delete_driver",
+            "roles": [
+              "authenticated"
+            ],
+            "command": "DELETE",
+            "using": "private.is_driver_of_ride(ride_id)",
+            "check": null
+          },
+          {
+            "table": "rides",
+            "name": "rides_insert_driver",
+            "roles": [
+              "authenticated"
+            ],
+            "command": "INSERT",
+            "using": null,
+            "check": "((EXISTS ( SELECT 1\n   FROM driver_profiles dp\n  WHERE ((dp.driver_id = rides.driver_id) AND (dp.user_id = auth.uid())))) AND (EXISTS ( SELECT 1\n   FROM vehicles v\n  WHERE ((v.vehicle_id = rides.vehicle_id) AND (v.driver_id = rides.driver_id)))))"
+          },
+          {
+            "table": "rides",
+            "name": "rides_select",
+            "roles": [
+              "authenticated"
+            ],
+            "command": "SELECT",
+            "using": "private.can_view_ride(ride_id)",
+            "check": null
+          },
+          {
+            "table": "rides",
+            "name": "rides_update_driver",
+            "roles": [
+              "authenticated"
+            ],
+            "command": "UPDATE",
+            "using": "private.is_driver_of_ride(ride_id)",
+            "check": "private.is_driver_of_ride(ride_id)"
+          },
+          {
+            "table": "ride_stops",
+            "name": "ride_stops_select",
+            "roles": [
+              "authenticated"
+            ],
+            "command": "SELECT",
+            "using": "private.can_view_ride(ride_id)",
+            "check": null
+          },
+          {
+            "table": "ride_stops",
+            "name": "ride_stops_write_driver",
+            "roles": [
+              "authenticated"
+            ],
+            "command": "ALL",
+            "using": "private.is_driver_of_ride(ride_id)",
+            "check": "private.is_driver_of_ride(ride_id)"
+          },
+          {
+            "table": "favorite_routes",
+            "name": "favorite_routes_owner_read",
+            "roles": [
+              "authenticated"
+            ],
+            "command": "SELECT",
+            "using": "(EXISTS ( SELECT 1\n   FROM driver_profiles dp\n  WHERE ((dp.driver_id = favorite_routes.driver_id) AND (dp.user_id = ( SELECT auth.uid() AS uid)))))",
+            "check": null
+          },
+          {
+            "table": "favorite_route_stops",
+            "name": "favorite_route_stops_owner_read",
+            "roles": [
+              "authenticated"
+            ],
+            "command": "SELECT",
+            "using": "(EXISTS ( SELECT 1\n   FROM (favorite_routes fr\n     JOIN driver_profiles dp ON ((dp.driver_id = fr.driver_id)))\n  WHERE ((fr.route_id = favorite_route_stops.route_id) AND (dp.user_id = ( SELECT auth.uid() AS uid)))))",
+            "check": null
+          },
+          {
+            "table": "transport_stops",
+            "name": "transport_stops_authenticated_read",
+            "roles": [
+              "authenticated"
+            ],
+            "command": "SELECT",
+            "using": "(( SELECT auth.uid() AS uid) IS NOT NULL)",
+            "check": null
+          }
+        ],
+        "routines": [
+          {
+            "name": "set_updated_at()",
+            "definition": "CREATE OR REPLACE FUNCTION public.set_updated_at()\n RETURNS trigger\n LANGUAGE plpgsql\n SET search_path TO 'public'\nAS $function$\r\nbegin\r\n  new.updated_at := now();\r\n  return new;\r\nend;\r\n$function$\n"
+          },
+          {
+            "name": "validate_ride_vehicle_driver()",
+            "definition": "CREATE OR REPLACE FUNCTION public.validate_ride_vehicle_driver()\n RETURNS trigger\n LANGUAGE plpgsql\n SET search_path TO 'public'\nAS $function$\r\nbegin\r\n  if not exists (\r\n    select 1\r\n    from public.vehicles v\r\n    where v.vehicle_id = new.vehicle_id\r\n      and v.driver_id = new.driver_id\r\n  ) then\r\n    raise exception 'The selected vehicle does not belong to the driver';\r\n  end if;\r\n\r\n  return new;\r\nend;\r\n$function$\n"
+          },
+          {
+            "name": "validate_booking_stops_same_ride()",
+            "definition": "CREATE OR REPLACE FUNCTION public.validate_booking_stops_same_ride()\n RETURNS trigger\n LANGUAGE plpgsql\n SET search_path TO 'public'\nAS $function$\r\nbegin\r\n  if not exists (\r\n    select 1\r\n    from public.ride_stops ps\r\n    join public.ride_stops ds on ds.stop_id = new.dropoff_stop_id\r\n    where ps.stop_id = new.pickup_stop_id\r\n      and ps.ride_id = new.ride_id\r\n      and ds.ride_id = new.ride_id\r\n  ) then\r\n    raise exception 'Pickup and dropoff stops must belong to the booking ride';\r\n  end if;\r\n\r\n  return new;\r\nend;\r\n$function$\n"
+          },
+          {
+            "name": "private.can_view_ride(uuid)",
+            "definition": "CREATE OR REPLACE FUNCTION private.can_view_ride(p_ride_id uuid)\n RETURNS boolean\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\r\n  select\r\n    auth.uid() is not null\r\n    and exists (\r\n      select 1\r\n      from rides r\r\n      where r.ride_id = p_ride_id\r\n        and (\r\n          r.status in ('scheduled', 'in_progress')\r\n          or exists (\r\n            select 1\r\n            from driver_profiles dp\r\n            where dp.driver_id = r.driver_id\r\n              and dp.user_id = auth.uid()\r\n          )\r\n          or exists (\r\n            select 1\r\n            from bookings b\r\n            where b.ride_id = r.ride_id\r\n              and b.user_id = auth.uid()\r\n          )\r\n        )\r\n    );\r\n$function$\n"
+          },
+          {
+            "name": "private.is_driver_of_ride(uuid)",
+            "definition": "CREATE OR REPLACE FUNCTION private.is_driver_of_ride(p_ride_id uuid)\n RETURNS boolean\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\r\n  select exists (\r\n    select 1\r\n    from rides r\r\n    join driver_profiles dp on dp.driver_id = r.driver_id\r\n    where r.ride_id = p_ride_id\r\n      and dp.user_id = auth.uid()\r\n  );\r\n$function$\n"
+          },
+          {
+            "name": "private.is_ride_participant(uuid)",
+            "definition": "CREATE OR REPLACE FUNCTION private.is_ride_participant(p_ride_id uuid)\n RETURNS boolean\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\r\n  select\r\n    auth.uid() is not null\r\n    and (\r\n      private.is_driver_of_ride(p_ride_id)\r\n      or exists (\r\n        select 1\r\n        from bookings b\r\n        where b.ride_id = p_ride_id\r\n          and b.user_id = auth.uid()\r\n          and b.status <> 'cancelled'\r\n      )\r\n    );\r\n$function$\n"
+          },
+          {
+            "name": "get_driver_card(uuid)",
+            "definition": "CREATE OR REPLACE FUNCTION public.get_driver_card(p_driver_id uuid)\n RETURNS TABLE(driver_id uuid, user_id uuid, rating numeric, status text)\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\r\n  select d.driver_id, d.user_id, d.rating, d.status\r\n  from public.driver_profiles d\r\n  where d.driver_id = p_driver_id\r\n    and d.status = 'approved'\r\n    and exists (\r\n      select 1\r\n      from public.rides r\r\n      where r.driver_id = d.driver_id\r\n        and private.can_view_ride(r.ride_id)\r\n    );\r\n$function$\n"
+          },
+          {
+            "name": "private.deactivate_catalog_ride_stops()",
+            "definition": "CREATE OR REPLACE FUNCTION private.deactivate_catalog_ride_stops()\n RETURNS trigger\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\nbegin\n  if old.active and not new.active then\n    update public.ride_stops\n    set is_active = false\n    where transport_stop_id = new.stop_id and is_active;\n  end if;\n  return new;\nend;\n$function$\n"
+          },
+          {
+            "name": "private.validate_catalog_booking_stops()",
+            "definition": "CREATE OR REPLACE FUNCTION private.validate_catalog_booking_stops()\n RETURNS trigger\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  v_version integer;\n  v_pickup_order integer;\n  v_dropoff_order integer;\nbegin\n  select r.version into v_version\n  from public.rides r\n  where r.ride_id = new.ride_id and r.route_provider is not null;\n\n  -- Historical rides may still use their original non-catalog stops.\n  if v_version is null then return new; end if;\n\n  select rs.stop_order into v_pickup_order\n  from public.ride_stops rs\n  join public.transport_stops ts\n    on ts.stop_id = rs.transport_stop_id and ts.active\n  where rs.stop_id = new.pickup_stop_id\n    and rs.ride_id = new.ride_id\n    and rs.route_version = v_version and rs.is_active\n  for share of ts;\n\n  select rs.stop_order into v_dropoff_order\n  from public.ride_stops rs\n  join public.transport_stops ts\n    on ts.stop_id = rs.transport_stop_id and ts.active\n  where rs.stop_id = new.dropoff_stop_id\n    and rs.ride_id = new.ride_id\n    and rs.route_version = v_version and rs.is_active\n  for share of ts;\n\n  if v_pickup_order is null or v_dropoff_order is null\n     or v_pickup_order >= v_dropoff_order then\n    raise exception 'Las paradas de la reserva no están activas u ordenadas';\n  end if;\n  return new;\nend;\n$function$\n"
+          },
+          {
+            "name": "handle_new_user()",
+            "definition": "CREATE OR REPLACE FUNCTION public.handle_new_user()\n RETURNS trigger\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public', 'extensions'\nAS $function$\r\nbegin\r\n  insert into public.users (uuid, full_name, email_address, profile_photo)\r\n  values (\r\n    new.id, \r\n    new.raw_user_meta_data->>'full_name', \r\n    new.email, \r\n    new.raw_user_meta_data->>'avatar_url'\r\n  );\r\n  return new;\r\nend;\r\n$function$\n"
+          },
+          {
+            "name": "cancel_ride(uuid,text)",
+            "definition": "CREATE OR REPLACE FUNCTION public.cancel_ride(p_ride_id uuid, p_reason text DEFAULT NULL::text)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\nDECLARE\n  v_actor uuid := auth.uid();\n  v_prev  text;\n  v_seats integer;\n  v_hist_reason text;\nBEGIN\n  IF v_actor IS NULL THEN\n    RAISE EXCEPTION 'No autenticado';\n  END IF;\n\n  IF p_ride_id IS NULL THEN\n    RAISE EXCEPTION 'Argumentos invalidos';\n  END IF;\n\n  BEGIN\n    SELECT r.status\n      INTO STRICT v_prev\n      FROM public.rides r\n     WHERE r.ride_id = p_ride_id\n       FOR UPDATE;\n  EXCEPTION\n    WHEN NO_DATA_FOUND THEN\n      RAISE EXCEPTION 'El viaje no existe';\n  END;\n\n  IF NOT EXISTS (\n    SELECT 1\n      FROM public.driver_profiles dp\n      JOIN public.rides rr ON rr.driver_id = dp.driver_id\n     WHERE rr.ride_id = p_ride_id\n       AND dp.user_id = v_actor\n  ) THEN\n    RAISE EXCEPTION 'Solo el conductor puede cancelar el viaje';\n  END IF;\n\n  IF v_prev = 'cancelled' THEN\n    RETURN;\n  END IF;\n\n  PERFORM public.validate_ride_transition(v_prev, 'cancelled');\n\n  SELECT COALESCE(SUM(b.seats_reserved), 0)::integer\n    INTO v_seats\n    FROM public.bookings b\n   WHERE b.ride_id = p_ride_id\n     AND b.status = 'confirmed';\n\n  UPDATE public.bookings b\n     SET status = 'cancelled'\n   WHERE b.ride_id = p_ride_id\n     AND b.status IN ('pending', 'confirmed');\n\n  UPDATE public.rides r\n     SET status = 'cancelled',\n         available_seats = r.available_seats + v_seats\n   WHERE r.ride_id = p_ride_id;\n\n  UPDATE public.chats c\n     SET closed_at = timezone('utc', now())\n   WHERE c.ride_id = p_ride_id\n     AND c.closed_at IS NULL;\n\n  v_hist_reason\n    := COALESCE(\n       NULLIF(btrim(COALESCE(p_reason, '')), ''),\n       'ride_cancelled_by_driver'\n     );\n\n  INSERT INTO public.ride_status_history (\n    ride_id,\n    status,\n    previous_status,\n    actor_id,\n    reason\n  )\n  VALUES (\n    p_ride_id,\n    'cancelled',\n    v_prev,\n    v_actor,\n    v_hist_reason\n  );\nEND;\n$function$\n"
+          },
+          {
+            "name": "complete_ride(uuid)",
+            "definition": "CREATE OR REPLACE FUNCTION public.complete_ride(p_ride_id uuid)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public', 'extensions'\nAS $function$\nDECLARE\n  v_actor uuid := auth.uid();\n  v_prev  text;\n  v_remaining integer;\nBEGIN\n  IF v_actor IS NULL THEN\n    RAISE EXCEPTION 'No autenticado';\n  END IF;\n\n  IF p_ride_id IS NULL THEN\n    RAISE EXCEPTION 'Argumentos invalidos';\n  END IF;\n\n  -- Lock the ride row\n  BEGIN\n    SELECT r.status\n      INTO STRICT v_prev\n      FROM public.rides r\n     WHERE r.ride_id = p_ride_id\n       FOR UPDATE;\n  EXCEPTION\n    WHEN NO_DATA_FOUND THEN\n      RAISE EXCEPTION 'El viaje no existe';\n  END;\n\n  -- Only driver can complete\n  IF NOT EXISTS (\n    SELECT 1\n      FROM public.driver_profiles dp\n      JOIN public.rides rr ON rr.driver_id = dp.driver_id\n     WHERE rr.ride_id = p_ride_id\n       AND dp.user_id = v_actor\n  ) THEN\n    RAISE EXCEPTION 'Solo el conductor puede finalizar el viaje';\n  END IF;\n\n  -- Idempotent\n  IF v_prev = 'completed' THEN\n    RETURN;\n  END IF;\n\n  -- Validate transition\n  PERFORM public.validate_ride_transition(v_prev, 'completed');\n\n  -- Check remaining active bookings\n  SELECT COUNT(*)::integer\n    INTO v_remaining\n    FROM public.bookings b\n   WHERE b.ride_id = p_ride_id\n     AND b.status IN ('confirmed', 'in_progress');\n\n  -- Force-complete any remaining active bookings\n  IF v_remaining > 0 THEN\n    UPDATE public.bookings b\n       SET status = 'completed'\n     WHERE b.ride_id = p_ride_id\n       AND b.status IN ('confirmed', 'in_progress');\n  END IF;\n\n  -- Complete the ride\n  UPDATE public.rides SET status = 'completed' WHERE ride_id = p_ride_id;\n\n  -- Close chat\n  UPDATE public.chats c\n     SET closed_at = timezone('utc', now())\n   WHERE c.ride_id = p_ride_id\n     AND c.closed_at IS NULL;\n\n  -- History\n  INSERT INTO public.ride_status_history (\n    ride_id, status, previous_status, actor_id, reason\n  )\n  VALUES (\n    p_ride_id, 'completed', v_prev, v_actor, 'manual_complete_by_driver'\n  );\nEND;\n$function$\n"
+          },
+          {
+            "name": "update_user_rating_on_review()",
+            "definition": "CREATE OR REPLACE FUNCTION public.update_user_rating_on_review()\n RETURNS trigger\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public', 'extensions'\nAS $function$\nDECLARE\n  v_avg numeric;\n  v_is_driver boolean;\nBEGIN\n  -- Calculate new average for the reviewee\n  SELECT AVG(r.rating)::numeric(3,2)\n    INTO v_avg\n    FROM public.ride_reviews r\n   WHERE r.reviewee_id = NEW.reviewee_id;\n\n  -- Update users.rating\n  UPDATE public.users\n     SET rating = v_avg,\n         updated_at = now()\n   WHERE uuid = NEW.reviewee_id;\n\n  -- Check if reviewee is a driver, update driver_profiles.rating too\n  SELECT EXISTS (\n    SELECT 1 FROM public.driver_profiles dp WHERE dp.user_id = NEW.reviewee_id\n  ) INTO v_is_driver;\n\n  IF v_is_driver THEN\n    UPDATE public.driver_profiles\n       SET rating = v_avg\n     WHERE user_id = NEW.reviewee_id;\n  END IF;\n\n  RETURN NEW;\nEND;\n$function$\n"
+          },
+          {
+            "name": "start_ride(uuid)",
+            "definition": "CREATE OR REPLACE FUNCTION public.start_ride(p_ride_id uuid)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\nDECLARE\n  v_actor uuid := auth.uid();\n  v_prev  text;\nBEGIN\n  IF v_actor IS NULL THEN\n    RAISE EXCEPTION 'No autenticado';\n  END IF;\n\n  IF p_ride_id IS NULL THEN\n    RAISE EXCEPTION 'Argumentos invalidos';\n  END IF;\n\n  BEGIN\n    SELECT r.status\n      INTO STRICT v_prev\n      FROM public.rides r\n     WHERE r.ride_id = p_ride_id\n       FOR UPDATE;\n  EXCEPTION\n    WHEN NO_DATA_FOUND THEN\n      RAISE EXCEPTION 'El viaje no existe';\n  END;\n\n  IF NOT EXISTS (\n    SELECT 1\n      FROM public.driver_profiles dp\n      JOIN public.rides rr ON rr.driver_id = dp.driver_id\n     WHERE rr.ride_id = p_ride_id\n       AND dp.user_id = v_actor\n  ) THEN\n    RAISE EXCEPTION 'Solo el conductor puede iniciar el viaje';\n  END IF;\n\n  IF v_prev = 'in_progress' THEN\n    RETURN;\n  END IF;\n\n  IF NOT EXISTS (\n    SELECT 1\n      FROM public.bookings b\n     WHERE b.ride_id = p_ride_id\n       AND b.status = 'confirmed'\n  ) THEN\n    RAISE EXCEPTION 'Se requiere al menos una reserva confirmada';\n  END IF;\n\n  PERFORM public.validate_ride_transition(v_prev, 'in_progress');\n\n  UPDATE public.rides SET status = 'in_progress' WHERE ride_id = p_ride_id;\n\n  UPDATE public.bookings b\n     SET status = 'rejected'\n   WHERE b.ride_id = p_ride_id\n     AND b.status = 'pending';\n\n  INSERT INTO public.chats AS c (ride_id)\n  VALUES (p_ride_id)\n  ON CONFLICT (ride_id) DO NOTHING;\n\n  INSERT INTO public.ride_status_history (\n    ride_id,\n    status,\n    previous_status,\n    actor_id,\n    reason\n  )\n  VALUES (p_ride_id, 'in_progress', v_prev, v_actor, NULL);\nEND;\n$function$\n"
+          },
+          {
+            "name": "rls_auto_enable()",
+            "definition": "CREATE OR REPLACE FUNCTION public.rls_auto_enable()\n RETURNS event_trigger\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'pg_catalog'\nAS $function$\nDECLARE\n  cmd record;\nBEGIN\n  FOR cmd IN\n    SELECT *\n    FROM pg_event_trigger_ddl_commands()\n    WHERE command_tag IN ('CREATE TABLE', 'CREATE TABLE AS', 'SELECT INTO')\n      AND object_type IN ('table','partitioned table')\n  LOOP\n     IF cmd.schema_name IS NOT NULL AND cmd.schema_name IN ('public') AND cmd.schema_name NOT IN ('pg_catalog','information_schema') AND cmd.schema_name NOT LIKE 'pg_toast%' AND cmd.schema_name NOT LIKE 'pg_temp%' THEN\n      BEGIN\n        EXECUTE format('alter table if exists %s enable row level security', cmd.object_identity);\n        RAISE LOG 'rls_auto_enable: enabled RLS on %', cmd.object_identity;\n      EXCEPTION\n        WHEN OTHERS THEN\n          RAISE LOG 'rls_auto_enable: failed to enable RLS on %', cmd.object_identity;\n      END;\n     ELSE\n        RAISE LOG 'rls_auto_enable: skip % (either system schema or not in enforced list: %.)', cmd.object_identity, cmd.schema_name;\n     END IF;\n  END LOOP;\nEND;\n$function$\n"
+          },
+          {
+            "name": "complete_stop(uuid)",
+            "definition": "CREATE OR REPLACE FUNCTION public.complete_stop(p_booking_id uuid)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\nDECLARE\n  v_actor     uuid := auth.uid();\n  v_booking   public.bookings%ROWTYPE;\n  v_ride_id   uuid;\n  v_prev_ride text;\n  v_remain    integer;\nBEGIN\n  IF v_actor IS NULL THEN\n    RAISE EXCEPTION 'No autenticado';\n  END IF;\n\n  IF p_booking_id IS NULL THEN\n    RAISE EXCEPTION 'Argumentos invalidos';\n  END IF;\n\n  SELECT b.*\n    INTO v_booking\n    FROM public.bookings b\n   WHERE b.booking_id = p_booking_id;\n\n  IF NOT FOUND THEN\n    RAISE EXCEPTION 'La reserva no existe';\n  END IF;\n\n  v_ride_id := v_booking.ride_id;\n\n  SELECT r.status\n    INTO STRICT v_prev_ride\n    FROM public.rides r\n   WHERE r.ride_id = v_ride_id\n     FOR UPDATE;\n\n  SELECT b.*\n    INTO v_booking\n    FROM public.bookings b\n   WHERE b.booking_id = p_booking_id\n     FOR UPDATE;\n\n  IF NOT EXISTS (\n    SELECT 1\n      FROM public.driver_profiles dp\n      JOIN public.rides rr ON rr.driver_id = dp.driver_id\n     WHERE rr.ride_id = v_ride_id\n       AND dp.user_id = v_actor\n  ) THEN\n    RAISE EXCEPTION 'Solo el conductor puede completar paradas';\n  END IF;\n\n  IF v_booking.status = 'completed' THEN\n    RETURN;\n  END IF;\n\n  IF v_booking.status NOT IN ('confirmed', 'in_progress') THEN\n    RAISE EXCEPTION 'Estado de reserva invalido para esta accion';\n  END IF;\n\n  IF v_booking.status = 'confirmed' THEN\n    PERFORM public.validate_booking_transition('confirmed', 'in_progress');\n    UPDATE public.bookings b\n       SET status = 'in_progress'\n     WHERE b.booking_id = p_booking_id;\n\n    SELECT b.*\n      INTO v_booking\n      FROM public.bookings b\n     WHERE b.booking_id = p_booking_id;\n  END IF;\n\n  PERFORM public.validate_booking_transition(v_booking.status, 'completed');\n\n  UPDATE public.bookings b\n     SET status = 'completed'\n   WHERE b.booking_id = p_booking_id;\n\n  SELECT COUNT(*)::integer\n    INTO v_remain\n    FROM public.bookings b\n   WHERE b.ride_id = v_ride_id\n     AND b.status IN ('confirmed', 'in_progress');\n\n  IF v_remain = 0 THEN\n    PERFORM public.validate_ride_transition(v_prev_ride, 'completed');\n    UPDATE public.rides SET status = 'completed' WHERE ride_id = v_ride_id;\n\n    INSERT INTO public.ride_status_history (\n      ride_id,\n      status,\n      previous_status,\n      actor_id,\n      reason\n    )\n    VALUES (\n      v_ride_id,\n      'completed',\n      v_prev_ride,\n      v_actor,\n      NULL\n    );\n\n    UPDATE public.chats c\n       SET closed_at = timezone('utc', now())\n     WHERE c.ride_id = v_ride_id\n       AND c.closed_at IS NULL;\n  END IF;\nEND;\n$function$\n"
+          },
+          {
+            "name": "validate_booking_transition(text,text)",
+            "definition": "CREATE OR REPLACE FUNCTION public.validate_booking_transition(current_status text, new_status text)\n RETURNS void\n LANGUAGE plpgsql\n SET search_path TO 'public', 'extensions'\nAS $function$\nBEGIN\n  IF NOT (\n    (\n      current_status = 'pending'\n      AND new_status = ANY (\n        ARRAY['confirmed', 'rejected', 'cancelled']::text[]\n      )\n    )\n    OR (\n      current_status = 'confirmed'\n      AND new_status = ANY (\n        ARRAY['in_progress', 'cancelled']::text[]\n      )\n    )\n    OR (\n      current_status = 'in_progress'\n      AND new_status = ANY (\n        ARRAY['completed', 'cancelled']::text[]\n      )\n    )\n  ) THEN\n    RAISE EXCEPTION 'Transición inválida de booking: % → %',\n                  current_status,\n                  new_status;\n  END IF;\nEND;\n$function$\n"
+          },
+          {
+            "name": "validate_ride_transition(text,text)",
+            "definition": "CREATE OR REPLACE FUNCTION public.validate_ride_transition(current_status text, new_status text)\n RETURNS void\n LANGUAGE plpgsql\n SET search_path TO 'public', 'extensions'\nAS $function$\nBEGIN\n  IF NOT (\n    (\n      current_status = 'scheduled'\n      AND new_status = ANY (\n        ARRAY['full', 'in_progress', 'cancelled']::text[]\n      )\n    )\n    OR (\n      current_status = 'full'\n      AND new_status = ANY (\n        ARRAY['scheduled', 'in_progress', 'cancelled']::text[]\n      )\n    )\n    OR (\n      current_status = 'in_progress'\n      AND new_status = ANY (\n        ARRAY['completed', 'cancelled']::text[]\n      )\n    )\n  ) THEN\n    RAISE EXCEPTION 'Transición inválida de ride: % → %',\n                  current_status,\n                  new_status;\n  END IF;\nEND;\n$function$\n"
+          },
+          {
+            "name": "create_ride(jsonb)",
+            "definition": "CREATE OR REPLACE FUNCTION public.create_ride(p_payload jsonb)\n RETURNS uuid\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\ndeclare\n  v_user_id     uuid;\n  v_driver_id   uuid;\n  v_vehicle_id  uuid;\n  v_departure   timestamptz;\n  v_seats       int;\n  v_price       numeric;\n  v_origin_lat  numeric;\n  v_origin_lng  numeric;\n  v_dest_lat    numeric;\n  v_dest_lng    numeric;\n  v_origin_addr text;\n  v_dest_addr   text;\n  v_polyline    text;\n  v_ride_id     uuid;\nbegin\n  v_user_id := auth.uid();\n  if v_user_id is null then\n    raise exception 'No autenticado';\n  end if;\n\n  select driver_id into v_driver_id\n  from public.driver_profiles\n  where user_id = v_user_id\n    and status  = 'approved'\n  limit 1;\n\n  if v_driver_id is null then\n    raise exception 'El usuario no tiene perfil de conductor aprobado';\n  end if;\n\n  v_vehicle_id := (p_payload->>'vehicle_id')::uuid;\n  v_departure  := (p_payload->>'departure_time')::timestamptz;\n  v_seats      := (p_payload->>'available_seats')::int;\n  v_price      := (p_payload->>'price_per_seat')::numeric;\n  v_origin_lat := (p_payload->>'origin_lat')::numeric;\n  v_origin_lng := (p_payload->>'origin_lng')::numeric;\n  v_dest_lat   := (p_payload->>'destination_lat')::numeric;\n  v_dest_lng   := (p_payload->>'destination_lng')::numeric;\n  v_origin_addr := nullif(p_payload->>'origin_address', '');\n  v_dest_addr   := nullif(p_payload->>'destination_address', '');\n  v_polyline    := nullif(p_payload->>'route_polyline', '');\n\n  if not exists (\n    select 1 from public.vehicles\n    where vehicle_id = v_vehicle_id\n      and driver_id  = v_driver_id\n      and is_active  = true\n  ) then\n    raise exception 'El vehiculo no existe o no pertenece al conductor';\n  end if;\n\n  if v_departure <= now() then\n    raise exception 'La hora de salida debe ser en el futuro';\n  end if;\n\n  if v_seats < 1 then\n    raise exception 'Debe haber al menos 1 asiento disponible al crear el viaje';\n  end if;\n\n  if v_price <= 0 then\n    raise exception 'El precio por asiento debe ser mayor a 0';\n  end if;\n\n  insert into public.rides (\n    driver_id,\n    vehicle_id,\n    origin_lat,\n    origin_lng,\n    destination_lat,\n    destination_lng,\n    origin_address,\n    destination_address,\n    route_polyline,\n    departure_time,\n    available_seats,\n    price_per_seat\n  )\n  values (\n    v_driver_id,\n    v_vehicle_id,\n    v_origin_lat,\n    v_origin_lng,\n    v_dest_lat,\n    v_dest_lng,\n    v_origin_addr,\n    v_dest_addr,\n    v_polyline,\n    v_departure,\n    v_seats,\n    v_price\n  )\n  returning ride_id into v_ride_id;\n\n  -- Origen (stop_order = 1) y destino (stop_order = 2) a nivel de ride.\n  -- Las bookings de pasajeros referencian estos stops, en lugar de crear stops nuevos por reserva.\n  insert into public.ride_stops (ride_id, lat, lng, address, stop_order)\n  values (v_ride_id, v_origin_lat, v_origin_lng, coalesce(v_origin_addr, ''), 1);\n\n  insert into public.ride_stops (ride_id, lat, lng, address, stop_order)\n  values (v_ride_id, v_dest_lat, v_dest_lng, coalesce(v_dest_addr, ''), 2);\n\n  insert into public.ride_status_history (ride_id, status)\n  values (v_ride_id, 'scheduled');\n\n  return v_ride_id;\nend;\n$function$\n"
+          },
+          {
+            "name": "request_booking(jsonb)",
+            "definition": "CREATE OR REPLACE FUNCTION public.request_booking(p_payload jsonb)\n RETURNS uuid\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\ndeclare\n  v_user_id        uuid;\n  v_ride_id        uuid;\n  v_seats          int;\n  v_ride           rides%rowtype;\n  v_pickup_stop    uuid;\n  v_dropoff_stop   uuid;\n  v_booking_id     uuid;\nbegin\n  v_user_id := auth.uid();\n  if v_user_id is null then\n    raise exception 'No autenticado';\n  end if;\n\n  v_ride_id := (p_payload->>'ride_id')::uuid;\n  v_seats   := coalesce((p_payload->>'seats_reserved')::int, 1);\n\n  if v_ride_id is null then\n    raise exception 'ride_id es obligatorio';\n  end if;\n  if v_seats < 1 then\n    raise exception 'Debe reservar al menos 1 asiento';\n  end if;\n\n  select * into v_ride from rides where ride_id = v_ride_id for update;\n  if not found then\n    raise exception 'El viaje no existe';\n  end if;\n\n  if v_ride.status <> 'scheduled' then\n    raise exception 'El viaje ya no esta disponible para reserva';\n  end if;\n  if v_ride.departure_time <= now() then\n    raise exception 'El viaje ya partio';\n  end if;\n  if v_ride.available_seats < v_seats then\n    raise exception 'No hay suficientes asientos disponibles';\n  end if;\n\n  if exists (\n    select 1 from driver_profiles dp\n    where dp.driver_id = v_ride.driver_id\n      and dp.user_id   = v_user_id\n  ) then\n    raise exception 'No puedes reservar tu propio viaje';\n  end if;\n\n  -- Verificar que el pasajero no tenga ya un booking activo en cualquier ride\n  if exists (\n    select 1 from bookings\n    where user_id = auth.uid()\n      and status = any(array['pending', 'confirmed', 'in_progress'])\n  ) then\n    raise exception 'Ya tienes una reserva activa en otro viaje';\n  end if;\n\n  if exists (\n    select 1 from bookings b\n    where b.ride_id = v_ride_id\n      and b.user_id = v_user_id\n      and b.status in ('pending', 'confirmed')\n  ) then\n    raise exception 'Ya tienes una reserva activa para este viaje';\n  end if;\n\n  select stop_id into v_pickup_stop\n  from ride_stops\n  where ride_id = v_ride_id and stop_order = 1\n  limit 1;\n\n  select stop_id into v_dropoff_stop\n  from ride_stops\n  where ride_id = v_ride_id and stop_order = 2\n  limit 1;\n\n  if v_pickup_stop is null or v_dropoff_stop is null then\n    raise exception 'El viaje no tiene paradas de origen y destino configuradas';\n  end if;\n\n  insert into bookings (\n    ride_id, user_id, pickup_stop_id, dropoff_stop_id,\n    seats_reserved, status\n  ) values (\n    v_ride_id, v_user_id, v_pickup_stop, v_dropoff_stop,\n    v_seats, 'pending'\n  )\n  returning booking_id into v_booking_id;\n\n  return v_booking_id;\nend;\n$function$\n"
+          },
+          {
+            "name": "get_my_driver_rides(integer)",
+            "definition": "CREATE OR REPLACE FUNCTION public.get_my_driver_rides(p_limit integer DEFAULT 10)\n RETURNS TABLE(ride_id uuid, status text, departure_time timestamp with time zone, origin_lat numeric, origin_lng numeric, destination_lat numeric, destination_lng numeric, origin_address text, destination_address text, available_seats integer, price_per_seat numeric)\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\ndeclare\n  v_user_id uuid;\n  v_driver_id uuid;\nbegin\n  v_user_id := auth.uid();\n  if v_user_id is null then\n    raise exception 'No autenticado';\n  end if;\n\n  select dp.driver_id into v_driver_id\n  from public.driver_profiles dp\n  where dp.user_id = v_user_id\n    and dp.status = 'approved'\n  limit 1;\n\n  if v_driver_id is null then\n    return;\n  end if;\n\n  return query\n  (\n    select\n      r.ride_id,\n      r.status,\n      r.departure_time,\n      r.origin_lat,\n      r.origin_lng,\n      r.destination_lat,\n      r.destination_lng,\n      r.origin_address,\n      r.destination_address,\n      r.available_seats,\n      r.price_per_seat\n    from public.rides r\n    where r.driver_id = v_driver_id\n      and r.status in ('scheduled', 'open', 'full', 'in_progress')\n    order by r.departure_time asc\n    limit p_limit\n  )\n  union all\n  (\n    select\n      r.ride_id,\n      r.status,\n      r.departure_time,\n      r.origin_lat,\n      r.origin_lng,\n      r.destination_lat,\n      r.destination_lng,\n      r.origin_address,\n      r.destination_address,\n      r.available_seats,\n      r.price_per_seat\n    from public.rides r\n    where r.driver_id = v_driver_id\n      and r.status in ('completed', 'cancelled')\n    order by r.departure_time desc\n    limit p_limit\n  );\nend;\n$function$\n"
+          },
+          {
+            "name": "get_my_passenger_rides(integer)",
+            "definition": "CREATE OR REPLACE FUNCTION public.get_my_passenger_rides(p_limit integer DEFAULT 10)\n RETURNS TABLE(ride_id uuid, status text, departure_time timestamp with time zone, origin_lat numeric, origin_lng numeric, destination_lat numeric, destination_lng numeric, origin_address text, destination_address text, available_seats integer, price_per_seat numeric)\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\ndeclare\n  v_user_id uuid;\nbegin\n  v_user_id := auth.uid();\n  if v_user_id is null then\n    raise exception 'No autenticado';\n  end if;\n\n  return query\n  (\n    select\n      r.ride_id,\n      r.status,\n      r.departure_time,\n      r.origin_lat,\n      r.origin_lng,\n      r.destination_lat,\n      r.destination_lng,\n      r.origin_address,\n      r.destination_address,\n      coalesce(b.seats_reserved, 0) as available_seats,\n      r.price_per_seat\n    from public.bookings b\n    join public.rides r on r.ride_id = b.ride_id\n    where b.user_id = v_user_id\n      and r.status in ('scheduled', 'open', 'full', 'in_progress')\n    order by r.departure_time asc\n    limit p_limit\n  )\n  union all\n  (\n    select\n      r.ride_id,\n      r.status,\n      r.departure_time,\n      r.origin_lat,\n      r.origin_lng,\n      r.destination_lat,\n      r.destination_lng,\n      r.origin_address,\n      r.destination_address,\n      coalesce(b.seats_reserved, 0) as available_seats,\n      r.price_per_seat\n    from public.bookings b\n    join public.rides r on r.ride_id = b.ride_id\n    where b.user_id = v_user_id\n      and r.status in ('completed', 'cancelled')\n    order by r.departure_time desc\n    limit p_limit\n  );\nend;\n$function$\n"
+          },
+          {
+            "name": "get_passenger_stop_candidates(double precision,double precision,double precision,double precision,integer)",
+            "definition": "CREATE OR REPLACE FUNCTION public.get_passenger_stop_candidates(p_origin_lat double precision, p_origin_lng double precision, p_destination_lat double precision, p_destination_lng double precision, p_max_distance_m integer DEFAULT 1000)\n RETURNS TABLE(stop_role text, stop_id uuid, external_id text, stop_name text, stop_address text, municipality text, stop_type text, lat numeric, lng numeric, distance_m double precision, enabled boolean, ride_count bigint)\n LANGUAGE plpgsql\n STABLE SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  v_actor uuid := auth.uid();\n  v_origin extensions.geography;\n  v_destination extensions.geography;\nbegin\n  if v_actor is null then raise exception 'No autenticado'; end if;\n  if p_max_distance_m < 1 or p_max_distance_m > 5000 then\n    raise exception 'Distancia maxima no valida';\n  end if;\n\n  v_origin := extensions.st_setsrid(\n    extensions.st_makepoint(p_origin_lng, p_origin_lat), 4326\n  )::extensions.geography;\n  v_destination := extensions.st_setsrid(\n    extensions.st_makepoint(p_destination_lng, p_destination_lat), 4326\n  )::extensions.geography;\n\n  return query\n  with candidates as (\n    select 'pickup'::text as candidate_role, ts.*,\n      extensions.st_distance(ts.location, v_origin) as candidate_distance\n    from public.transport_stops ts\n    where ts.active\n      and extensions.st_dwithin(ts.location, v_origin, p_max_distance_m)\n    union all\n    select 'dropoff'::text, ts.*,\n      extensions.st_distance(ts.location, v_destination)\n    from public.transport_stops ts\n    where ts.active\n      and extensions.st_dwithin(ts.location, v_destination, p_max_distance_m)\n  )\n  select\n    c.candidate_role,\n    c.stop_id,\n    c.external_id,\n    c.name,\n    c.address,\n    c.municipality,\n    c.stop_type,\n    c.latitude::numeric,\n    c.longitude::numeric,\n    c.candidate_distance,\n    availability.ride_count > 0,\n    availability.ride_count\n  from candidates c\n  cross join lateral (\n    select count(distinct r.ride_id) as ride_count\n    from public.rides r\n    join public.driver_profiles dp on dp.driver_id = r.driver_id\n    join public.ride_stops selected_stop\n      on selected_stop.ride_id = r.ride_id\n     and selected_stop.is_active\n     and selected_stop.route_version = r.version\n     and selected_stop.transport_stop_id = c.stop_id\n    where r.status = 'scheduled'\n      and r.available_seats > 0\n      and r.departure_time >= now()\n      and dp.user_id <> v_actor\n      and (\n        (\n          c.candidate_role = 'pickup'\n          and exists (\n            select 1\n            from public.ride_stops counterpart\n            join public.transport_stops counterpart_catalog\n              on counterpart_catalog.stop_id = counterpart.transport_stop_id\n             and counterpart_catalog.active\n            where counterpart.ride_id = r.ride_id\n              and counterpart.is_active\n              and counterpart.route_version = r.version\n              and counterpart.stop_order > selected_stop.stop_order\n              and extensions.st_dwithin(\n                counterpart.location, v_destination, p_max_distance_m\n              )\n          )\n        )\n        or\n        (\n          c.candidate_role = 'dropoff'\n          and exists (\n            select 1\n            from public.ride_stops counterpart\n            join public.transport_stops counterpart_catalog\n              on counterpart_catalog.stop_id = counterpart.transport_stop_id\n             and counterpart_catalog.active\n            where counterpart.ride_id = r.ride_id\n              and counterpart.is_active\n              and counterpart.route_version = r.version\n              and counterpart.stop_order < selected_stop.stop_order\n              and extensions.st_dwithin(\n                counterpart.location, v_origin, p_max_distance_m\n              )\n          )\n        )\n      )\n  ) availability\n  order by\n    c.candidate_role,\n    (availability.ride_count > 0) desc,\n    (c.stop_type = 'official_boarding_zone') desc,\n    c.candidate_distance,\n    c.name;\nend;\n$function$\n"
+          },
+          {
+            "name": "search_available_rides_by_stops(double precision,double precision,double precision,double precision,uuid,uuid,integer,timestamp with time zone,timestamp with time zone,integer)",
+            "definition": "CREATE OR REPLACE FUNCTION public.search_available_rides_by_stops(p_origin_lat double precision, p_origin_lng double precision, p_destination_lat double precision, p_destination_lng double precision, p_pickup_transport_stop_id uuid, p_dropoff_transport_stop_id uuid, p_max_results integer DEFAULT 50, p_from_time timestamp with time zone DEFAULT NULL::timestamp with time zone, p_to_time timestamp with time zone DEFAULT NULL::timestamp with time zone, p_max_distance_m integer DEFAULT 1000)\n RETURNS TABLE(ride_id uuid, driver_id uuid, driver_name text, driver_rating numeric, vehicle_id uuid, vehicle_brand text, vehicle_model text, vehicle_plate text, vehicle_color text, vehicle_capacity integer, origin_lat numeric, origin_lng numeric, destination_lat numeric, destination_lng numeric, origin_address text, destination_address text, route_polyline text, route_distance_meters integer, route_duration_seconds integer, departure_time timestamp with time zone, available_seats integer, price_per_seat numeric, status text, pickup_stop_id uuid, pickup_stop_name text, pickup_stop_address text, pickup_stop_lat numeric, pickup_stop_lng numeric, pickup_distance_m double precision, dropoff_stop_id uuid, dropoff_stop_name text, dropoff_stop_address text, dropoff_stop_lat numeric, dropoff_stop_lng numeric, dropoff_distance_m double precision)\n LANGUAGE plpgsql\n STABLE SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  v_actor uuid := auth.uid();\n  v_origin extensions.geography;\n  v_destination extensions.geography;\nbegin\n  if v_actor is null then raise exception 'No autenticado'; end if;\n  if p_pickup_transport_stop_id = p_dropoff_transport_stop_id then\n    raise exception 'Selecciona paradas diferentes';\n  end if;\n  if p_max_results < 1 or p_max_results > 100 then\n    raise exception 'Limite de resultados no valido';\n  end if;\n  if p_max_distance_m < 1 or p_max_distance_m > 5000 then\n    raise exception 'Distancia maxima no valida';\n  end if;\n\n  v_origin := extensions.st_setsrid(\n    extensions.st_makepoint(p_origin_lng, p_origin_lat), 4326\n  )::extensions.geography;\n  v_destination := extensions.st_setsrid(\n    extensions.st_makepoint(p_destination_lng, p_destination_lat), 4326\n  )::extensions.geography;\n\n  return query\n  select\n    r.ride_id, r.driver_id, u.full_name, dp.rating,\n    v.vehicle_id, v.brand, v.model, v.license_plate, v.car_color, v.capacity,\n    r.origin_lat, r.origin_lng, r.destination_lat, r.destination_lng,\n    r.origin_address, r.destination_address, r.route_polyline,\n    r.route_distance_meters, r.route_duration_seconds,\n    r.departure_time, r.available_seats, r.price_per_seat, r.status,\n    ps.stop_id, pts.name, ps.address, ps.lat, ps.lng,\n    extensions.st_distance(ps.location, v_origin),\n    ds.stop_id, dts.name, ds.address, ds.lat, ds.lng,\n    extensions.st_distance(ds.location, v_destination)\n  from public.rides r\n  join public.driver_profiles dp on dp.driver_id = r.driver_id\n  join public.users u on u.uuid = dp.user_id\n  join public.vehicles v on v.vehicle_id = r.vehicle_id\n  join public.ride_stops ps\n    on ps.ride_id = r.ride_id\n   and ps.is_active\n   and ps.route_version = r.version\n   and ps.transport_stop_id = p_pickup_transport_stop_id\n  join public.transport_stops pts\n    on pts.stop_id = ps.transport_stop_id and pts.active\n  join public.ride_stops ds\n    on ds.ride_id = r.ride_id\n   and ds.is_active\n   and ds.route_version = r.version\n   and ds.stop_order > ps.stop_order\n   and ds.transport_stop_id = p_dropoff_transport_stop_id\n  join public.transport_stops dts\n    on dts.stop_id = ds.transport_stop_id and dts.active\n  where r.status = 'scheduled'\n    and r.available_seats > 0\n    and r.departure_time >= coalesce(p_from_time, now())\n    and (p_to_time is null or r.departure_time <= p_to_time)\n    and dp.user_id <> v_actor\n    and extensions.st_dwithin(ps.location, v_origin, p_max_distance_m)\n    and extensions.st_dwithin(ds.location, v_destination, p_max_distance_m)\n  order by r.departure_time\n  limit p_max_results;\nend;\n$function$\n"
+          },
+          {
+            "name": "get_passenger_stop_pairs(double precision,double precision,double precision,double precision,integer)",
+            "definition": "CREATE OR REPLACE FUNCTION public.get_passenger_stop_pairs(p_origin_lat double precision, p_origin_lng double precision, p_destination_lat double precision, p_destination_lng double precision, p_max_distance_m integer DEFAULT 1000)\n RETURNS TABLE(pickup_transport_stop_id uuid, dropoff_transport_stop_id uuid, ride_count bigint)\n LANGUAGE plpgsql\n STABLE SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  v_actor uuid := auth.uid();\n  v_origin extensions.geography;\n  v_destination extensions.geography;\nbegin\n  if v_actor is null then raise exception 'No autenticado'; end if;\n  if p_max_distance_m < 1 or p_max_distance_m > 5000 then\n    raise exception 'Distancia maxima no valida';\n  end if;\n\n  v_origin := extensions.st_setsrid(\n    extensions.st_makepoint(p_origin_lng, p_origin_lat), 4326\n  )::extensions.geography;\n  v_destination := extensions.st_setsrid(\n    extensions.st_makepoint(p_destination_lng, p_destination_lat), 4326\n  )::extensions.geography;\n\n  return query\n  select\n    ps.transport_stop_id,\n    ds.transport_stop_id,\n    count(distinct r.ride_id)\n  from public.rides r\n  join public.driver_profiles dp on dp.driver_id = r.driver_id\n  join public.ride_stops ps\n    on ps.ride_id = r.ride_id\n   and ps.is_active\n   and ps.route_version = r.version\n  join public.transport_stops pts\n    on pts.stop_id = ps.transport_stop_id and pts.active\n  join public.ride_stops ds\n    on ds.ride_id = r.ride_id\n   and ds.is_active\n   and ds.route_version = r.version\n   and ds.stop_order > ps.stop_order\n  join public.transport_stops dts\n    on dts.stop_id = ds.transport_stop_id and dts.active\n  where r.status = 'scheduled'\n    and r.available_seats > 0\n    and r.departure_time >= now()\n    and dp.user_id <> v_actor\n    and extensions.st_dwithin(ps.location, v_origin, p_max_distance_m)\n    and extensions.st_dwithin(ds.location, v_destination, p_max_distance_m)\n  group by ps.transport_stop_id, ds.transport_stop_id\n  order by count(distinct r.ride_id) desc,\n    ps.transport_stop_id, ds.transport_stop_id;\nend;\n$function$\n"
+          },
+          {
+            "name": "private.is_current_admin()",
+            "definition": "CREATE OR REPLACE FUNCTION private.is_current_admin()\n RETURNS boolean\n LANGUAGE sql\n STABLE\n SET search_path TO ''\nAS $function$\n  select coalesce(\n    (auth.jwt() -> 'app_metadata' ->> 'role') = 'admin',\n    false\n  )\n$function$\n"
+          },
+          {
+            "name": "admin_upsert_transport_stop(jsonb)",
+            "definition": "CREATE OR REPLACE FUNCTION public.admin_upsert_transport_stop(p_payload jsonb)\n RETURNS uuid\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  v_stop_id uuid := nullif(p_payload->>'stop_id', '')::uuid;\n  v_external_id text := btrim(coalesce(p_payload->>'external_id', ''));\n  v_name text := btrim(coalesce(p_payload->>'name', ''));\n  v_address text := nullif(btrim(coalesce(p_payload->>'address', '')), '');\n  v_municipality text := nullif(\n    btrim(coalesce(p_payload->>'municipality', '')), ''\n  );\n  v_latitude double precision := (p_payload->>'latitude')::double precision;\n  v_longitude double precision := (p_payload->>'longitude')::double precision;\n  v_stop_type text := coalesce(p_payload->>'stop_type', 'general');\n  v_active boolean := coalesce((p_payload->>'active')::boolean, true);\nbegin\n  if not private.is_current_admin() then\n    raise exception 'Acceso administrativo requerido';\n  end if;\n  if v_external_id = '' or v_name = '' then\n    raise exception 'External ID y nombre son requeridos';\n  end if;\n  if v_latitude not between -90 and 90\n     or v_longitude not between -180 and 180 then\n    raise exception 'Coordenadas no validas';\n  end if;\n  if v_stop_type not in ('general', 'official_boarding_zone') then\n    raise exception 'Tipo de parada no valido';\n  end if;\n\n  if v_stop_id is null then\n    insert into public.transport_stops (\n      external_id, name, address, municipality,\n      latitude, longitude, source, active, stop_type\n    ) values (\n      v_external_id, v_name, v_address, v_municipality,\n      v_latitude, v_longitude, 'krow_admin', v_active, v_stop_type\n    )\n    returning stop_id into v_stop_id;\n  else\n    update public.transport_stops\n    set external_id = v_external_id,\n        name = v_name,\n        address = v_address,\n        municipality = v_municipality,\n        latitude = v_latitude,\n        longitude = v_longitude,\n        active = v_active,\n        stop_type = v_stop_type,\n        updated_at = now()\n    where stop_id = v_stop_id;\n    if not found then raise exception 'Parada no encontrada'; end if;\n  end if;\n  return v_stop_id;\nend;\n$function$\n"
+          },
+          {
+            "name": "submit_review(uuid,uuid,smallint,text)",
+            "definition": "CREATE OR REPLACE FUNCTION public.submit_review(p_ride_id uuid, p_reviewee_id uuid, p_rating smallint, p_comment text DEFAULT NULL::text)\n RETURNS uuid\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public', 'extensions'\nAS $function$\nDECLARE\n  v_actor uuid := auth.uid();\n  v_ride_status text;\n  v_review_id uuid;\nBEGIN\n  IF v_actor IS NULL THEN\n    RAISE EXCEPTION 'No autenticado';\n  END IF;\n\n  IF p_ride_id IS NULL OR p_reviewee_id IS NULL OR p_rating IS NULL THEN\n    RAISE EXCEPTION 'Argumentos invalidos';\n  END IF;\n\n  IF p_rating < 1 OR p_rating > 5 THEN\n    RAISE EXCEPTION 'La calificacion debe estar entre 1 y 5';\n  END IF;\n\n  IF v_actor = p_reviewee_id THEN\n    RAISE EXCEPTION 'No puedes calificarte a ti mismo';\n  END IF;\n\n  -- Verify ride is completed\n  SELECT r.status INTO v_ride_status\n    FROM public.rides r\n   WHERE r.ride_id = p_ride_id;\n\n  IF NOT FOUND THEN\n    RAISE EXCEPTION 'El viaje no existe';\n  END IF;\n\n  IF v_ride_status <> 'completed' THEN\n    RAISE EXCEPTION 'Solo se pueden calificar viajes completados';\n  END IF;\n\n  -- Verify reviewer participated in the ride (as driver or passenger with completed booking)\n  IF NOT EXISTS (\n    -- Is the driver of this ride\n    SELECT 1\n      FROM public.driver_profiles dp\n      JOIN public.rides rr ON rr.driver_id = dp.driver_id\n     WHERE rr.ride_id = p_ride_id\n       AND dp.user_id = v_actor\n  ) AND NOT EXISTS (\n    -- Has a completed booking on this ride\n    SELECT 1\n      FROM public.bookings b\n     WHERE b.ride_id = p_ride_id\n       AND b.user_id = v_actor\n       AND b.status = 'completed'\n  ) THEN\n    RAISE EXCEPTION 'No participaste en este viaje';\n  END IF;\n\n  -- Verify reviewee participated in the ride\n  IF NOT EXISTS (\n    SELECT 1\n      FROM public.driver_profiles dp\n      JOIN public.rides rr ON rr.driver_id = dp.driver_id\n     WHERE rr.ride_id = p_ride_id\n       AND dp.user_id = p_reviewee_id\n  ) AND NOT EXISTS (\n    SELECT 1\n      FROM public.bookings b\n     WHERE b.ride_id = p_ride_id\n       AND b.user_id = p_reviewee_id\n       AND b.status = 'completed'\n  ) THEN\n    RAISE EXCEPTION 'La persona a calificar no participo en este viaje';\n  END IF;\n\n  -- Upsert review\n  INSERT INTO public.ride_reviews (\n    ride_id, reviewer_id, reviewee_id, rating, comment\n  ) VALUES (\n    p_ride_id, v_actor, p_reviewee_id, p_rating, p_comment\n  )\n  ON CONFLICT (ride_id, reviewer_id, reviewee_id)\n  DO UPDATE SET\n    rating = EXCLUDED.rating,\n    comment = EXCLUDED.comment,\n    created_at = now()\n  RETURNING review_id INTO v_review_id;\n\n  RETURN v_review_id;\nEND;\n$function$\n"
+          },
+          {
+            "name": "private.route_stop_selection(jsonb,uuid[],integer)",
+            "definition": "CREATE OR REPLACE FUNCTION private.route_stop_selection(p_route_geojson jsonb, p_stop_ids uuid[], p_corridor_m integer DEFAULT 500)\n RETURNS TABLE(stop_id uuid, stop_order integer, route_fraction double precision)\n LANGUAGE sql\n STABLE\n SET search_path TO ''\nAS $function$\n  with route as (\n    select extensions.st_setsrid(\n      extensions.st_geomfromgeojson(p_route_geojson::text), 4326\n    ) as geom\n  ), ranked as (\n    select ts.stop_id,\n      extensions.st_linelocatepoint(route.geom, ts.location::extensions.geometry) as route_fraction\n    from public.transport_stops ts cross join route\n    where ts.active and ts.stop_id = any(p_stop_ids)\n      and extensions.st_dwithin(ts.location, route.geom::extensions.geography, p_corridor_m)\n  )\n  select ranked.stop_id,\n    row_number() over (order by ranked.route_fraction, ranked.stop_id)::integer,\n    ranked.route_fraction\n  from ranked order by ranked.route_fraction, ranked.stop_id;\n$function$\n"
+          },
+          {
+            "name": "delete_favorite_route(uuid)",
+            "definition": "CREATE OR REPLACE FUNCTION public.delete_favorite_route(p_route_id uuid)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  v_actor uuid := auth.uid();\nbegin\n  if v_actor is null then raise exception 'No autenticado'; end if;\n  delete from public.favorite_routes fr\n  using public.driver_profiles dp\n  where fr.route_id = p_route_id\n    and dp.driver_id = fr.driver_id and dp.user_id = v_actor;\n  if not found then raise exception 'Ruta favorita no encontrada'; end if;\nend;\n$function$\n"
+          },
+          {
+            "name": "find_compatible_transport_stops(jsonb,integer)",
+            "definition": "CREATE OR REPLACE FUNCTION public.find_compatible_transport_stops(p_route_geojson jsonb, p_corridor_m integer DEFAULT 500)\n RETURNS TABLE(stop_id uuid, external_id text, name text, address text, municipality text, lat double precision, lng double precision, distance_from_route_m double precision, route_fraction double precision)\n LANGUAGE plpgsql\n STABLE\n SET search_path TO ''\nAS $function$\ndeclare\n  v_actor uuid := auth.uid();\n  v_route extensions.geometry;\nbegin\n  if v_actor is null then raise exception 'No autenticado'; end if;\n  if p_corridor_m < 1 or p_corridor_m > 5000 then\n    raise exception 'El corredor solicitado no es valido';\n  end if;\n  v_route := extensions.st_setsrid(\n    extensions.st_geomfromgeojson(p_route_geojson::text), 4326\n  );\n  if extensions.st_geometrytype(v_route) <> 'ST_LineString' then\n    raise exception 'La geometria de ruta debe ser LineString';\n  end if;\n  return query\n  select ts.stop_id, ts.external_id, ts.name, ts.address, ts.municipality,\n    ts.latitude, ts.longitude,\n    extensions.st_distance(ts.location, v_route::extensions.geography),\n    extensions.st_linelocatepoint(v_route, ts.location::extensions.geometry)\n  from public.transport_stops ts\n  where ts.active\n    and extensions.st_dwithin(ts.location, v_route::extensions.geography, p_corridor_m)\n  order by extensions.st_linelocatepoint(v_route, ts.location::extensions.geometry), ts.name;\nend;\n$function$\n"
+          },
+          {
+            "name": "upsert_favorite_route(jsonb)",
+            "definition": "CREATE OR REPLACE FUNCTION public.upsert_favorite_route(p_payload jsonb)\n RETURNS uuid\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  v_actor uuid := auth.uid();\n  v_driver_id uuid;\n  v_route_id uuid;\n  v_stop_ids uuid[];\n  v_selected_count integer;\n  v_default_vehicle_id uuid;\n  v_default_capacity integer;\n  v_default_seats integer;\n  v_default_price numeric;\n  v_route_name text;\nbegin\n  if v_actor is null then raise exception 'No autenticado'; end if;\n  select dp.driver_id into v_driver_id\n  from public.driver_profiles dp\n  where dp.user_id = v_actor and dp.status = 'approved';\n  if v_driver_id is null then\n    raise exception 'Se requiere un perfil de conductor aprobado';\n  end if;\n\n  v_route_name := btrim(coalesce(p_payload->>'name', ''));\n  if length(v_route_name) < 1 or length(v_route_name) > 80 then\n    raise exception 'El nombre de la ruta no es valido';\n  end if;\n  select coalesce(array_agg(item.value::uuid order by item.ordinality), '{}'::uuid[])\n    into v_stop_ids\n  from jsonb_array_elements_text(\n    coalesce(p_payload->'transport_stop_ids', '[]'::jsonb)\n  ) with ordinality as item(value, ordinality);\n  if cardinality(v_stop_ids) < 2 then\n    raise exception 'Selecciona al menos dos paradas';\n  end if;\n  if cardinality(v_stop_ids) <> (\n    select count(distinct selected_id) from unnest(v_stop_ids) as selected_id\n  ) then\n    raise exception 'Las paradas no pueden repetirse';\n  end if;\n  select count(*) into v_selected_count\n  from private.route_stop_selection(p_payload->'route_geojson', v_stop_ids, 500);\n  if v_selected_count <> cardinality(v_stop_ids) then\n    raise exception 'Una o mas paradas no pertenecen al corredor de la ruta';\n  end if;\n\n  v_default_vehicle_id := nullif(p_payload->>'default_vehicle_id', '')::uuid;\n  v_default_seats := nullif(p_payload->>'default_available_seats', '')::integer;\n  v_default_price := nullif(p_payload->>'default_price_per_seat', '')::numeric;\n  if v_default_vehicle_id is not null then\n    select v.capacity into v_default_capacity\n    from public.vehicles v\n    where v.vehicle_id = v_default_vehicle_id\n      and v.driver_id = v_driver_id and v.is_active;\n    if v_default_capacity is null then\n      raise exception 'El vehiculo predeterminado no es valido';\n    end if;\n    if v_default_seats is not null\n       and v_default_seats > greatest(v_default_capacity - 1, 0) then\n      raise exception 'Los asientos exceden la capacidad del vehiculo';\n    end if;\n  end if;\n  if v_default_seats is not null and v_default_seats < 1 then\n    raise exception 'La cantidad predeterminada de asientos no es valida';\n  end if;\n  if v_default_price is not null and v_default_price <= 0 then\n    raise exception 'El precio predeterminado debe ser mayor que cero';\n  end if;\n\n  v_route_id := nullif(p_payload->>'route_id', '')::uuid;\n  if v_route_id is null then\n    insert into public.favorite_routes (\n      driver_id, name, origin_place_id, origin_address, origin_lat, origin_lng,\n      destination_place_id, destination_address, destination_lat, destination_lng,\n      default_vehicle_id, default_available_seats, default_price_per_seat\n    ) values (\n      v_driver_id, v_route_name,\n      nullif(p_payload->>'origin_place_id', ''), p_payload->>'origin_address',\n      (p_payload->>'origin_lat')::double precision,\n      (p_payload->>'origin_lng')::double precision,\n      nullif(p_payload->>'destination_place_id', ''), p_payload->>'destination_address',\n      (p_payload->>'destination_lat')::double precision,\n      (p_payload->>'destination_lng')::double precision,\n      v_default_vehicle_id, v_default_seats, v_default_price\n    ) returning route_id into v_route_id;\n  else\n    perform 1 from public.favorite_routes fr\n    where fr.route_id = v_route_id and fr.driver_id = v_driver_id for update;\n    if not found then raise exception 'Ruta favorita no encontrada'; end if;\n    update public.favorite_routes\n    set name = v_route_name,\n        origin_place_id = nullif(p_payload->>'origin_place_id', ''),\n        origin_address = p_payload->>'origin_address',\n        origin_lat = (p_payload->>'origin_lat')::double precision,\n        origin_lng = (p_payload->>'origin_lng')::double precision,\n        destination_place_id = nullif(p_payload->>'destination_place_id', ''),\n        destination_address = p_payload->>'destination_address',\n        destination_lat = (p_payload->>'destination_lat')::double precision,\n        destination_lng = (p_payload->>'destination_lng')::double precision,\n        default_vehicle_id = v_default_vehicle_id,\n        default_available_seats = v_default_seats,\n        default_price_per_seat = v_default_price,\n        updated_at = now()\n    where route_id = v_route_id;\n    delete from public.favorite_route_stops where route_id = v_route_id;\n  end if;\n  insert into public.favorite_route_stops (\n    route_id, transport_stop_id, stop_order, route_fraction\n  )\n  select v_route_id, selection.stop_id, selection.stop_order, selection.route_fraction\n  from private.route_stop_selection(\n    p_payload->'route_geojson', v_stop_ids, 500\n  ) selection;\n  return v_route_id;\nend;\n$function$\n"
+          },
+          {
+            "name": "create_ride_v2(jsonb)",
+            "definition": "CREATE OR REPLACE FUNCTION public.create_ride_v2(p_payload jsonb)\n RETURNS uuid\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  v_actor uuid := auth.uid();\n  v_driver_id uuid;\n  v_vehicle_id uuid;\n  v_vehicle_capacity integer;\n  v_favorite_route_id uuid;\n  v_ride_id uuid;\n  v_stop_ids uuid[];\n  v_selected_count integer;\n  v_available_seats integer;\n  v_price numeric;\n  v_departure timestamptz;\nbegin\n  if v_actor is null then raise exception 'No autenticado'; end if;\n  select dp.driver_id into v_driver_id\n  from public.driver_profiles dp\n  where dp.user_id = v_actor and dp.status = 'approved';\n  if v_driver_id is null then\n    raise exception 'Se requiere un perfil de conductor aprobado';\n  end if;\n  v_vehicle_id := (p_payload->>'vehicle_id')::uuid;\n  select v.capacity into v_vehicle_capacity\n  from public.vehicles v\n  where v.vehicle_id = v_vehicle_id\n    and v.driver_id = v_driver_id and v.is_active;\n  if v_vehicle_capacity is null then raise exception 'Vehiculo no valido'; end if;\n  v_available_seats := (p_payload->>'available_seats')::integer;\n  if v_available_seats < 1\n     or v_available_seats > greatest(v_vehicle_capacity - 1, 0) then\n    raise exception 'Los asientos exceden la capacidad disponible';\n  end if;\n  v_price := (p_payload->>'price_per_seat')::numeric;\n  if v_price <= 0 then raise exception 'El precio debe ser mayor que cero'; end if;\n  v_departure := (p_payload->>'departure_time')::timestamptz;\n  if v_departure < now() + interval '15 minutes' then\n    raise exception 'La salida debe programarse con al menos 15 minutos';\n  end if;\n\n  v_favorite_route_id := nullif(p_payload->>'favorite_route_id', '')::uuid;\n  if v_favorite_route_id is not null and not exists (\n    select 1 from public.favorite_routes fr\n    where fr.route_id = v_favorite_route_id and fr.driver_id = v_driver_id\n  ) then\n    raise exception 'Ruta favorita no valida';\n  end if;\n  select coalesce(array_agg(item.value::uuid order by item.ordinality), '{}'::uuid[])\n    into v_stop_ids\n  from jsonb_array_elements_text(\n    coalesce(p_payload->'transport_stop_ids', '[]'::jsonb)\n  ) with ordinality as item(value, ordinality);\n  if cardinality(v_stop_ids) < 2 then raise exception 'Selecciona al menos dos paradas'; end if;\n  if cardinality(v_stop_ids) <> (\n    select count(distinct selected_id) from unnest(v_stop_ids) as selected_id\n  ) then raise exception 'Las paradas no pueden repetirse'; end if;\n  select count(*) into v_selected_count\n  from private.route_stop_selection(p_payload->'route_geojson', v_stop_ids, 500);\n  if v_selected_count <> cardinality(v_stop_ids) then\n    raise exception 'Una o mas paradas no pertenecen al corredor de la ruta';\n  end if;\n\n  insert into public.rides (\n    driver_id, vehicle_id, favorite_route_id,\n    origin_lat, origin_lng, destination_lat, destination_lng,\n    origin_address, destination_address, route_polyline,\n    route_distance_meters, route_duration_seconds, route_provider,\n    route_calculated_at, departure_time, available_seats,\n    price_per_seat, status\n  ) values (\n    v_driver_id, v_vehicle_id, v_favorite_route_id,\n    (p_payload->>'origin_lat')::numeric, (p_payload->>'origin_lng')::numeric,\n    (p_payload->>'destination_lat')::numeric,\n    (p_payload->>'destination_lng')::numeric,\n    nullif(p_payload->>'origin_address', ''),\n    nullif(p_payload->>'destination_address', ''),\n    p_payload->>'route_polyline',\n    (p_payload->>'route_distance_meters')::integer,\n    (p_payload->>'route_duration_seconds')::integer,\n    coalesce(nullif(p_payload->>'route_provider', ''), 'google'),\n    coalesce((p_payload->>'route_calculated_at')::timestamptz, now()),\n    v_departure, v_available_seats, v_price, 'scheduled'\n  ) returning ride_id into v_ride_id;\n  insert into public.ride_stops (\n    ride_id, transport_stop_id, lat, lng, address,\n    stop_order, route_version, is_active, route_fraction\n  )\n  select v_ride_id, ts.stop_id, ts.latitude, ts.longitude,\n    coalesce(nullif(ts.address, ''), ts.name),\n    selection.stop_order, 1, true, selection.route_fraction\n  from private.route_stop_selection(\n    p_payload->'route_geojson', v_stop_ids, 500\n  ) selection\n  join public.transport_stops ts on ts.stop_id = selection.stop_id;\n  insert into public.ride_status_history (\n    ride_id, status, previous_status, actor_id, reason\n  ) values (\n    v_ride_id, 'scheduled', null, v_actor, 'ride_created_with_catalog_stops'\n  );\n  return v_ride_id;\nend;\n$function$\n"
+          },
+          {
+            "name": "update_ride_v2(uuid,integer,jsonb)",
+            "definition": "CREATE OR REPLACE FUNCTION public.update_ride_v2(p_ride_id uuid, p_expected_version integer, p_payload jsonb)\n RETURNS integer\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  v_actor uuid := auth.uid();\n  v_driver_id uuid;\n  v_ride public.rides%rowtype;\n  v_vehicle_id uuid;\n  v_vehicle_capacity integer;\n  v_favorite_route_id uuid;\n  v_stop_ids uuid[];\n  v_selected_count integer;\n  v_available_seats integer;\n  v_price numeric;\n  v_departure timestamptz;\n  v_new_version integer;\nbegin\n  if v_actor is null then raise exception 'No autenticado'; end if;\n  select dp.driver_id into v_driver_id\n  from public.driver_profiles dp\n  where dp.user_id = v_actor and dp.status = 'approved';\n  if v_driver_id is null then\n    raise exception 'Se requiere un perfil de conductor aprobado';\n  end if;\n  select * into v_ride from public.rides r\n  where r.ride_id = p_ride_id for update;\n  if not found or v_ride.driver_id <> v_driver_id then\n    raise exception 'Viaje no encontrado';\n  end if;\n  if v_ride.status <> 'scheduled' then\n    raise exception 'El viaje ya no se puede editar';\n  end if;\n  if v_ride.version <> p_expected_version then\n    raise exception 'Conflicto de version del viaje';\n  end if;\n  if exists (\n    select 1 from public.bookings b\n    where b.ride_id = p_ride_id\n      and b.status in ('pending', 'confirmed', 'in_progress')\n  ) then\n    raise exception 'El viaje tiene reservas activas y no se puede editar';\n  end if;\n\n  v_vehicle_id := (p_payload->>'vehicle_id')::uuid;\n  select v.capacity into v_vehicle_capacity\n  from public.vehicles v\n  where v.vehicle_id = v_vehicle_id\n    and v.driver_id = v_driver_id and v.is_active;\n  if v_vehicle_capacity is null then raise exception 'Vehiculo no valido'; end if;\n  v_available_seats := (p_payload->>'available_seats')::integer;\n  if v_available_seats < 1\n     or v_available_seats > greatest(v_vehicle_capacity - 1, 0) then\n    raise exception 'Los asientos exceden la capacidad disponible';\n  end if;\n  v_price := (p_payload->>'price_per_seat')::numeric;\n  if v_price <= 0 then raise exception 'El precio debe ser mayor que cero'; end if;\n  v_departure := (p_payload->>'departure_time')::timestamptz;\n  if v_departure < now() + interval '15 minutes' then\n    raise exception 'La salida debe programarse con al menos 15 minutos';\n  end if;\n  v_favorite_route_id := nullif(p_payload->>'favorite_route_id', '')::uuid;\n  if v_favorite_route_id is not null and not exists (\n    select 1 from public.favorite_routes fr\n    where fr.route_id = v_favorite_route_id and fr.driver_id = v_driver_id\n  ) then\n    raise exception 'Ruta favorita no valida';\n  end if;\n\n  select coalesce(array_agg(item.value::uuid order by item.ordinality), '{}'::uuid[])\n    into v_stop_ids\n  from jsonb_array_elements_text(\n    coalesce(p_payload->'transport_stop_ids', '[]'::jsonb)\n  ) with ordinality as item(value, ordinality);\n  if cardinality(v_stop_ids) < 2 then raise exception 'Selecciona al menos dos paradas'; end if;\n  if cardinality(v_stop_ids) <> (\n    select count(distinct selected_id) from unnest(v_stop_ids) as selected_id\n  ) then raise exception 'Las paradas no pueden repetirse'; end if;\n  select count(*) into v_selected_count\n  from private.route_stop_selection(p_payload->'route_geojson', v_stop_ids, 500);\n  if v_selected_count <> cardinality(v_stop_ids) then\n    raise exception 'Una o mas paradas no pertenecen al corredor de la ruta';\n  end if;\n\n  v_new_version := v_ride.version + 1;\n  update public.ride_stops set is_active = false\n  where ride_id = p_ride_id and is_active;\n  update public.rides\n  set vehicle_id = v_vehicle_id,\n      favorite_route_id = v_favorite_route_id,\n      origin_lat = (p_payload->>'origin_lat')::numeric,\n      origin_lng = (p_payload->>'origin_lng')::numeric,\n      destination_lat = (p_payload->>'destination_lat')::numeric,\n      destination_lng = (p_payload->>'destination_lng')::numeric,\n      origin_address = nullif(p_payload->>'origin_address', ''),\n      destination_address = nullif(p_payload->>'destination_address', ''),\n      route_polyline = p_payload->>'route_polyline',\n      route_distance_meters = (p_payload->>'route_distance_meters')::integer,\n      route_duration_seconds = (p_payload->>'route_duration_seconds')::integer,\n      route_provider = coalesce(nullif(p_payload->>'route_provider', ''), 'google'),\n      route_calculated_at = coalesce(\n        (p_payload->>'route_calculated_at')::timestamptz, now()\n      ),\n      departure_time = v_departure,\n      available_seats = v_available_seats,\n      price_per_seat = v_price,\n      updated_at = now(),\n      version = v_new_version\n  where ride_id = p_ride_id;\n  insert into public.ride_stops (\n    ride_id, transport_stop_id, lat, lng, address,\n    stop_order, route_version, is_active, route_fraction\n  )\n  select p_ride_id, ts.stop_id, ts.latitude, ts.longitude,\n    coalesce(nullif(ts.address, ''), ts.name),\n    selection.stop_order, v_new_version, true, selection.route_fraction\n  from private.route_stop_selection(\n    p_payload->'route_geojson', v_stop_ids, 500\n  ) selection\n  join public.transport_stops ts on ts.stop_id = selection.stop_id;\n  insert into public.ride_status_history (\n    ride_id, status, previous_status, actor_id, reason\n  ) values (\n    p_ride_id, 'scheduled', 'scheduled', v_actor, 'ride_updated_by_driver'\n  );\n  return v_new_version;\nend;\n$function$\n"
+          },
+          {
+            "name": "search_available_rides_v2(double precision,double precision,double precision,double precision,integer,timestamp with time zone,timestamp with time zone,integer)",
+            "definition": "CREATE OR REPLACE FUNCTION public.search_available_rides_v2(p_origin_lat double precision, p_origin_lng double precision, p_destination_lat double precision, p_destination_lng double precision, p_max_results integer DEFAULT 50, p_from_time timestamp with time zone DEFAULT NULL::timestamp with time zone, p_to_time timestamp with time zone DEFAULT NULL::timestamp with time zone, p_max_distance_m integer DEFAULT 500)\n RETURNS TABLE(ride_id uuid, driver_id uuid, driver_name text, driver_rating numeric, vehicle_id uuid, vehicle_brand text, vehicle_model text, vehicle_plate text, vehicle_color text, vehicle_capacity integer, origin_lat numeric, origin_lng numeric, destination_lat numeric, destination_lng numeric, origin_address text, destination_address text, route_polyline text, route_distance_meters integer, route_duration_seconds integer, departure_time timestamp with time zone, available_seats integer, price_per_seat numeric, status text, pickup_stop_id uuid, pickup_stop_name text, pickup_stop_address text, pickup_stop_lat numeric, pickup_stop_lng numeric, pickup_distance_m double precision, dropoff_stop_id uuid, dropoff_stop_name text, dropoff_stop_address text, dropoff_stop_lat numeric, dropoff_stop_lng numeric, dropoff_distance_m double precision)\n LANGUAGE plpgsql\n STABLE SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  v_actor uuid := auth.uid();\n  v_origin extensions.geography;\n  v_destination extensions.geography;\nbegin\n  if v_actor is null then raise exception 'No autenticado'; end if;\n  if p_max_results < 1 or p_max_results > 100 then\n    raise exception 'Limite de resultados no valido';\n  end if;\n  if p_max_distance_m < 1 or p_max_distance_m > 5000 then\n    raise exception 'Distancia maxima no valida';\n  end if;\n  v_origin := extensions.st_setsrid(\n    extensions.st_makepoint(p_origin_lng, p_origin_lat), 4326\n  )::extensions.geography;\n  v_destination := extensions.st_setsrid(\n    extensions.st_makepoint(p_destination_lng, p_destination_lat), 4326\n  )::extensions.geography;\n  return query\n  select\n    r.ride_id, r.driver_id, u.full_name, dp.rating,\n    v.vehicle_id, v.brand, v.model, v.license_plate, v.car_color, v.capacity,\n    r.origin_lat, r.origin_lng, r.destination_lat, r.destination_lng,\n    r.origin_address, r.destination_address, r.route_polyline,\n    r.route_distance_meters, r.route_duration_seconds,\n    r.departure_time, r.available_seats, r.price_per_seat, r.status,\n    pair.pickup_stop_id, pair.pickup_name, pair.pickup_address,\n    pair.pickup_lat, pair.pickup_lng, pair.pickup_distance_m,\n    pair.dropoff_stop_id, pair.dropoff_name, pair.dropoff_address,\n    pair.dropoff_lat, pair.dropoff_lng, pair.dropoff_distance_m\n  from public.rides r\n  join public.driver_profiles dp on dp.driver_id = r.driver_id\n  join public.users u on u.uuid = dp.user_id\n  join public.vehicles v on v.vehicle_id = r.vehicle_id\n  join lateral (\n    select\n      ps.stop_id as pickup_stop_id,\n      pts.name as pickup_name,\n      ps.address as pickup_address,\n      ps.lat as pickup_lat,\n      ps.lng as pickup_lng,\n      extensions.st_distance(ps.location, v_origin) as pickup_distance_m,\n      ds.stop_id as dropoff_stop_id,\n      dts.name as dropoff_name,\n      ds.address as dropoff_address,\n      ds.lat as dropoff_lat,\n      ds.lng as dropoff_lng,\n      extensions.st_distance(ds.location, v_destination) as dropoff_distance_m\n    from public.ride_stops ps\n    join public.transport_stops pts on pts.stop_id = ps.transport_stop_id\n    join public.ride_stops ds\n      on ds.ride_id = ps.ride_id and ds.is_active\n     and ds.stop_order > ps.stop_order\n    join public.transport_stops dts on dts.stop_id = ds.transport_stop_id\n    where ps.ride_id = r.ride_id and ps.is_active\n      and ps.route_version = r.version and ds.route_version = r.version\n      and extensions.st_dwithin(ps.location, v_origin, p_max_distance_m)\n      and extensions.st_dwithin(ds.location, v_destination, p_max_distance_m)\n    order by\n      extensions.st_distance(ps.location, v_origin)\n      + extensions.st_distance(ds.location, v_destination),\n      ps.stop_order, ds.stop_order\n    limit 1\n  ) pair on true\n  where r.status = 'scheduled' and r.available_seats > 0\n    and r.departure_time >= coalesce(p_from_time, now())\n    and (p_to_time is null or r.departure_time <= p_to_time)\n    and dp.user_id <> v_actor\n  order by r.departure_time\n  limit p_max_results;\nend;\n$function$\n"
+          },
+          {
+            "name": "get_ride_stop_options(uuid,double precision,double precision,double precision,double precision,integer)",
+            "definition": "CREATE OR REPLACE FUNCTION public.get_ride_stop_options(p_ride_id uuid, p_origin_lat double precision, p_origin_lng double precision, p_destination_lat double precision, p_destination_lng double precision, p_max_distance_m integer DEFAULT 500)\n RETURNS TABLE(pickup_stop_id uuid, pickup_stop_name text, pickup_stop_address text, pickup_stop_lat numeric, pickup_stop_lng numeric, pickup_distance_m double precision, dropoff_stop_id uuid, dropoff_stop_name text, dropoff_stop_address text, dropoff_stop_lat numeric, dropoff_stop_lng numeric, dropoff_distance_m double precision)\n LANGUAGE plpgsql\n STABLE SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  v_actor uuid := auth.uid();\n  v_origin extensions.geography;\n  v_destination extensions.geography;\nbegin\n  if v_actor is null then raise exception 'No autenticado'; end if;\n  if p_max_distance_m < 1 or p_max_distance_m > 5000 then\n    raise exception 'Distancia maxima no valida';\n  end if;\n  v_origin := extensions.st_setsrid(\n    extensions.st_makepoint(p_origin_lng, p_origin_lat), 4326\n  )::extensions.geography;\n  v_destination := extensions.st_setsrid(\n    extensions.st_makepoint(p_destination_lng, p_destination_lat), 4326\n  )::extensions.geography;\n  return query\n  select ps.stop_id, pts.name, ps.address, ps.lat, ps.lng,\n    extensions.st_distance(ps.location, v_origin),\n    ds.stop_id, dts.name, ds.address, ds.lat, ds.lng,\n    extensions.st_distance(ds.location, v_destination)\n  from public.rides r\n  join public.ride_stops ps\n    on ps.ride_id = r.ride_id and ps.is_active and ps.route_version = r.version\n  join public.transport_stops pts on pts.stop_id = ps.transport_stop_id\n  join public.ride_stops ds\n    on ds.ride_id = r.ride_id and ds.is_active\n   and ds.route_version = r.version and ds.stop_order > ps.stop_order\n  join public.transport_stops dts on dts.stop_id = ds.transport_stop_id\n  where r.ride_id = p_ride_id and r.status = 'scheduled'\n    and r.available_seats > 0\n    and extensions.st_dwithin(ps.location, v_origin, p_max_distance_m)\n    and extensions.st_dwithin(ds.location, v_destination, p_max_distance_m)\n  order by\n    extensions.st_distance(ps.location, v_origin)\n    + extensions.st_distance(ds.location, v_destination),\n    ps.stop_order, ds.stop_order\n  limit 50;\nend;\n$function$\n"
+          },
+          {
+            "name": "request_booking_v2(jsonb)",
+            "definition": "CREATE OR REPLACE FUNCTION public.request_booking_v2(p_payload jsonb)\n RETURNS uuid\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  v_actor uuid := auth.uid();\n  v_ride public.rides%rowtype;\n  v_booking_id uuid;\n  v_pickup public.ride_stops%rowtype;\n  v_dropoff public.ride_stops%rowtype;\n  v_seats integer;\nbegin\n  if v_actor is null then raise exception 'No autenticado'; end if;\n  if not exists (select 1 from public.users u where u.uuid = v_actor) then\n    raise exception 'Perfil de usuario no encontrado';\n  end if;\n  select * into v_ride\n  from public.rides r\n  where r.ride_id = (p_payload->>'ride_id')::uuid\n  for update;\n  if not found then raise exception 'El viaje no existe'; end if;\n  if v_ride.status <> 'scheduled' then\n    raise exception 'El viaje no acepta reservaciones';\n  end if;\n  if exists (\n    select 1 from public.driver_profiles dp\n    where dp.driver_id = v_ride.driver_id and dp.user_id = v_actor\n  ) then\n    raise exception 'No puedes reservar tu propio viaje';\n  end if;\n  if exists (\n    select 1 from public.bookings b\n    where b.user_id = v_actor\n      and b.status in ('pending', 'confirmed', 'in_progress')\n  ) then\n    raise exception 'Ya tienes una reservacion activa';\n  end if;\n  v_seats := coalesce((p_payload->>'seats_reserved')::integer, 1);\n  if v_seats < 1 or v_seats > v_ride.available_seats then\n    raise exception 'No hay suficientes asientos disponibles';\n  end if;\n  select * into v_pickup from public.ride_stops rs\n  where rs.stop_id = (p_payload->>'pickup_stop_id')::uuid\n    and rs.ride_id = v_ride.ride_id and rs.is_active\n    and rs.route_version = v_ride.version;\n  select * into v_dropoff from public.ride_stops rs\n  where rs.stop_id = (p_payload->>'dropoff_stop_id')::uuid\n    and rs.ride_id = v_ride.ride_id and rs.is_active\n    and rs.route_version = v_ride.version;\n  if v_pickup.stop_id is null or v_dropoff.stop_id is null then\n    raise exception 'Las paradas seleccionadas no son validas';\n  end if;\n  if v_pickup.transport_stop_id is null\n     or v_dropoff.transport_stop_id is null\n     or v_pickup.stop_order >= v_dropoff.stop_order then\n    raise exception 'La parada de bajada debe estar despues de la subida';\n  end if;\n  insert into public.bookings (\n    ride_id, user_id, pickup_stop_id, dropoff_stop_id,\n    seats_reserved, status\n  ) values (\n    v_ride.ride_id, v_actor, v_pickup.stop_id, v_dropoff.stop_id,\n    v_seats, 'pending'\n  ) returning booking_id into v_booking_id;\n  return v_booking_id;\nend;\n$function$\n"
+          },
+          {
+            "name": "search_available_rides(integer,timestamp with time zone,timestamp with time zone)",
+            "definition": "CREATE OR REPLACE FUNCTION public.search_available_rides(p_max_results integer DEFAULT 50, p_from_time timestamp with time zone DEFAULT NULL::timestamp with time zone, p_to_time timestamp with time zone DEFAULT NULL::timestamp with time zone)\n RETURNS TABLE(ride_id uuid, driver_id uuid, driver_user_id uuid, driver_name text, driver_rating numeric, vehicle_id uuid, vehicle_brand text, vehicle_model text, vehicle_plate text, vehicle_color text, origin_lat numeric, origin_lng numeric, destination_lat numeric, destination_lng numeric, origin_address text, destination_address text, route_polyline text, departure_time timestamp with time zone, available_seats integer, price_per_seat numeric, status text)\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\n  select\n    r.ride_id,\n    r.driver_id,\n    dp.user_id            as driver_user_id,\n    u.full_name           as driver_name,\n    coalesce(dp.rating, u.rating) as driver_rating,\n    v.vehicle_id,\n    v.brand               as vehicle_brand,\n    v.model               as vehicle_model,\n    v.license_plate       as vehicle_plate,\n    v.car_color           as vehicle_color,\n    r.origin_lat,\n    r.origin_lng,\n    r.destination_lat,\n    r.destination_lng,\n    r.origin_address,\n    r.destination_address,\n    r.route_polyline,\n    r.departure_time,\n    r.available_seats,\n    r.price_per_seat,\n    r.status\n  from rides r\n  join driver_profiles dp on dp.driver_id = r.driver_id\n  left join users u  on u.uuid = dp.user_id\n  left join vehicles v on v.vehicle_id = r.vehicle_id\n  where r.status = 'scheduled'\n    and r.available_seats > 0\n    and r.departure_time > coalesce(p_from_time, now())\n    and (p_to_time is null or r.departure_time <= p_to_time)\n    and not exists (\n      select 1 from driver_profiles dpme\n      where dpme.driver_id = r.driver_id\n        and dpme.user_id   = auth.uid()\n    )\n  order by r.departure_time asc\n  limit greatest(coalesce(p_max_results, 50), 1);\n$function$\n"
+          },
+          {
+            "name": "update_booking_status(uuid,text,text)",
+            "definition": "CREATE OR REPLACE FUNCTION public.update_booking_status(p_booking_id uuid, p_new_status text, p_reason text DEFAULT NULL::text)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\nDECLARE\n  v_actor     uuid := auth.uid();\n  v_booking   public.bookings%ROWTYPE;\n  v_ride      public.rides%ROWTYPE;\n  v_prev_ride text;\n  v_is_driver boolean;\n  v_is_owner  boolean;\nBEGIN\n  IF v_actor IS NULL THEN\n    RAISE EXCEPTION 'No autenticado';\n  END IF;\n\n  IF p_booking_id IS NULL OR p_new_status IS NULL THEN\n    RAISE EXCEPTION 'Argumentos invalidos';\n  END IF;\n\n  SELECT *\n    INTO v_booking\n    FROM public.bookings b\n   WHERE b.booking_id = p_booking_id;\n\n  IF NOT FOUND THEN\n    RAISE EXCEPTION 'La reserva no existe';\n  END IF;\n\n  SELECT *\n    INTO v_ride\n    FROM public.rides r\n   WHERE r.ride_id = v_booking.ride_id\n     FOR UPDATE;\n\n  SELECT *\n    INTO v_booking\n    FROM public.bookings b\n   WHERE b.booking_id = p_booking_id\n     FOR UPDATE;\n\n  IF v_booking.status = p_new_status THEN\n    RETURN;\n  END IF;\n\n  v_prev_ride := v_ride.status;\n\n  SELECT EXISTS (\n           SELECT 1\n             FROM public.driver_profiles dp\n            WHERE dp.driver_id = v_ride.driver_id\n              AND dp.user_id = v_actor\n         )\n    INTO v_is_driver;\n\n  v_is_owner := v_booking.user_id = v_actor;\n\n  IF NOT (v_is_driver OR v_is_owner) THEN\n    RAISE EXCEPTION 'No tienes permiso para modificar esta reserva';\n  END IF;\n\n  IF v_is_driver THEN\n    IF p_new_status NOT IN ('confirmed', 'rejected') THEN\n      RAISE EXCEPTION 'Estado no permitido para el conductor';\n    END IF;\n  ELSIF p_new_status <> 'cancelled' THEN\n    RAISE EXCEPTION 'Solo el pasajero puede cancelar desde el cliente';\n  END IF;\n\n  PERFORM public.validate_booking_transition(v_booking.status, p_new_status);\n\n  IF p_new_status = 'confirmed' THEN\n    IF v_booking.status <> 'pending' THEN\n      RAISE EXCEPTION 'Solo se pueden confirmar reservas pendientes';\n    END IF;\n\n    IF v_ride.available_seats < v_booking.seats_reserved THEN\n      RAISE EXCEPTION 'Ya no hay suficientes asientos disponibles';\n    END IF;\n\n    UPDATE public.bookings b\n       SET status = 'confirmed'\n     WHERE b.booking_id = p_booking_id;\n\n    UPDATE public.rides r\n       SET available_seats = r.available_seats - v_booking.seats_reserved\n     WHERE r.ride_id = v_booking.ride_id\n    RETURNING * INTO v_ride;\n\n    IF v_ride.available_seats = 0 THEN\n      IF v_prev_ride IS DISTINCT FROM 'full' THEN\n        PERFORM public.validate_ride_transition(v_prev_ride, 'full');\n        UPDATE public.rides r SET status = 'full' WHERE r.ride_id = v_booking.ride_id;\n        INSERT INTO public.ride_status_history (\n          ride_id,\n          status,\n          previous_status,\n          actor_id,\n          reason\n        )\n        VALUES (\n          v_booking.ride_id,\n          'full',\n          v_prev_ride,\n          v_actor,\n          p_reason\n        );\n      END IF;\n    END IF;\n\n    RETURN;\n  END IF;\n\n  IF p_new_status = 'rejected' THEN\n    UPDATE public.bookings b\n       SET status = 'rejected'\n     WHERE b.booking_id = p_booking_id;\n    RETURN;\n  END IF;\n\n  IF p_new_status = 'cancelled' THEN\n    IF v_booking.status = 'confirmed' THEN\n      UPDATE public.rides r\n         SET available_seats = r.available_seats + v_booking.seats_reserved\n       WHERE r.ride_id = v_booking.ride_id;\n\n      IF v_prev_ride = 'full' THEN\n        PERFORM public.validate_ride_transition('full', 'scheduled');\n        UPDATE public.rides r\n           SET status = 'scheduled'\n         WHERE r.ride_id = v_booking.ride_id;\n        INSERT INTO public.ride_status_history (\n          ride_id,\n          status,\n          previous_status,\n          actor_id,\n          reason\n        )\n        VALUES (\n          v_booking.ride_id,\n          'scheduled',\n          'full',\n          v_actor,\n          p_reason\n        );\n      END IF;\n    END IF;\n\n    UPDATE public.bookings b\n       SET status = 'cancelled'\n     WHERE b.booking_id = p_booking_id;\n    RETURN;\n  END IF;\n\n  RAISE EXCEPTION 'Estado de destino no soportado';\nEND;\n$function$\n"
+          }
+        ]
+      }
+    }
+  ]
+}

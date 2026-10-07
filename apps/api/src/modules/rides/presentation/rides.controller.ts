@@ -13,6 +13,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import type { AuthenticatedUser } from '../../auth/domain/authenticated-user.js';
 import { CurrentUser } from '../../auth/presentation/current-user.decorator.js';
 import { SupabaseAuthGuard } from '../../auth/presentation/supabase-auth.guard.js';
+import { MapsRateLimitGuard } from '../../maps/presentation/maps-rate-limit.guard.js';
 import { RidesService } from '../application/rides.service.js';
 import { RideViewsService } from '../application/ride-views.service.js';
 import {
@@ -35,19 +36,19 @@ export class RidesController {
     private readonly rides: RidesService,
     private readonly views: RideViewsService,
   ) {}
-  @Post() create(
-    @CurrentUser() user: AuthenticatedUser,
-    @Body() dto: CreateRideDto,
-  ) {
+  @UseGuards(MapsRateLimitGuard)
+  @Post()
+  create(@CurrentUser() user: AuthenticatedUser, @Body() dto: CreateRideDto) {
     return this.rides.create(user, dto);
   }
-  @Post('search') search(
-    @CurrentUser() user: AuthenticatedUser,
-    @Body() dto: SearchRidesDto,
-  ) {
+  @UseGuards(MapsRateLimitGuard)
+  @Post('search')
+  search(@CurrentUser() user: AuthenticatedUser, @Body() dto: SearchRidesDto) {
     return this.rides.search(user, dto);
   }
-  @Post('stops/candidates') stopCandidates(
+  @UseGuards(MapsRateLimitGuard)
+  @Post('stops/candidates')
+  stopCandidates(
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: PassengerStopCandidatesDto,
   ) {
@@ -57,10 +58,13 @@ export class RidesController {
     @CurrentUser() user: AuthenticatedUser,
     @Query() query: RecentRidesQueryDto,
   ) {
-    return this.views.recent(user, query.limit);
+    return this.views.recent(user, query.limit, query.context);
   }
-  @Get('mine/active') active(@CurrentUser() user: AuthenticatedUser) {
-    return this.views.active(user);
+  @Get('mine/active') active(
+    @CurrentUser() user: AuthenticatedUser,
+    @Query() query: RecentRidesQueryDto,
+  ) {
+    return this.views.active(user, query.context);
   }
   @Get('mine') mine(
     @CurrentUser() user: AuthenticatedUser,
@@ -68,7 +72,9 @@ export class RidesController {
   ) {
     return this.rides.mine(user, query);
   }
-  @Post(':rideId/stop-options') stopOptions(
+  @UseGuards(MapsRateLimitGuard)
+  @Post(':rideId/stop-options')
+  stopOptions(
     @CurrentUser() user: AuthenticatedUser,
     @Param('rideId', ParseUUIDPipe) rideId: string,
     @Body() dto: RideStopOptionsDto,
@@ -93,7 +99,9 @@ export class RidesController {
   ) {
     return this.rides.findOne(user, rideId);
   }
-  @Put(':rideId') update(
+  @UseGuards(MapsRateLimitGuard)
+  @Put(':rideId')
+  update(
     @CurrentUser() user: AuthenticatedUser,
     @Param('rideId', ParseUUIDPipe) rideId: string,
     @Body() dto: UpdateRideDto,

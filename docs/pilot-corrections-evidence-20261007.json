@@ -1,0 +1,74 @@
+{
+  "checkedAt": "2026-10-07T15:16:59.465Z",
+  "api": {
+    "url": "https://krow-api-production.up.railway.app",
+    "deploymentId": "27a8b37a-90d2-4a99-823d-c0b374231a51",
+    "deploymentStatus": "SUCCESS",
+    "health": 200,
+    "readiness": 200,
+    "pilot": "ready",
+    "unauthenticatedMe": 401,
+    "websocketHandshake": true,
+    "pollingEnabled": false
+  },
+  "supabase": {
+    "projectRef": "yyjbqzsokxpzhevpanyq",
+    "migrations": [
+      {
+        "version": "20261007145935",
+        "name": "campus_origin_passenger_search"
+      },
+      {
+        "version": "20261007150003",
+        "name": "itnl_corridor_stop_catalog"
+      }
+    ],
+    "activeStops": 17,
+    "newStops": 14,
+    "invalidCoordinates": 0,
+    "anonymousCandidateAccess": false,
+    "authenticatedCandidateAccess": true,
+    "postgisScopesVerified": true,
+    "googleDrivingRouteCompatibility": [
+      {
+        "avenue": "Eloy Cavazos",
+        "compatible_stops": 8
+      },
+      {
+        "avenue": "Pablo Livas",
+        "compatible_stops": 9
+      },
+      {
+        "avenue": "Reynosa",
+        "compatible_stops": 9
+      }
+    ]
+  },
+  "validation": {
+    "mobileTests": 147,
+    "mobileSuites": 27,
+    "backendTests": 104,
+    "backendSuites": 19,
+    "backendSkippedTests": 13,
+    "backendTypes": true,
+    "mobileTypes": true,
+    "affectedLintErrors": 0,
+    "androidCompile": true,
+    "apkBuild": true,
+    "privateDatabaseCredentialsInApk": false,
+    "apkEntriesChecked": 1490,
+    "physicalAndroidConnected": false
+  },
+  "apk": {
+    "version": "0.2.1-trial",
+    "versionCode": 3,
+    "path": "C:/Users/Novasys/Documents/krow-app-mobile/artifacts/android/krow-trial.apk",
+    "sha256": "CB03A21209D47EE943948CAFAB3682A406E59E3840E4E5CE7296501EB8497EB8",
+    "bytes": 136764786
+  },
+  "pending": [
+    "Confirmar cierre original en teléfono con el APK actualizado",
+    "Ensayo físico GPS y teclado Android/iOS",
+    "Revisar lado de circulación y detención de puntos del catálogo en campo"
+  ]
+}

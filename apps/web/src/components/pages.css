@@ -2,50 +2,191 @@
    Reutiliza las variables y clases .btn / .section-head / .eyebrow definidas en landing.css,
    así que este archivo se importa SIEMPRE junto a landing.css, nunca solo. */
 
-.page-hero { background: var(--navy-900); color: #fff; padding: 64px clamp(20px, 5vw, 64px) 56px; text-align: center; }
-.page-hero h1 { font-size: clamp(28px, 4vw, 40px); }
-.page-hero p { color: #C9D3E6; max-width: 56ch; margin: 14px auto 0; }
+.landing .page-hero {
+  background: var(--navy-900);
+  color: #fff;
+  padding: 64px clamp(20px, 5vw, 64px) 56px;
+  text-align: center;
+}
+.landing .page-hero h1 {
+  font-size: clamp(28px, 4vw, 40px);
+}
+.landing .page-hero p {
+  color: #c9d3e6;
+  max-width: 56ch;
+  margin: 14px auto 0;
+}
 
-.content { background: var(--surface); padding: 64px clamp(20px, 5vw, 64px); }
-.content-grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 48px; max-width: 1080px; margin: 0 auto; align-items: start; }
-@media (max-width: 860px) { .content-grid { grid-template-columns: 1fr; } }
+.landing .content {
+  background: var(--surface);
+  padding: 64px clamp(20px, 5vw, 64px);
+}
+.landing .content-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 48px;
+  max-width: 1080px;
+  margin: 0 auto;
+  align-items: start;
+}
+@media (max-width: 860px) {
+  .landing .content-grid {
+    grid-template-columns: 1fr;
+  }
+}
 
 /* Formulario de contacto */
-.form-card { background: var(--bg); border: 1px solid var(--line); border-radius: 14px; padding: 28px; }
-.form-card h3 { font-size: 18px; margin-bottom: 18px; }
-.field { display: grid; gap: 6px; margin-bottom: 16px; }
-.field label { font-size: 13px; font-weight: 600; color: var(--muted); }
-.field input, .field select, .field textarea {
-  font: inherit; padding: 11px 12px; border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--ink);
+.landing .form-card {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 28px;
 }
-.field textarea { resize: vertical; min-height: 110px; }
-.form-card .btn-primary { width: 100%; justify-content: center; margin-top: 6px; }
-.form-status { font-size: 14px; margin-top: 12px; }
-.form-status.ok { color: #16794A; }
-.form-status.error { color: #C2410C; }
+.landing .form-card h3 {
+  font-size: 18px;
+  margin-bottom: 18px;
+}
+.landing .field {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.landing .field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.landing .field input,
+.landing .field select,
+.landing .field textarea {
+  font: inherit;
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ink);
+}
+.landing .field textarea {
+  resize: vertical;
+  min-height: 110px;
+}
+.landing .form-card .btn-primary {
+  width: 100%;
+  justify-content: center;
+  margin-top: 6px;
+}
+.landing .form-status {
+  font-size: 14px;
+  margin-top: 12px;
+}
+.landing .form-status.ok {
+  color: #16794a;
+}
+.landing .form-status.error {
+  color: #c2410c;
+}
 
 /* Tarjetas de contacto directo */
-.contact-info { display: grid; gap: 16px; }
-.contact-info .item { display: flex; gap: 14px; align-items: flex-start; }
-.contact-info .icon { width: 40px; height: 40px; border-radius: 10px; background: #EAF0FB; display: grid; place-items: center; flex: none; font-size: 18px; }
-.contact-info h4 { margin: 0 0 4px; font-size: 15px; }
-.contact-info p, .contact-info a { margin: 0; color: var(--muted); font-size: 14px; text-decoration: none; }
-.contact-info a:hover { color: var(--blue-500); }
+.landing .contact-info {
+  display: grid;
+  gap: 16px;
+}
+.landing .contact-info .item {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+.landing .contact-info .icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: #eaf0fb;
+  display: grid;
+  place-items: center;
+  flex: none;
+  font-size: 18px;
+}
+.landing .contact-info h4 {
+  margin: 0 0 4px;
+  font-size: 15px;
+}
+.landing .contact-info p,
+.landing .contact-info a {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  text-decoration: none;
+}
+.landing .contact-info a:hover {
+  color: var(--blue-500);
+}
 
 /* Para Empresas */
-.use-cases { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; max-width: 1080px; margin: 0 auto; }
-.use-case { border: 1px solid var(--line); border-radius: 12px; padding: 22px; }
-.use-case h3 { font-size: 16px; margin-bottom: 8px; }
-.use-case p { color: var(--muted); font-size: 14.5px; margin: 0; }
+.landing .use-cases {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+  max-width: 1080px;
+  margin: 0 auto;
+}
+.landing .use-case {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 22px;
+}
+.landing .use-case h3 {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+.landing .use-case p {
+  color: var(--muted);
+  font-size: 14.5px;
+  margin: 0;
+}
 
 /* Sobre Nosotros */
-.values-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; max-width: 980px; margin: 32px auto 0; }
-.values-row .v { text-align: center; }
-.values-row .v .icon { width: 48px; height: 48px; border-radius: 50%; background: #EAF0FB; display: grid; place-items: center; margin: 0 auto 12px; font-size: 20px; }
+.landing .values-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  max-width: 980px;
+  margin: 32px auto 0;
+}
+.landing .values-row .v {
+  text-align: center;
+}
+.landing .values-row .v .icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #eaf0fb;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 12px;
+  font-size: 20px;
+}
 
 /* Términos / Privacidad (texto legal) */
-.legal { max-width: 760px; margin: 0 auto; padding: 56px clamp(20px, 5vw, 0); }
-.legal h2 { font-size: 20px; margin: 32px 0 10px; }
-.legal h2:first-of-type { margin-top: 0; }
-.legal p, .legal li { color: var(--muted); font-size: 15px; line-height: 1.7; }
-.legal .updated { color: var(--muted); font-size: 13px; margin-bottom: 32px; }
+.landing .legal {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 56px clamp(20px, 5vw, 0);
+}
+.landing .legal h2 {
+  font-size: 20px;
+  margin: 32px 0 10px;
+}
+.landing .legal h2:first-of-type {
+  margin-top: 0;
+}
+.landing .legal p,
+.landing .legal li {
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.7;
+}
+.landing .legal .updated {
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 32px;
+}

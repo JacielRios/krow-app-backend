@@ -10,9 +10,11 @@ import { RidesModule } from './modules/rides/rides.module.js';
 import { BookingsModule } from './modules/bookings/bookings.module.js';
 import { MapsModule } from './modules/maps/maps.module.js';
 import { RoutesModule } from './modules/routes/routes.module.js';
-import { ReportsModule } from './modules/reports/reports.module.js'
+import { ReportsModule } from './modules/reports/reports.module.js';
 import { TransportStopsModule } from './modules/transport-stops/transport-stops.module.js';
 import { RideRuntimeModule } from './modules/ride-runtime/ride-runtime.module.js';
+import { PilotModule } from './modules/pilot/pilot.module.js';
+import { AdminModule } from './modules/admin/admin.module.js';
 
 @Module({
   imports: [
@@ -27,7 +29,9 @@ import { RideRuntimeModule } from './modules/ride-runtime/ride-runtime.module.js
     RoutesModule,
     ReportsModule,
     TransportStopsModule,
-    RideRuntimeModule
+    RideRuntimeModule,
+    PilotModule,
+    AdminModule,
   ],
   controllers: [AppController],
 })

@@ -1,0 +1,20 @@
+-- Publicly verified reference points; keep existing IDs and booked stop coordinates.
+insert into public.transport_stops(external_id,name,address,municipality,latitude,longitude,stop_type,source,active) values
+('krow-itnl-eloy-tolteca','Eloy Cavazos · Tolteca','Av Eloy Cavazos & Av. Tolteca, Granjitas de La Silla, 67178 Guadalupe, N.L., México','Guadalupe',25.6620622,-100.2396799,'general','krow_curated',true),
+('krow-itnl-eloy-arcadia','Eloy Cavazos · Plaza Arcadia','Av Eloy Cavazos 3301, Camino Real, 67170 Guadalupe, N.L., México','Guadalupe',25.6594432,-100.2276571,'general','krow_curated',true),
+('krow-itnl-eloy-serafin','Eloy Cavazos · Serafín Peña','Prof. Serafin Peña & Av Eloy Cavazos, Residencial Las Avenidas, 67185 Guadalupe, N.L., México','Guadalupe',25.6562251,-100.2158093,'general','krow_curated',true),
+('krow-itnl-eloy-san-sebastian','Eloy Cavazos · San Sebastián','Av Eloy Cavazos & Av. San Sebastián, Sin Nombre de Col 54, 67186 Guadalupe, N.L., México','Guadalupe',25.6542102,-100.2086605,'general','krow_curated',true),
+('krow-itnl-eloy-mexico86','Eloy Cavazos · Plaza México 86','Av Eloy Cavazos 7010, México 86, 67194 Guadalupe, N.L., México','Guadalupe',25.651192299999998,-100.1985634,'general','krow_curated',true),
+('krow-itnl-pablo-tolteca','Pablo Livas · Tolteca','Av. Pablo Livas & Av. Tolteca, Tolteca, 67175 Guadalupe, N.L., México','Guadalupe',25.6697931,-100.2381737,'general','krow_curated',true),
+('krow-itnl-pablo-serafin','Pablo Livas · Serafín Peña','Av. Pablo Livas & Prof. Serafin Peña, Guadalupe Victoria, 67185 Guadalupe, N.L., México','Guadalupe',25.6657028,-100.2139846,'general','krow_curated',true),
+('krow-itnl-pablo-san-sebastian','Pablo Livas · San Sebastián','Av. Pablo Livas & Av. San Sebastián, Gustavo Díaz Ordaz, 67180 Guadalupe, N.L., México','Guadalupe',25.6646992,-100.2066197,'general','krow_curated',true),
+('krow-itnl-pablo-hidalgo','Pablo Livas · Dalia / La Hidalgo','Avenida Pablo Livas 7016 Entre calles Dalia, Azahares y, Santa María Sector A, 67198 Guadalupe, N.L., México','Guadalupe',25.6598622,-100.19469889999999,'general','krow_curated',true),
+('krow-itnl-pablo-guadalupe','Pablo Livas · Guadalupe','Guadalupe & Avenida Pablo Livas, Col. Tres Caminos, Sin Nombre de Col 5, 67198 Guadalupe, N.L., México','Guadalupe',25.6573254,-100.1874324,'general','krow_curated',true),
+('krow-itnl-reynosa-cadereyta','Reynosa · Antiguo Camino a Cadereyta','A Reynosa, Esquina con Atiguo Camino a Cadereyta S/N, Los Lermas, 67188 Guadalupe, N.L., México','Guadalupe',25.674979300000004,-100.199788,'general','krow_curated',true),
+('krow-itnl-reynosa-108','Reynosa · referencia 108','108, Av. A Reynosa, División del Nte., 67170 Guadalupe, Nuevo León, México','Guadalupe',25.6734725,-100.18945409999999,'general','krow_curated',true),
+('krow-itnl-reynosa-208','Reynosa · referencia 208','Av. A Reynosa 208, Tres Caminos Nte. 2a Etapa, 67190 Guadalupe, N.L., México','Guadalupe',25.671951399999998,-100.18628299999999,'general','krow_curated',true),
+('krow-itnl-reynosa-409','Reynosa · referencia 409 / Comex','Av. A Reynosa 409-411, Tres Caminos Nte. 1a Etapa, 67190 Guadalupe, N.L., México','Guadalupe',25.670330399999997,-100.18313119999999,'general','krow_curated',true)
+on conflict(external_id) do update set name=excluded.name,address=excluded.address,municipality=excluded.municipality,latitude=excluded.latitude,longitude=excluded.longitude,stop_type=excluded.stop_type,source=excluded.source,active=excluded.active,updated_at=now();
+
+-- Replace anonymous campus labels without moving or deactivating existing stops.
+update public.transport_stops set name=case external_id when 'krow-initial-stop-1' then 'ITNL · frente poniente' when 'krow-initial-stop-2' then 'Instituto Tecnológico de Nuevo León · frente central' when 'krow-initial-stop-3' then 'ITNL · frente oriente' end,address='Av. Eloy Cavazos 2001, Tolteca, Guadalupe, Nuevo León',municipality='Guadalupe',updated_at=now() where external_id in ('krow-initial-stop-1','krow-initial-stop-2','krow-initial-stop-3');

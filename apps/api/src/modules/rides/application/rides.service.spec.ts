@@ -4,6 +4,7 @@ import { SupabaseService } from '../../../infrastructure/supabase/supabase.servi
 import type { AuthenticatedUser } from '../../auth/domain/authenticated-user.js';
 import type { RoutesService } from '../../routes/application/routes.service.js';
 import { RidesService } from './rides.service.js';
+import { CAMPUS_ORIGIN } from '../../routes/domain/campus-origin.js';
 
 describe('RidesService commands', () => {
   const user: AuthenticatedUser = {
@@ -62,12 +63,22 @@ describe('RidesService commands', () => {
     const maybeSingle = jest
       .fn<
         () => Promise<{
-          data: { ride_id: string };
+          data: {
+            ride_id: string;
+            origin_lat: number;
+            origin_lng: number;
+            origin_address: string;
+          };
           error: null;
         }>
       >()
       .mockResolvedValue({
-        data: { ride_id: bookingRideId },
+        data: {
+          ride_id: bookingRideId,
+          origin_lat: 25.66,
+          origin_lng: -100.24,
+          origin_address: 'Campus',
+        },
         error: null,
       });
     const eq = jest.fn().mockReturnValue({ maybeSingle });
@@ -113,7 +124,7 @@ describe('RidesService commands', () => {
       rideId: 'ride-created',
     });
     expect(compute).toHaveBeenCalledWith(user, {
-      origin: rideDto.origin,
+      origin: CAMPUS_ORIGIN,
       destination: rideDto.destination,
       departureTime: rideDto.departureTime,
     });
@@ -122,6 +133,9 @@ describe('RidesService commands', () => {
       p_payload: Record<string, unknown>;
     };
     expect(callPayload.p_payload).toMatchObject({
+      origin_lat: CAMPUS_ORIGIN.lat,
+      origin_lng: CAMPUS_ORIGIN.lng,
+      origin_address: CAMPUS_ORIGIN.address,
       route_polyline: 'polyline-from-google',
       route_distance_meters: 1200,
       transport_stop_ids: [
@@ -130,6 +144,52 @@ describe('RidesService commands', () => {
       ],
       price_per_seat: 45,
     });
+  });
+
+  it('keeps a historical origin when editing an existing scheduled trip', async () => {
+    const { service, compute, rpc } = createService();
+    await service.update(user, 'ride-id', {
+      ...rideDto,
+      origin: { lat: 30, lng: -90 },
+      version: 1,
+    });
+    expect(compute).toHaveBeenCalledWith(user, {
+      origin: rideDto.origin,
+      destination: rideDto.destination,
+      departureTime: rideDto.departureTime,
+    });
+    expect(rpc.mock.calls[0]?.[0]).toBe('update_ride_v2');
+    const updateArgs = rpc.mock.calls[0]?.[1] as {
+      p_payload: { origin_lat: number };
+    };
+    expect(updateArgs.p_payload.origin_lat).toBe(rideDto.origin.lat);
+  });
+
+  it('keeps campus pickups fixed and allows an explicit intermediate pickup scope', async () => {
+    const { service, rpc } = createService();
+    const dto = {
+      origin: rideDto.origin,
+      destination: rideDto.destination,
+      maxDistanceMeters: 1000,
+      pickupScope: 'campus' as const,
+    };
+    await service.stopCandidates(user, dto);
+    expect(rpc).toHaveBeenCalledWith(
+      'get_passenger_stop_candidates_v2',
+      expect.objectContaining({
+        p_origin_lat: CAMPUS_ORIGIN.lat,
+        p_pickup_scope: 'campus',
+      }),
+    );
+    rpc.mockClear();
+    await service.stopCandidates(user, { ...dto, pickupScope: 'route' });
+    expect(rpc).toHaveBeenCalledWith(
+      'get_passenger_stop_pairs_v2',
+      expect.objectContaining({
+        p_origin_lat: rideDto.origin.lat,
+        p_pickup_scope: 'route',
+      }),
+    );
   });
 
   it('convierte un conflicto de versión en HTTP 409', async () => {

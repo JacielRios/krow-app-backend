@@ -1,6 +1,6 @@
 import { jest } from '@jest/globals';
 import { ServiceUnavailableException } from '@nestjs/common';
-import type { ConfigService } from '@nestjs/config';
+import { ConfigService } from '@nestjs/config';
 import { GoogleMapsService } from './google-maps.service.js';
 
 describe('GoogleMapsService', () => {
@@ -59,5 +59,29 @@ describe('GoogleMapsService', () => {
     await expect(
       service('server-key').autocomplete('inexistente'),
     ).resolves.toEqual([]);
+  });
+  it('shares concurrent requests and enforces the outbound quota', async () => {
+    const fetch = jest.spyOn(global, 'fetch').mockImplementation(() =>
+      Promise.resolve(
+        new Response(JSON.stringify({ status: 'ZERO_RESULTS' }), {
+          status: 200,
+        }),
+      ),
+    );
+    const maps = new GoogleMapsService(
+      new ConfigService({
+        GOOGLE_MAPS_API_KEY: 'synthetic',
+        GOOGLE_MAPS_REQUESTS_PER_MINUTE: '1',
+      }),
+    );
+    await Promise.all([
+      maps.autocomplete('centro'),
+      maps.autocomplete('centro'),
+    ]);
+    expect(fetch).toHaveBeenCalledTimes(1);
+    await expect(maps.autocomplete('otro')).rejects.toThrow(
+      ServiceUnavailableException,
+    );
+    expect(fetch).toHaveBeenCalledTimes(1);
   });
 });

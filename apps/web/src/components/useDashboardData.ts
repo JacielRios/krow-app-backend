@@ -1,63 +1,61 @@
-import { useEffect, useState } from "react";
-import { createKrowApiClient } from "@krow/api-client";
-import type { Range } from "./mockData";
-
-// Debe coincidir con lo que regresa reports.service.ts en el backend.
-export interface DashboardData {
-  completed: number;
-  cancelled: number;
-  ongoing: number;
-  activeDrivers: number;
-  inactiveDrivers: number;
-  passengers: number;
-  occupancy: number;
-  revenue: number;
-  paid: number | null;
-  pending: number | null;
-  trend: { date: string; completed: number; cancelled: number; revenue: number }[];
-  topRoutes: { route: string; trips: number; occupancy: number; revenue: number }[];
-}
+'use client';
+import { useEffect, useState } from 'react';
+import { useAdminApi } from '@/lib/admin-api';
+import type { DashboardData, Range } from './dashboard-data';
 
 interface State {
+  key: string;
   data: DashboardData | null;
   loading: boolean;
   error: string | null;
 }
 
-// AJUSTA ESTO: la URL donde corre tu apps/api en desarrollo.
-// Si tu equipo usa otro puerto, cámbialo aquí.
-const API_BASE_URL = "http://localhost:3001";
-
-export function useDashboardData(range: Range, getAccessToken: () => Promise<string | null>) {
-  const [state, setState] = useState<State>({ data: null, loading: true, error: null });
+export function useDashboardData(range: Range) {
+  const request = useAdminApi();
+  const key = `${range.from}:${range.to}`;
+  const [attempt, setAttempt] = useState(0);
+  const [state, setState] = useState<State>({
+    key,
+    data: null,
+    loading: true,
+    error: null,
+  });
 
   useEffect(() => {
-    let cancelled = false;
-
-    async function load() {
-      setState((s) => ({ ...s, loading: true, error: null }));
-      try {
-        const client = createKrowApiClient({ baseUrl: API_BASE_URL, getAccessToken });
-        const data = await client.request<DashboardData>(
-          `/reports/dashboard-summary?from=${range.from}&to=${range.to}`,
-        );
-        if (!cancelled) setState({ data, loading: false, error: null });
-      } catch (err) {
-        if (!cancelled) {
-          setState({
-            data: null,
+    const controller = new AbortController();
+    setState((previous) => ({
+      key,
+      data: previous.key === key ? previous.data : null,
+      loading: true,
+      error: null,
+    }));
+    const query = new URLSearchParams({ from: range.from, to: range.to });
+    request<DashboardData>(`/reports/dashboard-summary?${query}`, {
+      signal: controller.signal,
+    })
+      .then((data) => {
+        if (!controller.signal.aborted)
+          setState({ key, data, loading: false, error: null });
+      })
+      .catch((error) => {
+        if (!controller.signal.aborted)
+          setState((previous) => ({
+            ...previous,
+            key,
             loading: false,
-            error: err instanceof Error ? err.message : "Error al cargar el dashboard",
-          });
-        }
-      }
-    }
+            error:
+              error instanceof Error
+                ? error.message
+                : 'No fue posible consultar los indicadores.',
+          }));
+      });
+    return () => controller.abort();
+  }, [key, range.from, range.to, attempt, request]);
 
-    load();
-    return () => {
-      cancelled = true;
-    };
-  }, [range.from, range.to]);
-
-  return state;
+  return {
+    data: state.key === key ? state.data : null,
+    loading: state.key !== key || state.loading,
+    error: state.key === key ? state.error : null,
+    reload: () => setAttempt((value) => value + 1),
+  };
 }

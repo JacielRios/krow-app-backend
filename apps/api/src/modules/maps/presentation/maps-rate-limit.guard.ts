@@ -20,6 +20,15 @@ export class MapsRateLimitGuard implements CanActivate {
       .getRequest<Request & { user: AuthenticatedUser }>();
     const key = request.user?.id ?? request.ip ?? 'unknown';
     const now = Date.now();
+    if (this.windows.size >= 4096) {
+      for (const [actor, window] of this.windows)
+        if (now - window.startedAt >= 60_000) this.windows.delete(actor);
+      if (this.windows.size >= 4096 && !this.windows.has(key))
+        throw new HttpException(
+          'Mapas temporalmente ocupados. Intenta nuevamente.',
+          429,
+        );
+    }
     const current = this.windows.get(key);
     if (!current || now - current.startedAt >= 60_000) {
       this.windows.set(key, { startedAt: now, count: 1 });

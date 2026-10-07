@@ -1,10 +1,9 @@
-import PublicSection from '@/components/PublicSection';
-
+import TerminosPage from '@/components/TerminosPage';
 export const metadata = {
-  title: "Privacidad | KROW",
-  description: "Espacio reservado para el aviso de privacidad y las políticas aplicables al uso de KROW..",
+  title: 'Privacidad',
+  description:
+    'Información sobre privacidad y el alcance actual del piloto KROW.',
 };
-
 export default function Page() {
-  return <PublicSection />;
+  return <TerminosPage privacy />;
 }

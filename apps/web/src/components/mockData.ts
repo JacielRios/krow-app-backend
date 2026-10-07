@@ -1,5 +1,5 @@
-// Datos de ejemplo. Reemplaza getMockData por las consultas de packages/api-client
-// (idealmente vistas SQL / RPC en Supabase que ya devuelvan estos agregados).
+// Demostración original de Persona 2 conservada como referencia de diseño.
+// Ninguna pantalla de producción importa este generador; el dashboard usa la API.
 export type Range = { from: string; to: string }; // YYYY-MM-DD
 
 export interface DayPoint { date: string; completed: number; cancelled: number; revenue: number }

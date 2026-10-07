@@ -1,0 +1,934 @@
+{
+  "projectId": "yyjbqzsokxpzhevpanyq",
+  "capturedBeforeDeployment": true,
+  "scope": "Schema permissions and aggregate counts; no account records or credentials. Not a full data backup.",
+  "metadata": [
+    {
+      "deployment_metadata": {
+        "tables": [
+          {
+            "acl": [
+              "postgres=arwdDxtm/postgres",
+              "anon=arwdDxtm/postgres",
+              "authenticated=arwdDxtm/postgres",
+              "service_role=arwdDxtm/postgres"
+            ],
+            "rls": true,
+            "table": "payment_methods"
+          },
+          {
+            "acl": [
+              "postgres=arwdDxtm/postgres",
+              "anon=arwdDxtm/postgres",
+              "authenticated=arwdDxtm/postgres",
+              "service_role=arwdDxtm/postgres"
+            ],
+            "rls": true,
+            "table": "payments"
+          },
+          {
+            "acl": [
+              "postgres=arwdDxtm/postgres",
+              "anon=arwdDxtm/postgres",
+              "authenticated=arwdDxtm/postgres",
+              "service_role=arwdDxtm/postgres"
+            ],
+            "rls": true,
+            "table": "chats"
+          },
+          {
+            "acl": [
+              "postgres=arwdDxtm/postgres",
+              "anon=arwdDxtm/postgres",
+              "authenticated=arwdDxtm/postgres",
+              "service_role=arwdDxtm/postgres"
+            ],
+            "rls": true,
+            "table": "chat_messages"
+          },
+          {
+            "acl": [
+              "postgres=arwdDxtm/postgres",
+              "anon=rDxtm/postgres",
+              "authenticated=rDxtm/postgres",
+              "service_role=arwdDxtm/postgres"
+            ],
+            "rls": true,
+            "table": "bookings"
+          },
+          {
+            "acl": [
+              "postgres=arwdDxtm/postgres",
+              "anon=arwdDxtm/postgres",
+              "authenticated=arwdDxtm/postgres",
+              "service_role=arwdDxtm/postgres"
+            ],
+            "rls": true,
+            "table": "ride_reviews"
+          },
+          {
+            "acl": [
+              "postgres=arwdDxtm/postgres",
+              "anon=arwdDxtm/postgres",
+              "authenticated=arwdDxtm/postgres",
+              "service_role=arwdDxtm/postgres"
+            ],
+            "rls": true,
+            "table": "ride_status_history"
+          },
+          {
+            "acl": [
+              "postgres=arwdDxtm/postgres",
+              "anon=arwdDxtm/postgres",
+              "authenticated=arwdDxtm/postgres",
+              "service_role=arwdDxtm/postgres"
+            ],
+            "rls": true,
+            "table": "users"
+          },
+          {
+            "acl": [
+              "postgres=arwdDxtm/postgres",
+              "anon=arwdDxtm/postgres",
+              "authenticated=arwdDxtm/postgres",
+              "service_role=arwdDxtm/postgres"
+            ],
+            "rls": true,
+            "table": "driver_profiles"
+          },
+          {
+            "acl": [
+              "postgres=arwdDxtm/postgres",
+              "anon=arwdDxtm/postgres",
+              "authenticated=arwdDxtm/postgres",
+              "service_role=arwdDxtm/postgres"
+            ],
+            "rls": true,
+            "table": "vehicles"
+          },
+          {
+            "acl": [
+              "postgres=arwdDxtm/postgres",
+              "anon=rDxtm/postgres",
+              "authenticated=rDxtm/postgres",
+              "service_role=arwdDxtm/postgres"
+            ],
+            "rls": true,
+            "table": "rides"
+          },
+          {
+            "acl": [
+              "postgres=arwdDxtm/postgres",
+              "anon=rDxtm/postgres",
+              "authenticated=rDxtm/postgres",
+              "service_role=arwdDxtm/postgres"
+            ],
+            "rls": true,
+            "table": "ride_stops"
+          },
+          {
+            "acl": [
+              "postgres=arwdDxtm/postgres",
+              "authenticated=arwdDxtm/postgres",
+              "service_role=arwdDxtm/postgres"
+            ],
+            "rls": true,
+            "table": "favorite_routes"
+          },
+          {
+            "acl": [
+              "postgres=arwdDxtm/postgres",
+              "authenticated=arwdDxtm/postgres",
+              "service_role=arwdDxtm/postgres"
+            ],
+            "rls": true,
+            "table": "favorite_route_stops"
+          },
+          {
+            "acl": [
+              "postgres=arwdDxtm/postgres",
+              "authenticated=arwdDxtm/postgres",
+              "service_role=arwdDxtm/postgres"
+            ],
+            "rls": true,
+            "table": "transport_stops"
+          }
+        ],
+        "policies": [
+          {
+            "cmd": "ALL",
+            "qual": "(user_id = auth.uid())",
+            "roles": [
+              "authenticated"
+            ],
+            "tablename": "payment_methods",
+            "permissive": "PERMISSIVE",
+            "policyname": "payment_methods_all_own",
+            "schemaname": "public",
+            "with_check": "(user_id = auth.uid())"
+          },
+          {
+            "cmd": "INSERT",
+            "qual": null,
+            "roles": [
+              "authenticated"
+            ],
+            "tablename": "payments",
+            "permissive": "PERMISSIVE",
+            "policyname": "payments_insert_booker",
+            "schemaname": "public",
+            "with_check": "((EXISTS ( SELECT 1\n   FROM bookings b\n  WHERE ((b.booking_id = payments.booking_id) AND (b.user_id = auth.uid())))) AND ((payment_method_id IS NULL) OR (EXISTS ( SELECT 1\n   FROM payment_methods pm\n  WHERE ((pm.payment_method_id = payments.payment_method_id) AND (pm.user_id = auth.uid()))))))"
+          },
+          {
+            "cmd": "SELECT",
+            "qual": "(EXISTS ( SELECT 1\n   FROM bookings b\n  WHERE ((b.booking_id = payments.booking_id) AND ((b.user_id = auth.uid()) OR private.is_driver_of_ride(b.ride_id)))))",
+            "roles": [
+              "authenticated"
+            ],
+            "tablename": "payments",
+            "permissive": "PERMISSIVE",
+            "policyname": "payments_select_parties",
+            "schemaname": "public",
+            "with_check": null
+          },
+          {
+            "cmd": "INSERT",
+            "qual": null,
+            "roles": [
+              "authenticated"
+            ],
+            "tablename": "chats",
+            "permissive": "PERMISSIVE",
+            "policyname": "chats_insert_driver",
+            "schemaname": "public",
+            "with_check": "private.is_driver_of_ride(ride_id)"
+          },
+          {
+            "cmd": "SELECT",
+            "qual": "(EXISTS ( SELECT 1\n   FROM rides r\n  WHERE ((r.ride_id = chats.ride_id) AND private.is_ride_participant(r.ride_id))))",
+            "roles": [
+              "authenticated"
+            ],
+            "tablename": "chats",
+            "permissive": "PERMISSIVE",
+            "policyname": "chats_select",
+            "schemaname": "public",
+            "with_check": null
+          },
+          {
+            "cmd": "UPDATE",
+            "qual": "(EXISTS ( SELECT 1\n   FROM rides r\n  WHERE ((r.ride_id = chats.ride_id) AND private.is_ride_participant(r.ride_id))))",
+            "roles": [
+              "authenticated"
+            ],
+            "tablename": "chats",
+            "permissive": "PERMISSIVE",
+            "policyname": "chats_update_parties",
+            "schemaname": "public",
+            "with_check": "(EXISTS ( SELECT 1\n   FROM rides r\n  WHERE ((r.ride_id = chats.ride_id) AND private.is_ride_participant(r.ride_id))))"
+          },
+          {
+            "cmd": "INSERT",
+            "qual": null,
+            "roles": [
+              "authenticated"
+            ],
+            "tablename": "chat_messages",
+            "permissive": "PERMISSIVE",
+            "policyname": "chat_messages_insert",
+            "schemaname": "public",
+            "with_check": "((sender_id = auth.uid()) AND (EXISTS ( SELECT 1\n   FROM (chats c\n     JOIN rides r ON ((r.ride_id = c.ride_id)))\n  WHERE ((c.chat_id = chat_messages.chat_id) AND private.is_ride_participant(r.ride_id)))))"
+          },
+          {
+            "cmd": "SELECT",
+            "qual": "(EXISTS ( SELECT 1\n   FROM (chats c\n     JOIN rides r ON ((r.ride_id = c.ride_id)))\n  WHERE ((c.chat_id = chat_messages.chat_id) AND private.is_ride_participant(r.ride_id))))",
+            "roles": [
+              "authenticated"
+            ],
+            "tablename": "chat_messages",
+            "permissive": "PERMISSIVE",
+            "policyname": "chat_messages_select",
+            "schemaname": "public",
+            "with_check": null
+          },
+          {
+            "cmd": "UPDATE",
+            "qual": "(sender_id = auth.uid())",
+            "roles": [
+              "authenticated"
+            ],
+            "tablename": "chat_messages",
+            "permissive": "PERMISSIVE",
+            "policyname": "chat_messages_update_sender",
+            "schemaname": "public",
+            "with_check": "(sender_id = auth.uid())"
+          },
+          {
+            "cmd": "INSERT",
+            "qual": null,
+            "roles": [
+              "authenticated"
+            ],
+            "tablename": "bookings",
+            "permissive": "PERMISSIVE",
+            "policyname": "bookings_insert_self",
+            "schemaname": "public",
+            "with_check": "((user_id = auth.uid()) AND (EXISTS ( SELECT 1\n   FROM ride_stops ps\n  WHERE ((ps.stop_id = bookings.pickup_stop_id) AND (ps.ride_id = ps.ride_id)))) AND (EXISTS ( SELECT 1\n   FROM ride_stops ds\n  WHERE ((ds.stop_id = bookings.dropoff_stop_id) AND (ds.ride_id = ds.ride_id)))))"
+          },
+          {
+            "cmd": "SELECT",
+            "qual": "((user_id = auth.uid()) OR private.is_driver_of_ride(ride_id))",
+            "roles": [
+              "authenticated"
+            ],
+            "tablename": "bookings",
+            "permissive": "PERMISSIVE",
+            "policyname": "bookings_select_parties",
+            "schemaname": "public",
+            "with_check": null
+          },
+          {
+            "cmd": "UPDATE",
+            "qual": "((user_id = auth.uid()) OR private.is_driver_of_ride(ride_id))",
+            "roles": [
+              "authenticated"
+            ],
+            "tablename": "bookings",
+            "permissive": "PERMISSIVE",
+            "policyname": "bookings_update_parties",
+            "schemaname": "public",
+            "with_check": "((user_id = auth.uid()) OR private.is_driver_of_ride(ride_id))"
+          },
+          {
+            "cmd": "INSERT",
+            "qual": null,
+            "roles": [
+              "public"
+            ],
+            "tablename": "ride_reviews",
+            "permissive": "PERMISSIVE",
+            "policyname": "ride_reviews_insert_own",
+            "schemaname": "public",
+            "with_check": "(reviewer_id = auth.uid())"
+          },
+          {
+            "cmd": "SELECT",
+            "qual": "((reviewer_id = auth.uid()) OR (reviewee_id = auth.uid()))",
+            "roles": [
+              "public"
+            ],
+            "tablename": "ride_reviews",
+            "permissive": "PERMISSIVE",
+            "policyname": "ride_reviews_select_involved",
+            "schemaname": "public",
+            "with_check": null
+          },
+          {
+            "cmd": "INSERT",
+            "qual": null,
+            "roles": [
+              "authenticated"
+            ],
+            "tablename": "ride_status_history",
+            "permissive": "PERMISSIVE",
+            "policyname": "ride_status_history_insert_driver",
+            "schemaname": "public",
+            "with_check": "private.is_driver_of_ride(ride_id)"
+          },
+          {
+            "cmd": "SELECT",
+            "qual": "private.can_view_ride(ride_id)",
+            "roles": [
+              "authenticated"
+            ],
+            "tablename": "ride_status_history",
+            "permissive": "PERMISSIVE",
+            "policyname": "ride_status_history_select",
+            "schemaname": "public",
+            "with_check": null
+          },
+          {
+            "cmd": "INSERT",
+            "qual": null,
+            "roles": [
+              "authenticated"
+            ],
+            "tablename": "users",
+            "permissive": "PERMISSIVE",
+            "policyname": "users_insert_own",
+            "schemaname": "public",
+            "with_check": "(uuid = auth.uid())"
+          },
+          {
+            "cmd": "SELECT",
+            "qual": "((EXISTS ( SELECT 1\n   FROM (bookings my\n     JOIN bookings theirs ON ((theirs.ride_id = my.ride_id)))\n  WHERE ((my.user_id = auth.uid()) AND (theirs.user_id = users.uuid) AND (my.status <> 'cancelled'::text) AND (theirs.status <> 'cancelled'::text)))) OR (EXISTS ( SELECT 1\n   FROM ((bookings b\n     JOIN rides r ON ((r.ride_id = b.ride_id)))\n     JOIN driver_profiles dp ON ((dp.driver_id = r.driver_id)))\n  WHERE ((b.user_id = auth.uid()) AND (dp.user_id = users.uuid)))) OR (EXISTS ( SELECT 1\n   FROM ((rides r\n     JOIN driver_profiles dp ON ((dp.driver_id = r.driver_id)))\n     JOIN bookings b ON ((b.ride_id = r.ride_id)))\n  WHERE ((dp.user_id = auth.uid()) AND (b.user_id = users.uuid) AND (b.status <> 'cancelled'::text)))))",
+            "roles": [
+              "authenticated"
+            ],
+            "tablename": "users",
+            "permissive": "PERMISSIVE",
+            "policyname": "users_select_coplanners",
+            "schemaname": "public",
+            "with_check": null
+          },
+          {
+            "cmd": "SELECT",
+            "qual": "(uuid = auth.uid())",
+            "roles": [
+              "authenticated"
+            ],
+            "tablename": "users",
+            "permissive": "PERMISSIVE",
+            "policyname": "users_select_own",
+            "schemaname": "public",
+            "with_check": null
+          },
+          {
+            "cmd": "UPDATE",
+            "qual": "(uuid = auth.uid())",
+            "roles": [
+              "authenticated"
+            ],
+            "tablename": "users",
+            "permissive": "PERMISSIVE",
+            "policyname": "users_update_own",
+            "schemaname": "public",
+            "with_check": "(uuid = auth.uid())"
+          },
+          {
+            "cmd": "INSERT",
+            "qual": null,
+            "roles": [
+              "authenticated"
+            ],
+            "tablename": "driver_profiles",
+            "permissive": "PERMISSIVE",
+            "policyname": "driver_profiles_insert_own",
+            "schemaname": "public",
+            "with_check": "(user_id = auth.uid())"
+          },
+          {
+            "cmd": "SELECT",
+            "qual": "(user_id = auth.uid())",
+            "roles": [
+              "authenticated"
+            ],
+            "tablename": "driver_profiles",
+            "permissive": "PERMISSIVE",
+            "policyname": "driver_profiles_select_own",
+            "schemaname": "public",
+            "with_check": null
+          },
+          {
+            "cmd": "UPDATE",
+            "qual": "(user_id = auth.uid())",
+            "roles": [
+              "authenticated"
+            ],
+            "tablename": "driver_profiles",
+            "permissive": "PERMISSIVE",
+            "policyname": "driver_profiles_update_own",
+            "schemaname": "public",
+            "with_check": "(user_id = auth.uid())"
+          },
+          {
+            "cmd": "ALL",
+            "qual": "(EXISTS ( SELECT 1\n   FROM driver_profiles dp\n  WHERE ((dp.driver_id = vehicles.driver_id) AND (dp.user_id = auth.uid()))))",
+            "roles": [
+              "authenticated"
+            ],
+            "tablename": "vehicles",
+            "permissive": "PERMISSIVE",
+            "policyname": "vehicles_all_owner",
+            "schemaname": "public",
+            "with_check": "(EXISTS ( SELECT 1\n   FROM driver_profiles dp\n  WHERE ((dp.driver_id = vehicles.driver_id) AND (dp.user_id = auth.uid()))))"
+          },
+          {
+            "cmd": "SELECT",
+            "qual": "(EXISTS ( SELECT 1\n   FROM rides r\n  WHERE ((r.vehicle_id = vehicles.vehicle_id) AND private.can_view_ride(r.ride_id))))",
+            "roles": [
+              "authenticated"
+            ],
+            "tablename": "vehicles",
+            "permissive": "PERMISSIVE",
+            "policyname": "vehicles_select_on_visible_ride",
+            "schemaname": "public",
+            "with_check": null
+          },
+          {
+            "cmd": "DELETE",
+            "qual": "private.is_driver_of_ride(ride_id)",
+            "roles": [
+              "authenticated"
+            ],
+            "tablename": "rides",
+            "permissive": "PERMISSIVE",
+            "policyname": "rides_delete_driver",
+            "schemaname": "public",
+            "with_check": null
+          },
+          {
+            "cmd": "INSERT",
+            "qual": null,
+            "roles": [
+              "authenticated"
+            ],
+            "tablename": "rides",
+            "permissive": "PERMISSIVE",
+            "policyname": "rides_insert_driver",
+            "schemaname": "public",
+            "with_check": "((EXISTS ( SELECT 1\n   FROM driver_profiles dp\n  WHERE ((dp.driver_id = rides.driver_id) AND (dp.user_id = auth.uid())))) AND (EXISTS ( SELECT 1\n   FROM vehicles v\n  WHERE ((v.vehicle_id = rides.vehicle_id) AND (v.driver_id = rides.driver_id)))))"
+          },
+          {
+            "cmd": "SELECT",
+            "qual": "private.can_view_ride(ride_id)",
+            "roles": [
+              "authenticated"
+            ],
+            "tablename": "rides",
+            "permissive": "PERMISSIVE",
+            "policyname": "rides_select",
+            "schemaname": "public",
+            "with_check": null
+          },
+          {
+            "cmd": "UPDATE",
+            "qual": "private.is_driver_of_ride(ride_id)",
+            "roles": [
+              "authenticated"
+            ],
+            "tablename": "rides",
+            "permissive": "PERMISSIVE",
+            "policyname": "rides_update_driver",
+            "schemaname": "public",
+            "with_check": "private.is_driver_of_ride(ride_id)"
+          },
+          {
+            "cmd": "SELECT",
+            "qual": "private.can_view_ride(ride_id)",
+            "roles": [
+              "authenticated"
+            ],
+            "tablename": "ride_stops",
+            "permissive": "PERMISSIVE",
+            "policyname": "ride_stops_select",
+            "schemaname": "public",
+            "with_check": null
+          },
+          {
+            "cmd": "ALL",
+            "qual": "private.is_driver_of_ride(ride_id)",
+            "roles": [
+              "authenticated"
+            ],
+            "tablename": "ride_stops",
+            "permissive": "PERMISSIVE",
+            "policyname": "ride_stops_write_driver",
+            "schemaname": "public",
+            "with_check": "private.is_driver_of_ride(ride_id)"
+          },
+          {
+            "cmd": "SELECT",
+            "qual": "(EXISTS ( SELECT 1\n   FROM driver_profiles dp\n  WHERE ((dp.driver_id = favorite_routes.driver_id) AND (dp.user_id = ( SELECT auth.uid() AS uid)))))",
+            "roles": [
+              "authenticated"
+            ],
+            "tablename": "favorite_routes",
+            "permissive": "PERMISSIVE",
+            "policyname": "favorite_routes_owner_read",
+            "schemaname": "public",
+            "with_check": null
+          },
+          {
+            "cmd": "SELECT",
+            "qual": "(EXISTS ( SELECT 1\n   FROM (favorite_routes fr\n     JOIN driver_profiles dp ON ((dp.driver_id = fr.driver_id)))\n  WHERE ((fr.route_id = favorite_route_stops.route_id) AND (dp.user_id = ( SELECT auth.uid() AS uid)))))",
+            "roles": [
+              "authenticated"
+            ],
+            "tablename": "favorite_route_stops",
+            "permissive": "PERMISSIVE",
+            "policyname": "favorite_route_stops_owner_read",
+            "schemaname": "public",
+            "with_check": null
+          },
+          {
+            "cmd": "SELECT",
+            "qual": "(( SELECT auth.uid() AS uid) IS NOT NULL)",
+            "roles": [
+              "authenticated"
+            ],
+            "tablename": "transport_stops",
+            "permissive": "PERMISSIVE",
+            "policyname": "transport_stops_authenticated_read",
+            "schemaname": "public",
+            "with_check": null
+          }
+        ],
+        "functions": [
+          {
+            "acl": [
+              "=X/postgres",
+              "postgres=X/postgres",
+              "anon=X/postgres",
+              "authenticated=X/postgres",
+              "service_role=X/postgres"
+            ],
+            "signature": "set_updated_at()"
+          },
+          {
+            "acl": [
+              "=X/postgres",
+              "postgres=X/postgres",
+              "anon=X/postgres",
+              "authenticated=X/postgres",
+              "service_role=X/postgres"
+            ],
+            "signature": "validate_ride_vehicle_driver()"
+          },
+          {
+            "acl": [
+              "=X/postgres",
+              "postgres=X/postgres",
+              "anon=X/postgres",
+              "authenticated=X/postgres",
+              "service_role=X/postgres"
+            ],
+            "signature": "validate_booking_stops_same_ride()"
+          },
+          {
+            "acl": [
+              "postgres=X/postgres",
+              "authenticated=X/postgres",
+              "service_role=X/postgres"
+            ],
+            "signature": "get_driver_card(uuid)"
+          },
+          {
+            "acl": [
+              "postgres=X/postgres",
+              "service_role=X/postgres"
+            ],
+            "signature": "handle_new_user()"
+          },
+          {
+            "acl": [
+              "postgres=X/postgres",
+              "authenticated=X/postgres",
+              "service_role=X/postgres"
+            ],
+            "signature": "cancel_ride(uuid,text)"
+          },
+          {
+            "acl": [
+              "postgres=X/postgres",
+              "authenticated=X/postgres",
+              "service_role=X/postgres"
+            ],
+            "signature": "complete_ride(uuid)"
+          },
+          {
+            "acl": [
+              "postgres=X/postgres",
+              "service_role=X/postgres"
+            ],
+            "signature": "update_user_rating_on_review()"
+          },
+          {
+            "acl": [
+              "postgres=X/postgres",
+              "authenticated=X/postgres",
+              "service_role=X/postgres"
+            ],
+            "signature": "start_ride(uuid)"
+          },
+          {
+            "acl": [
+              "postgres=X/postgres",
+              "service_role=X/postgres"
+            ],
+            "signature": "rls_auto_enable()"
+          },
+          {
+            "acl": [
+              "postgres=X/postgres",
+              "authenticated=X/postgres",
+              "service_role=X/postgres"
+            ],
+            "signature": "complete_stop(uuid)"
+          },
+          {
+            "acl": [
+              "postgres=X/postgres",
+              "anon=X/postgres",
+              "authenticated=X/postgres",
+              "service_role=X/postgres"
+            ],
+            "signature": "validate_booking_transition(text,text)"
+          },
+          {
+            "acl": [
+              "postgres=X/postgres",
+              "anon=X/postgres",
+              "authenticated=X/postgres",
+              "service_role=X/postgres"
+            ],
+            "signature": "validate_ride_transition(text,text)"
+          },
+          {
+            "acl": [
+              "postgres=X/postgres",
+              "authenticated=X/postgres",
+              "service_role=X/postgres"
+            ],
+            "signature": "create_ride(jsonb)"
+          },
+          {
+            "acl": [
+              "postgres=X/postgres",
+              "authenticated=X/postgres",
+              "service_role=X/postgres"
+            ],
+            "signature": "request_booking(jsonb)"
+          },
+          {
+            "acl": [
+              "postgres=X/postgres",
+              "authenticated=X/postgres",
+              "service_role=X/postgres"
+            ],
+            "signature": "get_my_driver_rides(integer)"
+          },
+          {
+            "acl": [
+              "postgres=X/postgres",
+              "authenticated=X/postgres",
+              "service_role=X/postgres"
+            ],
+            "signature": "get_my_passenger_rides(integer)"
+          },
+          {
+            "acl": [
+              "postgres=X/postgres",
+              "authenticated=X/postgres",
+              "service_role=X/postgres"
+            ],
+            "signature": "get_passenger_stop_candidates(double precision,double precision,double precision,double precision,integer)"
+          },
+          {
+            "acl": [
+              "postgres=X/postgres",
+              "authenticated=X/postgres",
+              "service_role=X/postgres"
+            ],
+            "signature": "search_available_rides_by_stops(double precision,double precision,double precision,double precision,uuid,uuid,integer,timestamp with time zone,timestamp with time zone,integer)"
+          },
+          {
+            "acl": [
+              "postgres=X/postgres",
+              "authenticated=X/postgres",
+              "service_role=X/postgres"
+            ],
+            "signature": "get_passenger_stop_pairs(double precision,double precision,double precision,double precision,integer)"
+          },
+          {
+            "acl": [
+              "postgres=X/postgres",
+              "authenticated=X/postgres",
+              "service_role=X/postgres"
+            ],
+            "signature": "admin_upsert_transport_stop(jsonb)"
+          },
+          {
+            "acl": [
+              "postgres=X/postgres",
+              "authenticated=X/postgres",
+              "service_role=X/postgres"
+            ],
+            "signature": "submit_review(uuid,uuid,smallint,text)"
+          },
+          {
+            "acl": [
+              "postgres=X/postgres",
+              "authenticated=X/postgres",
+              "service_role=X/postgres"
+            ],
+            "signature": "delete_favorite_route(uuid)"
+          },
+          {
+            "acl": [
+              "postgres=X/postgres",
+              "authenticated=X/postgres",
+              "service_role=X/postgres"
+            ],
+            "signature": "find_compatible_transport_stops(jsonb,integer)"
+          },
+          {
+            "acl": [
+              "postgres=X/postgres",
+              "authenticated=X/postgres",
+              "service_role=X/postgres"
+            ],
+            "signature": "upsert_favorite_route(jsonb)"
+          },
+          {
+            "acl": [
+              "postgres=X/postgres",
+              "authenticated=X/postgres",
+              "service_role=X/postgres"
+            ],
+            "signature": "create_ride_v2(jsonb)"
+          },
+          {
+            "acl": [
+              "postgres=X/postgres",
+              "authenticated=X/postgres",
+              "service_role=X/postgres"
+            ],
+            "signature": "update_ride_v2(uuid,integer,jsonb)"
+          },
+          {
+            "acl": [
+              "postgres=X/postgres",
+              "authenticated=X/postgres",
+              "service_role=X/postgres"
+            ],
+            "signature": "search_available_rides_v2(double precision,double precision,double precision,double precision,integer,timestamp with time zone,timestamp with time zone,integer)"
+          },
+          {
+            "acl": [
+              "postgres=X/postgres",
+              "authenticated=X/postgres",
+              "service_role=X/postgres"
+            ],
+            "signature": "get_ride_stop_options(uuid,double precision,double precision,double precision,double precision,integer)"
+          },
+          {
+            "acl": [
+              "postgres=X/postgres",
+              "authenticated=X/postgres",
+              "service_role=X/postgres"
+            ],
+            "signature": "request_booking_v2(jsonb)"
+          },
+          {
+            "acl": [
+              "postgres=X/postgres",
+              "authenticated=X/postgres",
+              "service_role=X/postgres"
+            ],
+            "signature": "search_available_rides(integer,timestamp with time zone,timestamp with time zone)"
+          },
+          {
+            "acl": [
+              "postgres=X/postgres",
+              "authenticated=X/postgres",
+              "service_role=X/postgres"
+            ],
+            "signature": "update_booking_status(uuid,text,text)"
+          }
+        ],
+        "constraints": [
+          {
+            "name": "rides_available_seats_positive",
+            "table": "rides",
+            "definition": "CHECK ((available_seats >= 0))"
+          },
+          {
+            "name": "rides_driver_id_fkey",
+            "table": "rides",
+            "definition": "FOREIGN KEY (driver_id) REFERENCES driver_profiles(driver_id) ON DELETE RESTRICT"
+          },
+          {
+            "name": "rides_favorite_route_id_fkey",
+            "table": "rides",
+            "definition": "FOREIGN KEY (favorite_route_id) REFERENCES favorite_routes(route_id) ON DELETE SET NULL"
+          },
+          {
+            "name": "rides_pkey",
+            "table": "rides",
+            "definition": "PRIMARY KEY (ride_id)"
+          },
+          {
+            "name": "rides_route_distance_meters_check",
+            "table": "rides",
+            "definition": "CHECK (((route_distance_meters IS NULL) OR (route_distance_meters >= 0)))"
+          },
+          {
+            "name": "rides_route_duration_seconds_check",
+            "table": "rides",
+            "definition": "CHECK (((route_duration_seconds IS NULL) OR (route_duration_seconds >= 0)))"
+          },
+          {
+            "name": "rides_status_check",
+            "table": "rides",
+            "definition": "CHECK ((status = ANY (ARRAY['scheduled'::text, 'full'::text, 'in_progress'::text, 'completed'::text, 'cancelled'::text])))"
+          },
+          {
+            "name": "rides_vehicle_id_fkey",
+            "table": "rides",
+            "definition": "FOREIGN KEY (vehicle_id) REFERENCES vehicles(vehicle_id) ON DELETE RESTRICT"
+          },
+          {
+            "name": "rides_version_check",
+            "table": "rides",
+            "definition": "CHECK ((version >= 1))"
+          },
+          {
+            "name": "bookings_dropoff_stop_id_fkey",
+            "table": "bookings",
+            "definition": "FOREIGN KEY (dropoff_stop_id) REFERENCES ride_stops(stop_id) ON DELETE RESTRICT"
+          },
+          {
+            "name": "bookings_pickup_stop_id_fkey",
+            "table": "bookings",
+            "definition": "FOREIGN KEY (pickup_stop_id) REFERENCES ride_stops(stop_id) ON DELETE RESTRICT"
+          },
+          {
+            "name": "bookings_pkey",
+            "table": "bookings",
+            "definition": "PRIMARY KEY (booking_id)"
+          },
+          {
+            "name": "bookings_ride_id_fkey",
+            "table": "bookings",
+            "definition": "FOREIGN KEY (ride_id) REFERENCES rides(ride_id) ON DELETE CASCADE"
+          },
+          {
+            "name": "bookings_status_check",
+            "table": "bookings",
+            "definition": "CHECK ((status = ANY (ARRAY['pending'::text, 'confirmed'::text, 'rejected'::text, 'cancelled'::text, 'in_progress'::text, 'completed'::text])))"
+          },
+          {
+            "name": "bookings_user_id_fkey",
+            "table": "bookings",
+            "definition": "FOREIGN KEY (user_id) REFERENCES users(uuid) ON DELETE CASCADE"
+          }
+        ]
+      }
+    }
+  ],
+  "counts": [
+    {
+      "existing_records": {
+        "rides": 45,
+        "users": 11,
+        "reviews": 4,
+        "bookings": 33,
+        "vehicles": 1,
+        "ride_states": {
+          "cancelled": 14,
+          "completed": 20,
+          "scheduled": 10,
+          "in_progress": 1
+        },
+        "booking_states": {
+          "rejected": 2,
+          "cancelled": 8,
+          "completed": 20,
+          "confirmed": 3
+        },
+        "driver_profiles": 1
+      }
+    }
+  ]
+}

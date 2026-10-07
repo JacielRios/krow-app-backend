@@ -1,102 +1,188 @@
-"use client";
-import { useMemo, useState } from "react";
-import { MetricCard } from "./MetricCard";
-import { DateRangeFilter, rangeFromDays } from "./DateRangeFilter";
-import { RevenueChart, TripsTrendChart } from "./Charts";
-import { TopRoutesTable } from "./TopRoutesTable";
-import { getMockData } from "./mockData";
-import "./dashboard.css";
-
-const n = (v: number) => v.toLocaleString("es-MX");
-const money = (v: number) => `$${v.toLocaleString("es-MX")}`;
-const NAV = [["resumen", "Resumen"], ["viajes", "Viajes"], ["conductores", "Conductores"], ["finanzas", "Finanzas"], ["rutas", "Rutas"]];
+'use client';
+import { useState } from 'react';
+import { MetricCard } from './MetricCard';
+import { DateRangeFilter, rangeFromDays } from './DateRangeFilter';
+import { RevenueChart, TripsTrendChart } from './Charts';
+import { TopRoutesTable } from './TopRoutesTable';
+import { dashboardInsights, money, number, percent } from './dashboard-data';
+import { useDashboardData } from './useDashboardData';
+import './dashboard.css';
 
 export default function DashboardPage() {
   const [range, setRange] = useState(() => rangeFromDays(30));
-  // TODO: sustituir por datos reales (api-client) con estados de carga y error.
- /*const { data: d, loading, error } = useDashboardData(range, getAccessToken);
-
-    if (loading && !d) return <p>Cargando...</p>;
-    if (error) return <p>Error al cargar el dashboard: {error}</p>;
-    if (!d) return null;*/
-const d = getMockData(range);
-
-  const cancelRate = (d.cancelled / (d.completed + d.cancelled)) * 100;
-  const top = d.topRoutes[0];
-  const insights = [
-    cancelRate > 8
-      ? `Las cancelaciones están en ${cancelRate.toFixed(1)}%. Revisa los horarios con más cancelaciones.`
-      : `Las cancelaciones están controladas (${cancelRate.toFixed(1)}%).`,
-    `${top.route} concentra ${Math.round((top.trips / d.completed) * 100)}% de los viajes realizados.`,
-    `Hay ${money(d.pending)} en pagos pendientes (${Math.round((d.pending / d.revenue) * 100)}% de los ingresos).`,
-  ];
+  const { data, loading, error, reload } = useDashboardData(range);
+  const cancelRate = data ? percent(data.cancelled, data.totalTrips) : 0;
+  const registeredDrivers = data
+    ? data.activeDrivers + data.inactiveDrivers
+    : 0;
 
   return (
-    <div className="shell">
-      <aside className="side">
-        <p className="brand">KROW</p>
-        <nav aria-label="Secciones">
-          {NAV.map(([id, label]) => <a key={id} href={`#${id}`}>{label}</a>)}
-        </nav>
-        <button type="button" className="ghost">Cerrar sesión</button>
-      </aside>
-
-      <main className="main">
-        <header id="resumen" className="top">
-          <div>
-            <h1>Panel de operación</h1>
-            <p className="sub">Del {range.from} al {range.to}</p>
-          </div>
-          <DateRangeFilter value={range} onChange={setRange} />
-        </header>
-
-        <section className="insights" aria-label="Lectura rápida">
-          <h2>Lo más importante del periodo</h2>
-          <ul>{insights.map((t) => <li key={t}>{t}</li>)}</ul>
-        </section>
-
-        <section id="viajes">
-          <h2>Viajes</h2>
-          <div className="grid">
-            <MetricCard tone="trips" label="Realizados" value={n(d.completed)} />
-            <MetricCard tone="alert" label="Cancelados" value={n(d.cancelled)} hint={`${cancelRate.toFixed(1)}% del total`} />
-            <MetricCard tone="trips" label="En curso ahora" value={n(d.ongoing)} />
-            <MetricCard tone="riders" label="Pasajeros transportados" value={n(d.passengers)} />
-            <MetricCard tone="riders" label="Ocupación promedio" value={`${d.occupancy}%`} progress={d.occupancy} hint="Asientos usados vs. ofrecidos" />
-          </div>
-          <div className="panel">
-            <h3>Viajes por día</h3>
-            <TripsTrendChart data={d.trend} />
-          </div>
-        </section>
-
-        <section id="conductores">
-          <h2>Conductores</h2>
-          <div className="grid">
-            <MetricCard tone="drivers" label="Activos" value={n(d.activeDrivers)}
-              progress={Math.round((d.activeDrivers / (d.activeDrivers + d.inactiveDrivers)) * 100)} hint="Del total registrado" />
-            <MetricCard tone="drivers" label="Inactivos" value={n(d.inactiveDrivers)} />
-          </div>
-        </section>
-
-        <section id="finanzas">
-          <h2>Finanzas</h2>
-          <div className="grid">
-            <MetricCard tone="money" label="Ingresos" value={money(d.revenue)} />
-            <MetricCard tone="money" label="Pagos confirmados" value={money(d.paid)} />
-            <MetricCard tone="alert" label="Pagos pendientes" value={money(d.pending)} />
-          </div>
-          <div className="panel">
-            <h3>Ingresos por día</h3>
-            <RevenueChart data={d.trend} />
-          </div>
-        </section>
-
-        <section id="rutas">
-          <h2>Rutas con más actividad</h2>
-          <div className="panel"><TopRoutesTable rows={d.topRoutes} /></div>
-        </section>
-      </main>
+    <div className="dashboard" aria-busy={loading}>
+      <header className="top">
+        <div>
+          <p className="eyebrow">Operación</p>
+          <h1>Panel de operación</h1>
+          <p className="sub">
+            Del {range.from} al {range.to} · hora de Monterrey · MXN
+          </p>
+        </div>
+        <DateRangeFilter value={range} onChange={setRange} />
+      </header>
+      <div className="dashboard-toolbar">
+        <p className="sub">
+          Indicadores de los viajes con salida dentro del periodo seleccionado.
+        </p>
+        <button
+          type="button"
+          className="dashboard-retry"
+          onClick={reload}
+          disabled={loading}
+        >
+          Actualizar
+        </button>
+      </div>
+      {loading && (
+        <p role="status">
+          {data ? 'Actualizando indicadores…' : 'Cargando indicadores…'}
+        </p>
+      )}
+      {error && (
+        <div className="dashboard-error" role="alert">
+          <p>{error}</p>
+          {data && (
+            <p>
+              Se conservan los últimos datos consultados. Pueden estar
+              desactualizados.
+            </p>
+          )}
+          <button type="button" onClick={reload}>
+            Reintentar
+          </button>
+        </div>
+      )}
+      {!data && loading && (
+        <div className="dashboard-skeleton" aria-hidden="true">
+          {Array.from({ length: 6 }, (_, i) => (
+            <div key={i} />
+          ))}
+        </div>
+      )}
+      {data && (
+        <>
+          <section className="insights" aria-label="Lectura rápida">
+            <h2>Lo más importante del periodo</h2>
+            <ul>
+              {dashboardInsights(data).map((text) => (
+                <li key={text}>{text}</li>
+              ))}
+            </ul>
+          </section>
+          <section id="viajes">
+            <h2>Viajes</h2>
+            <div className="grid">
+              <MetricCard
+                tone="trips"
+                label="Realizados"
+                value={number(data.completed)}
+              />
+              <MetricCard
+                tone="alert"
+                label="Cancelados"
+                value={number(data.cancelled)}
+                hint={`${cancelRate.toFixed(1)}% de los viajes del periodo`}
+              />
+              <MetricCard
+                tone="trips"
+                label="En curso"
+                value={number(data.ongoing)}
+                hint="Con salida dentro del periodo"
+              />
+              <MetricCard
+                tone="trips"
+                label="Programados"
+                value={number(data.scheduled)}
+              />
+              <MetricCard
+                tone="riders"
+                label="Pasajeros transportados"
+                value={number(data.passengers)}
+                hint="Asientos de reservas abordadas o completadas"
+              />
+              <MetricCard
+                tone="riders"
+                label="Ocupación promedio"
+                value={`${data.occupancy.toFixed(1)}%`}
+                progress={data.occupancy}
+                hint="Asientos reservados / ofrecidos; excluye viajes cancelados"
+              />
+            </div>
+            {data.totalTrips > 0 && (
+              <div className="panel">
+                <h3>Viajes por día</h3>
+                <TripsTrendChart data={data.trend} />
+              </div>
+            )}
+          </section>
+          <section id="conductores">
+            <h2>Conductores</h2>
+            <div className="grid">
+              <MetricCard
+                tone="drivers"
+                label="Activos"
+                value={number(data.activeDrivers)}
+                progress={percent(data.activeDrivers, registeredDrivers)}
+                hint="Estado actual del catálogo; no depende de las fechas"
+              />
+              <MetricCard
+                tone="drivers"
+                label="Inactivos"
+                value={number(data.inactiveDrivers)}
+                hint="Incluye pendientes, rechazados y suspendidos"
+              />
+            </div>
+          </section>
+          <section id="finanzas">
+            <h2>Importes y efectivo</h2>
+            <p className="sub">
+              Los importes comprometidos pertenecen a las reservas. No
+              representan ingresos netos de KROW ni pagos electrónicos.
+            </p>
+            <div className="grid">
+              <MetricCard
+                tone="money"
+                label="Importe comprometido"
+                value={money(data.revenue)}
+                hint="Precio acordado de las reservas vigentes"
+              />
+              <MetricCard
+                tone="money"
+                label="Efectivo recibido"
+                value={data.paid === null ? 'Sin registro' : money(data.paid)}
+                hint="Recepción registrada por el conductor"
+              />
+              <MetricCard
+                tone="alert"
+                label="Efectivo pendiente"
+                value={
+                  data.pending === null ? 'Sin registro' : money(data.pending)
+                }
+              />
+            </div>
+            {data.totalTrips > 0 && (
+              <div className="panel">
+                <h3>Importes comprometidos por día</h3>
+                <RevenueChart data={data.trend} />
+              </div>
+            )}
+          </section>
+          <section id="rutas">
+            <h2>Rutas con más actividad</h2>
+            <div className="panel">
+              <TopRoutesTable rows={data.topRoutes} />
+            </div>
+          </section>
+        </>
+      )}
     </div>
   );
 }

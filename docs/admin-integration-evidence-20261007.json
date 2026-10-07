@@ -1,0 +1,116 @@
+{
+  "checkedAt": "2026-10-07T17:26:37.812Z",
+  "scope": "Repository integration, administrative panel, real dashboard and public landing",
+  "repositories": {
+    "backendHead": "6bb3cdbf4bead4283e6261453437eba0c155b4a2",
+    "integratedCommits": [
+      "a414d0c",
+      "6bb3cdb"
+    ],
+    "mobileRemoteChanges": 0,
+    "committedOrPushed": false,
+    "originalUntrackedFilesPreserved": 98,
+    "safetyStashRetained": true
+  },
+  "deployment": {
+    "provider": "Railway",
+    "service": "krow-api",
+    "id": "ab5a9622-db44-4751-ab96-3ded384b7150",
+    "status": "SUCCESS",
+    "api": "https://krow-api-production.up.railway.app/v1",
+    "web": "http://localhost:3001",
+    "webPublished": false
+  },
+  "supabase": {
+    "projectId": "yyjbqzsokxpzhevpanyq",
+    "migrationsApplied": [
+      "20261007170120_admin_management",
+      "20261007171623_admin_route_catalog_read"
+    ],
+    "preservedCounts": {
+      "rides": 50,
+      "bookings": 34,
+      "drivers": 1,
+      "vehicles": 1
+    },
+    "documentBucketPrivate": true
+  },
+  "validation": {
+    "api": {
+      "passed": 137,
+      "suites": 22,
+      "skippedExternalPostgresTests": 13
+    },
+    "e2e": {
+      "passed": 6,
+      "suites": 2
+    },
+    "web": {
+      "passed": 39,
+      "suites": 9,
+      "persona1": 23,
+      "persona2": 16
+    },
+    "mobile": {
+      "passed": 147,
+      "suites": 27
+    },
+    "migrationLedgerMatches": 37,
+    "stopsImportTestsPassed": 6,
+    "apiTypes": true,
+    "webTypes": true,
+    "mobileTypes": true,
+    "apiBuild": true,
+    "webBuild": true,
+    "apiLint": true,
+    "gitDiffCheck": true,
+    "liveHttpChecksPassed": 15,
+    "livePermissionsChecksPassed": 6,
+    "storageSignedUploadAccepted": true,
+    "liveTestTransactionRolledBack": true,
+    "noRealFileUploaded": true
+  },
+  "security": {
+    "productionDependencyAdvisories": 0,
+    "webDependencyAdvisories": 0,
+    "inheritedDevelopmentAdvisories": {
+      "total": 35,
+      "moderate": 25,
+      "high": 10
+    },
+    "privateDatabaseSecretsExposedToBrowser": false
+  },
+  "browser": {
+    "realAdminLoginVerified": true,
+    "mobileMenuVerified": true,
+    "modalInitialFocusVerified": true,
+    "escapeRestoresFocusVerified": true,
+    "rideDetailVerified": true,
+    "dashboardUsesPublishedApi": true,
+    "reviewedViewports": [
+      {
+        "width": 390,
+        "height": 844
+      },
+      {
+        "width": 768,
+        "height": 1024
+      },
+      {
+        "width": 1440,
+        "height": 900
+      }
+    ],
+    "tabletHorizontalOverflow": false
+  },
+  "pending": [
+    "Publish the web and add its domain to CORS",
+    "Full upload/download browser test with a real document",
+    "Non-admin browser login with available credentials",
+    "13 isolated external PostgreSQL tests",
+    "Approved support/legal/retention content",
+    "Recover initial production schema and two historical migrations",
+    "Compatible development dependency updates",
+    "Physical Android GPS validation"
+  ]
+}

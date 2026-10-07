@@ -1,0 +1,32 @@
+-- Run only in an authenticated administrative psql session for the KROW project.
+-- This is credential provisioning, not an application migration. Never include
+-- a password or administrator connection URL in a migration, command line or Git.
+\set ON_ERROR_STOP on
+
+begin;
+do $$
+begin
+  if not exists(select 1 from pg_roles where rolname='krow_pilot_service') then
+    raise exception 'Apply the audited pilot permission group first';
+  end if;
+  if exists(select 1 from pg_roles where rolname='krow_pilot_runtime') then
+    raise exception 'Runtime role already exists; use a reviewed rotation procedure';
+  end if;
+end;
+$$;
+create role krow_pilot_runtime nologin inherit nosuperuser nocreatedb
+  nocreaterole noreplication nobypassrls connection limit 12;
+grant krow_pilot_service to krow_pilot_runtime with inherit true;
+grant krow_pilot_service to krow_pilot_runtime with admin false;
+grant krow_pilot_service to krow_pilot_runtime with set false;
+commit;
+
+-- psql prompts privately and sends a SCRAM verifier instead of a clear password.
+set password_encryption = 'scram-sha-256';
+\password krow_pilot_runtime
+alter role krow_pilot_runtime login;
+
+-- Metadata only. Do not select password hashes or any personal records.
+select rolname,rolcanlogin,rolsuper,rolcreatedb,rolcreaterole,rolreplication,
+  rolbypassrls,rolconnlimit
+from pg_roles where rolname='krow_pilot_runtime';

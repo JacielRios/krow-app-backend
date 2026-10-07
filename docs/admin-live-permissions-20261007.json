@@ -1,0 +1,31 @@
+{
+  "checkedAt": "2026-10-07T17:10:12.774Z",
+  "transactionRolledBack": true,
+  "noFileUploaded": true,
+  "checks": [
+    {
+      "check": "No identity has no admin authorization",
+      "ok": true
+    },
+    {
+      "check": "Authorized account verified by actual Auth and profile",
+      "ok": true
+    },
+    {
+      "check": "Limited runtime can write administrative metadata and audit under verified actor",
+      "ok": true
+    },
+    {
+      "check": "No privileged Auth or direct client metadata access",
+      "ok": true
+    },
+    {
+      "check": "Normal Supabase password login grants server-managed admin role",
+      "ok": true
+    },
+    {
+      "check": "Private Storage accepts limited signed upload for authorized admin",
+      "ok": true
+    }
+  ]
+}

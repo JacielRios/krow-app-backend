@@ -1,0 +1,87 @@
+{
+  "checkedAt": "2026-10-06T23:15:34.200Z",
+  "deploymentId": "47d2d1b4-0482-40bc-a9a2-33bef3dc6db3",
+  "deploymentStatus": "SUCCESS",
+  "origin": "https://krow-api-production.up.railway.app",
+  "passed": true,
+  "http": [
+    {
+      "path": "/v1/health",
+      "status": 200,
+      "durationMs": 282,
+      "service": "krow-api",
+      "healthStatus": "ok"
+    },
+    {
+      "path": "/v1/health/ready",
+      "status": 200,
+      "durationMs": 240,
+      "healthStatus": "ok",
+      "pilot": "disabled"
+    },
+    {
+      "path": "/v1/me",
+      "status": 401,
+      "durationMs": 240
+    }
+  ],
+  "websocket": {
+    "upgrade": true,
+    "engineIoOpenPacket": true,
+    "pingIntervalMs": 25000,
+    "pingTimeoutMs": 20000
+  },
+  "routing": {
+    "explicitPort": 3000,
+    "domainTargetPort": 3000
+  },
+  "initialFeatureFlags": {
+    "RIDE_PILOT_ENABLED": false,
+    "RIDE_TRACKING_ENABLED": false
+  },
+  "usageSnapshot": {
+    "checkedAt": "2026-10-06T23:15:04.1507532Z",
+    "currentBillDollars": 0,
+    "currentUsageDollars": 0,
+    "estimatedBillDollars": 0,
+    "usageLimit": null
+  },
+  "previousChecks": [
+    {
+      "checkedAt": "2026-10-06T23:12:17.864Z",
+      "deploymentId": "7ae063aa-2689-4b80-ac70-24cadd6ac250",
+      "deploymentStatus": "SUCCESS",
+      "passed": false,
+      "http": [
+        {
+          "path": "/v1/health",
+          "status": 502,
+          "durationMs": 476,
+          "healthStatus": "error"
+        },
+        {
+          "path": "/v1/health/ready",
+          "status": 502,
+          "durationMs": 433,
+          "healthStatus": "error"
+        },
+        {
+          "path": "/v1/me",
+          "status": 502,
+          "durationMs": 430
+        }
+      ],
+      "websocket": {
+        "upgrade": false,
+        "engineIoOpenPacket": false,
+        "error": "websocket_error"
+      }
+    }
+  ],
+  "limits": [
+    "Readiness confirms process startup while the pilot is disabled; PostgreSQL credentials and pilot flows remain unverified.",
+    "WebSocket verification covers the Engine.IO transport; authenticated tracking and real GPS remain unverified.",
+    "No user account, JWT, database connection string or payment data was used or recorded.",
+    "Usage is a point-in-time summary and does not guarantee unlimited free hosting."
+  ]
+}

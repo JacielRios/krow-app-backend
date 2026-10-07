@@ -1,7 +1,16 @@
 const STEPS = [
-  { title: "Crea tu cuenta", text: "Regístrate como pasajero o conductor en un par de minutos." },
-  { title: "Encuentra o publica un viaje", text: "Busca rutas compatibles o publica la tuya si manejas." },
-  { title: "Viaja y califica", text: "Comparte el trayecto y deja tu calificación al terminar." },
+  {
+    title: 'Crea tu cuenta',
+    text: 'Regístrate en la app; una misma cuenta puede viajar como pasajero o conductor autorizado.',
+  },
+  {
+    title: 'Encuentra o publica un viaje',
+    text: 'Busca rutas compatibles o publica la tuya si manejas.',
+  },
+  {
+    title: 'Viaja y califica',
+    text: 'Comparte el trayecto y deja tu calificación al terminar.',
+  },
 ];
 
 export function HowItWorks() {
@@ -9,7 +18,7 @@ export function HowItWorks() {
     <section className="how" id="como-funciona">
       <div className="section-head">
         <p className="eyebrow">Cómo funciona</p>
-        <h2>Empezar toma menos de 5 minutos</h2>
+        <h2>Un trayecto compartido, paso a paso</h2>
       </div>
       <div className="steps">
         {STEPS.map((s, i) => (

@@ -339,6 +339,21 @@ export type Database = {
           route_fraction: number;
         }>;
       };
+      get_passenger_stop_candidates_v2: {
+        Args: {
+          p_origin_lat: number;
+          p_origin_lng: number;
+          p_destination_lat: number;
+          p_destination_lng: number;
+          p_max_distance_m: number;
+          p_pickup_scope: 'campus' | 'route';
+        };
+        Returns: Database['public']['Functions']['get_passenger_stop_candidates']['Returns'];
+      };
+      get_passenger_stop_pairs_v2: {
+        Args: Database['public']['Functions']['get_passenger_stop_candidates_v2']['Args'];
+        Returns: Database['public']['Functions']['get_passenger_stop_pairs']['Returns'];
+      };
       get_passenger_stop_candidates: {
         Args: {
           p_origin_lat: number;

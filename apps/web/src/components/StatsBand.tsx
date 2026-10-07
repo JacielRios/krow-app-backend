@@ -1,18 +1,18 @@
-const STATS = [
-  { num: "12,000+", label: "Viajes compartidos" },
-  { num: "3,200+", label: "Usuarios activos" },
-  { num: "8", label: "Ciudades" },
-  { num: "4.8/5", label: "Calificación promedio" },
+const PILOT = [
+  { num: 'ITNL', label: 'Punto de salida de los viajes' },
+  { num: 'Android', label: 'Plataforma del piloto' },
+  { num: 'Efectivo', label: 'Forma de pago actual' },
+  { num: 'GPS online', label: 'Seguimiento durante el viaje' },
 ];
 
 export function StatsBand() {
   return (
-    <section className="stats">
+    <section className="stats" aria-label="Alcance actual del piloto">
       <div className="stats-grid">
-        {STATS.map((s) => (
-          <div key={s.label}>
-            <p className="num">{s.num}</p>
-            <p className="label">{s.label}</p>
+        {PILOT.map((item) => (
+          <div key={item.label}>
+            <p className="num">{item.num}</p>
+            <p className="label">{item.label}</p>
           </div>
         ))}
       </div>

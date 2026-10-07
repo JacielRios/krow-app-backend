@@ -1,6 +1,8 @@
 import { Type } from 'class-transformer';
 import {
   IsDateString,
+  IsDefined,
+  IsObject,
   IsOptional,
   IsString,
   MaxLength,
@@ -19,11 +21,23 @@ export class PlaceDetailsQueryDto {
 }
 
 export class ReverseGeocodeDto {
-  @ValidateNested() @Type(() => CoordinateDto) point!: CoordinateDto;
+  @IsDefined()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => CoordinateDto)
+  point!: CoordinateDto;
 }
 
 export class RoutePreviewDto {
-  @ValidateNested() @Type(() => CoordinateDto) origin!: CoordinateDto;
-  @ValidateNested() @Type(() => CoordinateDto) destination!: CoordinateDto;
+  @IsDefined()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => CoordinateDto)
+  origin!: CoordinateDto;
+  @IsDefined()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => CoordinateDto)
+  destination!: CoordinateDto;
   @IsOptional() @IsDateString() departureTime?: string;
 }

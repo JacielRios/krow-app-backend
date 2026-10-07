@@ -19,6 +19,58 @@ export function validateEnvironment(
     throw new Error(`Faltan variables de entorno: ${missing.join(', ')}`);
 
   const port = input.PORT ? Number(input.PORT) : 3000;
+  const mapsQuota = Number(read('GOOGLE_MAPS_REQUESTS_PER_MINUTE', '250'));
+  if (!Number.isInteger(mapsQuota) || mapsQuota < 1)
+    throw new Error('Cuota de Google Maps inválida');
+  for (const flag of [
+    'RIDE_PILOT_ENABLED',
+    'RIDE_TRACKING_ENABLED',
+    'PILOT_PUSH_ENABLED',
+    'PILOT_ACCOUNT_CLOSURE_ENABLED',
+  ]) {
+    if (!['', 'true', 'false'].includes(read(flag)))
+      throw new Error(`${flag} debe ser true o false`);
+  }
+  if (
+    read('RIDE_TRACKING_ENABLED') === 'true' &&
+    read('RIDE_PILOT_ENABLED') !== 'true'
+  )
+    throw new Error('El GPS requiere RIDE_PILOT_ENABLED');
+  if (read('RIDE_PILOT_ENABLED') === 'true') {
+    if (!read('PILOT_DATABASE_URL'))
+      throw new Error('Falta PILOT_DATABASE_URL');
+    if (read('NODE_ENV') === 'production' && !read('PILOT_DATABASE_CA'))
+      throw new Error('Falta PILOT_DATABASE_CA');
+  }
+  if (
+    read('RIDE_TRACKING_ENABLED') === 'true' &&
+    !read('GOOGLE_MAPS_API_KEY').trim()
+  )
+    throw new Error('El GPS online requiere GOOGLE_MAPS_API_KEY en el backend');
+  if (read('PILOT_PUSH_ENABLED') === 'true') {
+    const requiredPush = [
+      'PILOT_PUSH_ENCRYPTION_KEY',
+      'FCM_PROJECT_ID',
+      'FCM_CLIENT_EMAIL',
+      'FCM_PRIVATE_KEY',
+    ];
+    if (
+      read('RIDE_PILOT_ENABLED') !== 'true' ||
+      requiredPush.some((key) => !read(key))
+    )
+      throw new Error('Configuración push del piloto incompleta');
+    if (Buffer.from(read('PILOT_PUSH_ENCRYPTION_KEY'), 'base64').length !== 32)
+      throw new Error('PILOT_PUSH_ENCRYPTION_KEY requiere 32 bytes');
+  }
+  if (
+    read('PILOT_ACCOUNT_CLOSURE_ENABLED') === 'true' &&
+    (read('RIDE_PILOT_ENABLED') !== 'true' ||
+      !read('PILOT_PRIVACY_URL') ||
+      !read('PILOT_SUPPORT_URL'))
+  )
+    throw new Error(
+      'El cierre de cuenta requiere piloto, soporte y aviso de privacidad aprobados',
+    );
   if (!Number.isInteger(port) || port < 1 || port > 65535)
     throw new Error('PORT debe ser un número entero entre 1 y 65535');
 

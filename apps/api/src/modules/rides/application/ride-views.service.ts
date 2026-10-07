@@ -8,10 +8,12 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  Optional,
 } from '@nestjs/common';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { SupabaseService } from '../../../infrastructure/supabase/supabase.service.js';
 import type { AuthenticatedUser } from '../../auth/domain/authenticated-user.js';
+import { PilotService } from '../../pilot/pilot.service.js';
 
 type LooseClient = SupabaseClient<any, 'public', any>;
 
@@ -23,13 +25,20 @@ const PASSENGER_ACTIVE_STATUSES = ['pending', 'confirmed', 'in_progress'];
 
 @Injectable()
 export class RideViewsService {
-  constructor(private readonly supabase: SupabaseService) {}
+  constructor(
+    private readonly supabase: SupabaseService,
+    @Optional() private readonly pilot?: PilotService,
+  ) {}
 
-  async recent(user: AuthenticatedUser, limit: number) {
+  async recent(
+    user: AuthenticatedUser,
+    limit: number,
+    context?: 'driver' | 'passenger',
+  ) {
     const client = this.client(user);
     const driverId = await this.driverId(client, user.id);
 
-    if (driverId) {
+    if (driverId && context !== 'passenger') {
       const { data, error } = await client
         .from('rides')
         .select(
@@ -45,7 +54,7 @@ export class RideViewsService {
     const { data, error } = await client
       .from('bookings')
       .select(
-        `seats_reserved, ride:rides(ride_id, status, departure_time, origin_lat, origin_lng, destination_lat, destination_lng, available_seats, price_per_seat)`,
+        `status, seats_reserved, ride:rides(ride_id, status, departure_time, origin_lat, origin_lng, destination_lat, destination_lng, available_seats, price_per_seat)`,
       )
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
@@ -56,20 +65,24 @@ export class RideViewsService {
       .map((booking: any) => {
         const ride = this.flatten<any>(booking.ride);
         return ride
-          ? this.mapRecentRide({
-              ...ride,
-              available_seats: booking.seats_reserved,
-            })
+          ? {
+              ...this.mapRecentRide({
+                ...ride,
+                available_seats: booking.seats_reserved,
+              }),
+              bookingStatus: booking.status,
+            }
           : null;
       })
       .filter((ride: unknown) => ride !== null);
   }
 
-  async active(user: AuthenticatedUser) {
+  async active(user: AuthenticatedUser, context?: 'driver' | 'passenger') {
+    if (this.pilot?.db.enabled) return this.pilot.activeRide(user, context);
     const client = this.client(user);
     const driverId = await this.driverId(client, user.id);
 
-    if (driverId) {
+    if (driverId && context !== 'passenger') {
       const { data, error } = await client
         .from('rides')
         .select(
@@ -87,7 +100,7 @@ export class RideViewsService {
     const { data, error } = await client
       .from('bookings')
       .select(
-        'ride:rides!inner(ride_id, status, departure_time, origin_address, destination_address)',
+        'status, ride:rides!inner(ride_id, status, departure_time, origin_address, destination_address)',
       )
       .eq('user_id', user.id)
       .in('status', PASSENGER_ACTIVE_STATUSES)
@@ -97,10 +110,16 @@ export class RideViewsService {
       .maybeSingle();
     this.throwIfError(error);
     const ride = this.flatten<any>(data?.ride);
-    return ride ? this.mapActiveRide(ride, 'passenger') : null;
+    return ride
+      ? {
+          ...this.mapActiveRide(ride, 'passenger'),
+          bookingStatus: data?.status,
+        }
+      : null;
   }
 
   async scheduled(user: AuthenticatedUser, rideId: string) {
+    if (this.pilot?.db.enabled) return this.pilot.rideView(user, rideId, false);
     const client = this.client(user);
     const driverId = await this.driverId(client, user.id);
     const ride = await this.rideHeader(client, rideId);
@@ -193,6 +212,7 @@ export class RideViewsService {
   }
 
   async activeData(user: AuthenticatedUser, rideId: string) {
+    if (this.pilot?.db.enabled) return this.pilot.rideView(user, rideId, true);
     const client = this.client(user);
     const driverId = await this.driverId(client, user.id);
     const ride = await this.rideMap(client, rideId);
@@ -202,19 +222,26 @@ export class RideViewsService {
         .from('bookings')
         .select(
           `booking_id, user_id, status, seats_reserved,
-           dropoff_stop:ride_stops!bookings_dropoff_stop_id_fkey(lat, lng, address),
+           pickup_stop:ride_stops!bookings_pickup_stop_id_fkey(stop_id, stop_order, lat, lng, address),
+           dropoff_stop:ride_stops!bookings_dropoff_stop_id_fkey(stop_id, stop_order, lat, lng, address),
            passenger:users!bookings_user_id_fkey(uuid, full_name, profile_photo, rating)`,
         )
         .eq('ride_id', rideId)
-        .in('status', ['confirmed', 'in_progress'])
+        .in('status', ['confirmed', 'in_progress', 'completed', 'no_show'])
         .order('created_at', { ascending: true });
       this.throwIfError(error);
       return {
         role: 'conductor',
         ride: this.mapRideHeader(ride, true),
+        canComplete:
+          ride.status === 'in_progress' &&
+          !(data ?? []).some((b: { status: string }) =>
+            ['confirmed', 'in_progress'].includes(b.status),
+          ),
         passengers: (data ?? []).map((row: any) => {
           const passenger = this.flatten<any>(row.passenger);
           const stop = this.flatten<any>(row.dropoff_stop);
+          const pickup = this.flatten<any>(row.pickup_stop);
           return {
             bookingId: row.booking_id,
             bookingStatus: row.status,
@@ -223,6 +250,11 @@ export class RideViewsService {
             profilePhoto: passenger?.profile_photo ?? null,
             rating: this.nullableNumber(passenger?.rating),
             seatsReserved: row.seats_reserved,
+            pickupLat: this.nullableNumber(pickup?.lat),
+            pickupLng: this.nullableNumber(pickup?.lng),
+            pickupAddress: pickup?.address ?? null,
+            pickupOrder: pickup?.stop_order ?? null,
+            dropoffOrder: stop?.stop_order ?? null,
             dropoffLat: this.number(stop?.lat),
             dropoffLng: this.number(stop?.lng),
             dropoffAddress: stop?.address ?? null,

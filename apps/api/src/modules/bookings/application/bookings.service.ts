@@ -1,4 +1,5 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Optional } from '@nestjs/common';
+import { PilotService } from '../../pilot/pilot.service.js';
 import { SupabaseService } from '../../../infrastructure/supabase/supabase.service.js';
 import type { AuthenticatedUser } from '../../auth/domain/authenticated-user.js';
 import type { BookingStatus } from '../domain/booking-state.js';
@@ -6,13 +7,27 @@ import type { RequestBookingDto } from '../presentation/booking.dto.js';
 
 @Injectable()
 export class BookingsService {
-  constructor(private readonly supabase: SupabaseService) {}
+  constructor(
+    private readonly supabase: SupabaseService,
+    @Optional() private readonly pilot?: PilotService,
+  ) {}
 
   async request(
     user: AuthenticatedUser,
     rideId: string,
     dto: RequestBookingDto,
   ) {
+    if (this.pilot?.db.enabled)
+      return {
+        bookingId: await this.pilot.db.routeRpc(user.id, 'request_booking_v2', [
+          {
+            ride_id: rideId,
+            seats_reserved: dto.seats,
+            pickup_stop_id: dto.pickupStopId,
+            dropoff_stop_id: dto.dropoffStopId,
+          },
+        ]),
+      };
     const { data, error } = await this.supabase
       .forUser(user.accessToken)
       .rpc('request_booking_v2', {
@@ -79,6 +94,8 @@ export class BookingsService {
     target: BookingStatus,
     reason?: string,
   ) {
+    if (this.pilot?.db.enabled)
+      return this.pilot.updateBooking(user, bookingId, target, reason);
     const client = this.supabase.forUser(user.accessToken);
     const { error } = await client.rpc('update_booking_status', {
       p_booking_id: bookingId,

@@ -1,0 +1,23 @@
+# railway up uploads the working tree before Docker's exclusions apply.
+.git
+.github
+.codex
+.agents
+.tmp
+.temp
+artifacts
+docs
+**/node_modules
+**/dist
+**/.next
+**/coverage
+**/*.tsbuildinfo
+**/*.log
+**/.env
+**/.env.*
+**/*.pem
+**/*.key
+**/*.dump
+**/*service-account*.json
+**/*serviceAccount*.json
+supabase/.temp

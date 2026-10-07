@@ -14,11 +14,12 @@ import type { AuthenticatedUser } from '../../auth/domain/authenticated-user.js'
 import { CurrentUser } from '../../auth/presentation/current-user.decorator.js';
 import { SupabaseAuthGuard } from '../../auth/presentation/supabase-auth.guard.js';
 import { RoutesService } from '../application/routes.service.js';
+import { MapsRateLimitGuard } from '../../maps/presentation/maps-rate-limit.guard.js';
 import { RoutePreviewRequestDto, SaveFavoriteRouteDto } from './route.dto.js';
 
 @ApiTags('routes')
 @ApiBearerAuth()
-@UseGuards(SupabaseAuthGuard)
+@UseGuards(SupabaseAuthGuard, MapsRateLimitGuard)
 @Controller('routes')
 export class RoutesController {
   constructor(private readonly routes: RoutesService) {}

@@ -58,6 +58,7 @@ export class NotificationProviders {
       rideId: string;
       kind: string;
       expiresAt: Date;
+      recipientId?: string;
     },
   ): Promise<string> {
     const title =
@@ -73,6 +74,9 @@ export class NotificationProviders {
       rideId: notification.rideId,
       kind: notification.kind,
       expiresAt: String(notification.expiresAt.getTime()),
+      ...(notification.recipientId
+        ? { recipientId: notification.recipientId }
+        : {}),
     };
     if (platform === 'android') {
       const project = this.config.getOrThrow<string>('FCM_PROJECT_ID');

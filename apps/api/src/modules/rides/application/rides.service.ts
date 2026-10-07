@@ -3,12 +3,15 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
+  Optional,
 } from '@nestjs/common';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { SupabaseService } from '../../../infrastructure/supabase/supabase.service.js';
 import type { Database } from '../../../infrastructure/supabase/database.types.js';
 import type { AuthenticatedUser } from '../../auth/domain/authenticated-user.js';
 import { RoutesService } from '../../routes/application/routes.service.js';
+import { CAMPUS_ORIGIN } from '../../routes/domain/campus-origin.js';
+import { PilotService } from '../../pilot/pilot.service.js';
 import type {
   CreateRideDto,
   DriverRidesQueryDto,
@@ -115,31 +118,82 @@ export class RidesService {
   constructor(
     private readonly supabase: SupabaseService,
     private readonly routes: RoutesService,
+    @Optional() private readonly pilot?: PilotService,
   ) {}
 
   async create(user: AuthenticatedUser, dto: CreateRideDto) {
+    const campusRide = {
+      ...dto,
+      origin: CAMPUS_ORIGIN,
+      originAddress: CAMPUS_ORIGIN.address,
+    };
     const computed = await this.routes.computeWithCompatibleStops(user, {
-      origin: dto.origin,
+      origin: CAMPUS_ORIGIN,
       destination: dto.destination,
       departureTime: dto.departureTime,
     });
+    if (this.pilot?.db.enabled)
+      return {
+        rideId: await this.pilot.db.routeRpc(user.id, 'create_ride_v2', [
+          this.ridePayload(campusRide, computed),
+        ]),
+      };
     const { data, error } = await this.client(user).rpc('create_ride_v2', {
-      p_payload: this.ridePayload(dto, computed),
+      p_payload: this.ridePayload(campusRide, computed),
     });
     if (error) this.throwRpcError(error.message);
     return { rideId: data };
   }
 
   async update(user: AuthenticatedUser, rideId: string, dto: UpdateRideDto) {
+    // An edit changes destination/details, never the existing trip's departure.
+    // This also preserves booked/historical origins when older clients send one.
+    const { data: ride, error: originError } = await this.client(user)
+      .from('rides')
+      .select('origin_lat, origin_lng, origin_address')
+      .eq('ride_id', rideId)
+      .maybeSingle();
+    if (originError) throw new BadRequestException(originError.message);
+    if (!ride) throw new NotFoundException('Viaje no encontrado');
+    const origin = {
+      lat: Number(ride.origin_lat),
+      lng: Number(ride.origin_lng),
+    };
+    if (
+      ride.origin_lat == null ||
+      ride.origin_lng == null ||
+      !Number.isFinite(origin.lat) ||
+      !Number.isFinite(origin.lng) ||
+      Math.abs(origin.lat) > 90 ||
+      Math.abs(origin.lng) > 180
+    ) {
+      throw new BadRequestException(
+        'El punto de salida del viaje no es válido',
+      );
+    }
+    const existingRide = {
+      ...dto,
+      origin,
+      originAddress: ride.origin_address ?? undefined,
+    };
     const computed = await this.routes.computeWithCompatibleStops(user, {
-      origin: dto.origin,
+      origin,
       destination: dto.destination,
       departureTime: dto.departureTime,
     });
+    if (this.pilot?.db.enabled)
+      return {
+        rideId,
+        version: await this.pilot.db.routeRpc(user.id, 'update_ride_v2', [
+          rideId,
+          dto.version,
+          this.ridePayload(existingRide, computed),
+        ]),
+      };
     const { data, error } = await this.client(user).rpc('update_ride_v2', {
       p_ride_id: rideId,
       p_expected_version: dto.version,
-      p_payload: this.ridePayload(dto, computed),
+      p_payload: this.ridePayload(existingRide, computed),
     });
     if (error) this.throwRpcError(error.message);
     return { rideId, version: data };
@@ -199,9 +253,18 @@ export class RidesService {
          bookings(status)`,
       )
       .eq('driver_id', driver.driver_id)
-      .order('departure_time', { ascending: false })
+      .order('departure_time', { ascending: query.group === 'upcoming' })
       .range(query.offset, query.offset + query.limit - 1);
     if (query.status) request = request.eq('status', query.status);
+    if (query.group)
+      request = request.in(
+        'status',
+        query.group === 'upcoming'
+          ? ['scheduled', 'full']
+          : query.group === 'active'
+            ? ['in_progress']
+            : ['completed', 'cancelled'],
+      );
     const { data, error } = await request;
     if (error) throw new BadRequestException(error.message);
     const rows = (data ?? []) as unknown as DriverRideRow[];
@@ -209,6 +272,7 @@ export class RidesService {
   }
 
   async search(user: AuthenticatedUser, dto: SearchRidesDto) {
+    const pickupLocation = dto.origin ?? CAMPUS_ORIGIN;
     const hasPickup = Boolean(dto.pickupTransportStopId);
     const hasDropoff = Boolean(dto.dropoffTransportStopId);
     if (hasPickup !== hasDropoff) {
@@ -217,8 +281,8 @@ export class RidesService {
       );
     }
     const commonArgs = {
-      p_origin_lat: dto.origin.lat,
-      p_origin_lng: dto.origin.lng,
+      p_origin_lat: pickupLocation.lat,
+      p_origin_lng: pickupLocation.lng,
       p_destination_lat: dto.destination.lat,
       p_destination_lng: dto.destination.lng,
       p_max_results: dto.maxResults,
@@ -244,17 +308,22 @@ export class RidesService {
     user: AuthenticatedUser,
     dto: PassengerStopCandidatesDto,
   ) {
+    const pickupLocation =
+      dto.pickupScope === 'route'
+        ? (dto.origin ?? CAMPUS_ORIGIN)
+        : CAMPUS_ORIGIN;
     const args = {
-      p_origin_lat: dto.origin.lat,
-      p_origin_lng: dto.origin.lng,
+      p_origin_lat: pickupLocation.lat,
+      p_origin_lng: pickupLocation.lng,
       p_destination_lat: dto.destination.lat,
       p_destination_lng: dto.destination.lng,
       p_max_distance_m: dto.maxDistanceMeters,
+      p_pickup_scope: dto.pickupScope ?? 'campus',
     };
     const client = this.client(user);
     const [candidateResult, pairResult] = await Promise.all([
-      client.rpc('get_passenger_stop_candidates', args),
-      client.rpc('get_passenger_stop_pairs', args),
+      client.rpc('get_passenger_stop_candidates_v2', args),
+      client.rpc('get_passenger_stop_pairs_v2', args),
     ]);
     if (candidateResult.error) {
       throw new BadRequestException(candidateResult.error.message);
@@ -313,6 +382,8 @@ export class RidesService {
   }
 
   async start(user: AuthenticatedUser, rideId: string) {
+    if (this.pilot?.db.enabled)
+      return this.pilot.lifecycle(user, rideId, 'start');
     const { error } = await this.client(user).rpc('start_ride', {
       p_ride_id: rideId,
     });
@@ -321,6 +392,8 @@ export class RidesService {
   }
 
   async cancel(user: AuthenticatedUser, rideId: string, reason?: string) {
+    if (this.pilot?.db.enabled)
+      return this.pilot.lifecycle(user, rideId, 'cancel');
     const { error } = await this.client(user).rpc('cancel_ride', {
       p_ride_id: rideId,
       ...(reason ? { p_reason: reason } : {}),
@@ -330,6 +403,8 @@ export class RidesService {
   }
 
   async complete(user: AuthenticatedUser, rideId: string) {
+    if (this.pilot?.db.enabled)
+      return this.pilot.lifecycle(user, rideId, 'complete');
     const { error } = await this.client(user).rpc('complete_ride', {
       p_ride_id: rideId,
     });
@@ -343,6 +418,8 @@ export class RidesService {
     bookingId: string,
   ) {
     const client = this.client(user);
+    if (this.pilot?.db.enabled)
+      return this.pilot.attend(user, rideId, bookingId, 'dropoff');
     const { data: booking, error: bookingError } = await client
       .from('bookings')
       .select('ride_id')

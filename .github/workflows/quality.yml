@@ -1,0 +1,38 @@
+name: Quality
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  api-and-web:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: synthetic-ci-only
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      TEST_RUNTIME_DATABASE_URL: postgresql://postgres:synthetic-ci-only@localhost:5432/postgres
+      TEST_PILOT_DATABASE_URL: postgresql://postgres:synthetic-ci-only@localhost:5432/postgres
+      SUPABASE_URL: https://example.supabase.co
+      SUPABASE_ANON_KEY: synthetic-test-key
+      RIDE_PILOT_ENABLED: 'false'
+      RIDE_RUNTIME_ENABLED: 'false'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint --workspace @krow/api
+      - run: npm run test --workspace @krow/api -- --runInBand
+      - run: npm run test:web
+      - run: npm run test:e2e --workspace @krow/api -- --runInBand
+      - run: npm run test:stops-import
+      - run: npm run test:migrations
+      - run: npm run build

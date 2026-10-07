@@ -1,0 +1,204 @@
+{
+  "projectId": "yyjbqzsokxpzhevpanyq",
+  "completed": true,
+  "applied": [
+    {
+      "version": "20261006221452",
+      "name": "pilot_online"
+    },
+    {
+      "version": "20261006221521",
+      "name": "pilot_notifications"
+    },
+    {
+      "version": "20261006221527",
+      "name": "pilot_lifecycle_guardrails"
+    },
+    {
+      "version": "20261006222624",
+      "name": "pilot_private_api_role"
+    },
+    {
+      "version": "20261006231801",
+      "name": "pilot_runtime_login_role"
+    },
+    {
+      "version": "20261007002518",
+      "name": "pilot_profile_privacy"
+    },
+    {
+      "version": "20261007002528",
+      "name": "pilot_api_cutover"
+    }
+  ],
+  "pending": [],
+  "blockedAction": null,
+  "approvalRejection": "Persistent broad backend privileges, USING(true) policies and sensitive rating/is_active writes require specific user approval.",
+  "originalCountsPreserved": true,
+  "verification": {
+    "existing_records": {
+      "rides": 45,
+      "users": 11,
+      "reviews": 4,
+      "bookings": 33,
+      "vehicles": 1,
+      "ride_states": {
+        "cancelled": 14,
+        "completed": 20,
+        "scheduled": 10,
+        "in_progress": 1
+      },
+      "booking_states": {
+        "rejected": 2,
+        "cancelled": 8,
+        "completed": 20,
+        "confirmed": 3
+      },
+      "driver_profiles": 1
+    },
+    "frozen_prices": 33,
+    "price_mismatches": 0,
+    "private_role_exists": true
+  },
+  "privateTablePermissions": [
+    {
+      "table_name": "account_closure_requests",
+      "rls_enabled": true,
+      "anon_has_data_access": false,
+      "authenticated_has_data_access": false
+    },
+    {
+      "table_name": "booking_prices",
+      "rls_enabled": true,
+      "anon_has_data_access": false,
+      "authenticated_has_data_access": false
+    },
+    {
+      "table_name": "cash",
+      "rls_enabled": true,
+      "anon_has_data_access": false,
+      "authenticated_has_data_access": false
+    },
+    {
+      "table_name": "devices",
+      "rls_enabled": true,
+      "anon_has_data_access": false,
+      "authenticated_has_data_access": false
+    },
+    {
+      "table_name": "messages",
+      "rls_enabled": true,
+      "anon_has_data_access": false,
+      "authenticated_has_data_access": false
+    },
+    {
+      "table_name": "outbox",
+      "rls_enabled": true,
+      "anon_has_data_access": false,
+      "authenticated_has_data_access": false
+    },
+    {
+      "table_name": "reviews",
+      "rls_enabled": true,
+      "anon_has_data_access": false,
+      "authenticated_has_data_access": false
+    },
+    {
+      "table_name": "tracking_sessions",
+      "rls_enabled": true,
+      "anon_has_data_access": false,
+      "authenticated_has_data_access": false
+    }
+  ],
+  "triggersAndIndexes": [
+    {
+      "pilot_triggers": 3,
+      "pilot_indexes": 5,
+      "legacy_publish_available": true,
+      "legacy_booking_available": true,
+      "booking_status_constraint": "CHECK ((status = ANY (ARRAY['pending'::text, 'confirmed'::text, 'rejected'::text, 'cancelled'::text, 'in_progress'::text, 'completed'::text, 'no_show'::text, 'interrupted'::text])))"
+    }
+  ],
+  "securityAdvisors": [
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "count": 8,
+      "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy"
+    },
+    {
+      "name": "authenticated_security_definer_function_executable",
+      "level": "WARN",
+      "count": 23,
+      "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable"
+    },
+    {
+      "name": "auth_leaked_password_protection",
+      "level": "WARN",
+      "count": 1,
+      "remediation": "https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection"
+    }
+  ],
+  "approvalResolved": "User explicitly authorized private backend role; application succeeded and NOLOGIN/non-super/non-BYPASS properties were verified.",
+  "privateRoleVerification": {
+    "rides": 45,
+    "bookings": 33,
+    "frozen_prices": 33,
+    "private_group_safe": true,
+    "private_booking_rpc": true,
+    "private_tracking_access": true,
+    "legacy_booking_available": true
+  },
+  "runtimeRolePrepared": {
+    "role": "krow_pilot_runtime",
+    "loginEnabled": true,
+    "superuser": false,
+    "bypassRls": false,
+    "connectionLimit": 12,
+    "parent": "krow_pilot_service",
+    "inherit": true,
+    "admin": false,
+    "set": false
+  },
+  "runtimeActivation": {
+    "checkedAt": "2026-10-07T00:05:03.207Z",
+    "method": "User-authorized ten-minute custom-authenticated Edge bootstrap",
+    "preflight": "READY",
+    "provision": "PROVISIONED",
+    "runtimeTlsAuthenticated": true,
+    "runtimePermissionsVerified": true,
+    "postgresPasswordChanged": false,
+    "credentialDestination": "Railway krow-api-pilot / krow-api / production",
+    "bootstrapRetiredVersion": 3,
+    "bootstrapRetiredHttpStatus": 410,
+    "bootstrapRetiredResponse": "RETIRED",
+    "railwayReadiness": "ready",
+    "pilotEnabled": true,
+    "trackingEnabled": true,
+    "physicalGpsVerified": false
+  },
+  "finalCutoverVerification": {
+    "checkedAt": "2026-10-07T00:26:10.129Z",
+    "rides": 45,
+    "bookings": 33,
+    "users": 11,
+    "reviews": 4,
+    "vehicles": 1,
+    "inProgressRides": 1,
+    "privateProfileRead": true,
+    "privateBookingRpc": true,
+    "clientFullProfileRead": false,
+    "clientRatingUpdate": false,
+    "clientActiveUpdate": false,
+    "clientRideWrite": false,
+    "clientBusinessRpcCount": 0,
+    "railwayReadinessAfterCutover": "ready",
+    "recoveredMigrationLedgerChecks": 33
+  },
+  "postCutoverSecurityAdvisors": {
+    "checkedAt": "2026-10-07T00:26:38.227Z",
+    "securityDefinerWarnings": 10,
+    "leakedPasswordProtectionWarnings": 1,
+    "note": "Remaining callable functions include intentional reads and an admin stop operation guarded by private.is_current_admin; warnings require review, not blanket revocation."
+  }
+}

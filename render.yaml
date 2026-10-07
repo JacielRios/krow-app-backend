@@ -1,0 +1,42 @@
+# Free testing service. Keep Supabase as the existing database/Auth provider.
+# The initial Blueprint creation asks for sync:false values; no secrets here.
+services:
+  - type: web
+    name: krow-api-test
+    runtime: docker
+    plan: free
+    numInstances: 1
+    dockerfilePath: ./Dockerfile.api
+    dockerContext: .
+    healthCheckPath: /v1/health/ready
+    autoDeployTrigger: 'off'
+    maxShutdownDelaySeconds: 30
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: HOST
+        value: 0.0.0.0
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: GOOGLE_MAPS_API_KEY
+        sync: false
+      - key: GOOGLE_MAPS_REQUESTS_PER_MINUTE
+        value: '250'
+      - key: CORS_ORIGINS
+        value: ''
+      - key: RIDE_PILOT_ENABLED
+        value: 'true'
+      - key: RIDE_TRACKING_ENABLED
+        value: 'true'
+      - key: PILOT_DATABASE_URL
+        sync: false
+      - key: PILOT_DATABASE_CA
+        sync: false
+      - key: RIDE_RUNTIME_ENABLED
+        value: 'false'
+      - key: PILOT_PUSH_ENABLED
+        value: 'false'
+      - key: PILOT_ACCOUNT_CLOSURE_ENABLED
+        value: 'false'

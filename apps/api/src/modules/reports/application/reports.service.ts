@@ -1,168 +1,157 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import type { SupabaseClient } from '@supabase/supabase-js';
-import { SupabaseService } from '../../../infrastructure/supabase/supabase.service.js';
-import type { Database } from '../../../infrastructure/supabase/database.types.js';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import type { AuthenticatedUser } from '../../auth/domain/authenticated-user.js';
+import { PilotDatabase } from '../../pilot/pilot.database.js';
+import { adminTransaction } from '../../admin/admin.database.js';
 import type { DashboardSummaryQueryDto } from '../presentation/reports.dto.js';
 
-type ReportsClient = SupabaseClient<Database>;
-type RideRow = Database['public']['Tables']['rides']['Row'];
-type BookingStatusRow = Pick<
-  Database['public']['Tables']['bookings']['Row'],
-  'status' | 'seats_reserved'
->;
-type RideWithBookings = Pick<
-  RideRow,
-  | 'ride_id'
-  | 'status'
-  | 'departure_time'
-  | 'price_per_seat'
-  | 'available_seats'
-  | 'origin_address'
-  | 'destination_address'
-> & { bookings: BookingStatusRow[] };
+export interface DashboardSummary {
+  completed: number;
+  cancelled: number;
+  ongoing: number;
+  scheduled: number;
+  totalTrips: number;
+  activeDrivers: number;
+  inactiveDrivers: number;
+  passengers: number;
+  reservedPassengers: number;
+  occupancy: number;
+  revenue: number;
+  paid: number;
+  pending: number;
+  currency: 'MXN';
+  timezone: 'America/Monterrey';
+  trend: {
+    date: string;
+    completed: number;
+    cancelled: number;
+    revenue: number;
+  }[];
+  topRoutes: {
+    route: string;
+    trips: number;
+    occupancy: number;
+    revenue: number;
+  }[];
+}
 
-// Estados de booking que cuentan como "pasajero sí viajó / va a viajar".
-const CONFIRMED_BOOKING_STATUSES = ['confirmed', 'completed', 'in_progress'];
+// Aggregate in PostgreSQL: REST row limits and per-user RLS must not truncate
+// administrative totals. Booking prices are committed totals in integer cents.
+export const DASHBOARD_SUMMARY_SQL = `
+with bounds as (
+  select $1::date as first_day, $2::date as last_day,
+    $1::date::timestamp at time zone 'America/Monterrey' as starts_at,
+    ($2::date + 1)::timestamp at time zone 'America/Monterrey' as ends_at
+), ride_metrics as (
+  select r.ride_id, r.status,
+    (r.departure_time at time zone 'America/Monterrey')::date as day,
+    coalesce(nullif(r.origin_address,''),'Origen sin dirección') || ' → ' ||
+      coalesce(nullif(r.destination_address,''),'Destino sin dirección') as route,
+    coalesce(b.reserved,0) as reserved, coalesce(b.transported,0) as transported,
+    greatest(r.available_seats,0) + coalesce(b.reserved,0) as offered,
+    coalesce(b.amount,0) as amount, coalesce(b.paid,0) as paid,
+    coalesce(b.pending,0) as pending
+  from public.rides r cross join bounds
+  left join lateral (
+    select sum(b.seats_reserved) as reserved,
+      sum(b.seats_reserved) filter(where b.status in ('in_progress','completed')) as transported,
+      sum(coalesce(p.amount_cents,round(r.price_per_seat*100)::bigint*b.seats_reserved)) as amount,
+      sum(c.amount_cents) filter(where c.status='collected') as paid,
+      sum(coalesce(p.amount_cents,round(r.price_per_seat*100)::bigint*b.seats_reserved))
+        filter(where coalesce(c.status,'pending')='pending') as pending
+    from public.bookings b
+    left join krow_pilot.booking_prices p on p.booking_id=b.booking_id
+    left join krow_pilot.cash c on c.booking_id=b.booking_id
+    where b.ride_id=r.ride_id and b.status in ('confirmed','in_progress','completed')
+  ) b on r.status <> 'cancelled'
+  where r.departure_time >= bounds.starts_at and r.departure_time < bounds.ends_at
+), drivers as (
+  select count(*) filter(where d.status='approved'
+    and coalesce(to_jsonb(d)->>'admin_status','active')='active'
+    and u.is_active is distinct from false and u.deleted_at is null) as active,
+    count(*) as total
+  from public.driver_profiles d join public.users u on u.uuid=d.user_id
+), totals as (
+  select count(*) as trips,
+    count(*) filter(where status='completed') as completed,
+    count(*) filter(where status='cancelled') as cancelled,
+    count(*) filter(where status='in_progress') as ongoing,
+    count(*) filter(where status in ('scheduled','full')) as scheduled,
+    coalesce(sum(transported),0) as passengers,
+    coalesce(sum(reserved),0) as reserved,
+    coalesce(sum(offered) filter(where status <> 'cancelled'),0) as offered,
+    coalesce(sum(amount),0) as amount, coalesce(sum(paid),0) as paid,
+    coalesce(sum(pending),0) as pending
+  from ride_metrics
+), daily as (
+  select days.day::date as day,
+    count(r.ride_id) filter(where r.status='completed') as completed,
+    count(r.ride_id) filter(where r.status='cancelled') as cancelled,
+    coalesce(sum(r.amount),0) as amount
+  from bounds cross join lateral generate_series(bounds.first_day::timestamp,
+    bounds.last_day::timestamp,interval '1 day') days(day)
+  left join ride_metrics r on r.day=days.day::date
+  group by days.day
+), routes as (
+  select route,count(*) as trips, sum(reserved) as reserved,
+    sum(offered) as offered, sum(amount) as amount
+  from ride_metrics where status <> 'cancelled'
+  group by route order by count(*) desc,route limit 5
+)
+select jsonb_build_object(
+  'completed',t.completed,'cancelled',t.cancelled,'ongoing',t.ongoing,
+  'scheduled',t.scheduled,'totalTrips',t.trips,
+  'activeDrivers',d.active,'inactiveDrivers',d.total-d.active,
+  'passengers',t.passengers,'reservedPassengers',t.reserved,
+  'occupancy',case when t.offered>0 then round(t.reserved*100.0/t.offered,1) else 0 end,
+  'revenue',t.amount/100.0,'paid',t.paid/100.0,'pending',t.pending/100.0,
+  'currency','MXN','timezone','America/Monterrey',
+  'trend',coalesce((select jsonb_agg(jsonb_build_object('date',day::text,
+    'completed',completed,'cancelled',cancelled,'revenue',amount/100.0) order by day) from daily),'[]'::jsonb),
+  'topRoutes',coalesce((select jsonb_agg(jsonb_build_object('route',route,'trips',trips,
+    'occupancy',case when offered>0 then round(reserved*100.0/offered,1) else 0 end,
+    'revenue',amount/100.0) order by trips desc,route) from routes),'[]'::jsonb)
+) as summary from totals t cross join drivers d
+`;
 
 @Injectable()
 export class ReportsService {
-  constructor(private readonly supabase: SupabaseService) {}
+  constructor(private readonly database: PilotDatabase) {}
 
   async dashboardSummary(
     user: AuthenticatedUser,
     query: DashboardSummaryQueryDto,
   ) {
-    const client = this.client(user);
-    const fromIso = `${query.from}T00:00:00.000Z`;
-    const toIso = `${query.to}T23:59:59.999Z`;
-
-    // 1. Trae todos los viajes del rango, con sus reservas (bookings) incluidas.
-    const { data, error } = await client
-      .from('rides')
-      .select(
-        `ride_id, status, departure_time, price_per_seat, available_seats,
-         origin_address, destination_address,
-         bookings(status, seats_reserved)`,
-      )
-      .gte('departure_time', fromIso)
-      .lte('departure_time', toIso);
-    if (error) throw new BadRequestException(error.message);
-    const rides = (data ?? []) as unknown as RideWithBookings[];
-
-    // 2. Cuenta conductores activos e inactivos (no depende del rango de fechas).
-    const { count: activeDrivers, error: activeErr } = await client
-      .from('driver_profiles')
-      .select('driver_id', { count: 'exact', head: true })
-      .eq('status', 'active');
-    if (activeErr) throw new BadRequestException(activeErr.message);
-
-    const { count: inactiveDrivers, error: inactiveErr } = await client
-      .from('driver_profiles')
-      .select('driver_id', { count: 'exact', head: true })
-      .neq('status', 'active');
-    if (inactiveErr) throw new BadRequestException(inactiveErr.message);
-
-    return this.aggregate(rides, activeDrivers ?? 0, inactiveDrivers ?? 0);
+    if (user.appMetadata.role !== 'admin')
+      throw new ForbiddenException('Acceso administrativo requerido');
+    const from = this.calendarDate(query.from);
+    const to = this.calendarDate(query.to);
+    const days = (to - from) / 86_400_000;
+    if (days < 0 || days > 365)
+      throw new BadRequestException(
+        'Selecciona un rango válido de hasta 366 días.',
+      );
+    return adminTransaction(this.database, user, async (client) => {
+      const result = await client.query<{ summary: DashboardSummary }>(
+        DASHBOARD_SUMMARY_SQL,
+        [query.from, query.to],
+      );
+      return result.rows[0].summary;
+    });
   }
 
-  // Toda la suma/conteo pasa aquí, en JavaScript, a partir de los datos crudos.
-  private aggregate(
-    rides: RideWithBookings[],
-    activeDrivers: number,
-    inactiveDrivers: number,
-  ) {
-    let completed = 0;
-    let cancelled = 0;
-    let ongoing = 0;
-    let passengers = 0;
-    let revenue = 0;
-    const byDay = new Map<
-      string,
-      { completed: number; cancelled: number; revenue: number }
-    >();
-    const byRoute = new Map<
-      string,
-      { trips: number; revenue: number; seatsReserved: number; seatsOffered: number }
-    >();
-
-    for (const ride of rides) {
-      const day = ride.departure_time.slice(0, 10);
-      if (!byDay.has(day)) byDay.set(day, { completed: 0, cancelled: 0, revenue: 0 });
-      const dayBucket = byDay.get(day)!;
-
-      if (ride.status === 'completed') {
-        completed++;
-        dayBucket.completed++;
-      }
-      if (ride.status === 'cancelled') {
-        cancelled++;
-        dayBucket.cancelled++;
-      }
-      if (ride.status === 'in_progress') ongoing++;
-
-      const confirmedBookings = (ride.bookings ?? []).filter((b) =>
-        CONFIRMED_BOOKING_STATUSES.includes(b.status),
-      );
-      const seatsReserved = confirmedBookings.reduce(
-        (sum, b) => sum + b.seats_reserved,
-        0,
-      );
-      const rideRevenue = seatsReserved * Number(ride.price_per_seat);
-      passengers += seatsReserved;
-      revenue += rideRevenue;
-      dayBucket.revenue += rideRevenue;
-
-      const routeKey = `${ride.origin_address ?? 'Origen sin dirección'} → ${
-        ride.destination_address ?? 'Destino sin dirección'
-      }`;
-      if (!byRoute.has(routeKey))
-        byRoute.set(routeKey, { trips: 0, revenue: 0, seatsReserved: 0, seatsOffered: 0 });
-      const routeBucket = byRoute.get(routeKey)!;
-      routeBucket.trips++;
-      routeBucket.revenue += rideRevenue;
-      routeBucket.seatsReserved += seatsReserved;
-      routeBucket.seatsOffered += ride.available_seats;
-    }
-
-    const trend = [...byDay.entries()]
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([date, v]) => ({ date, ...v, revenue: Math.round(v.revenue) }));
-
-    const topRoutes = [...byRoute.entries()]
-      .map(([route, v]) => ({
-        route,
-        trips: v.trips,
-        revenue: Math.round(v.revenue),
-        occupancy:
-          v.seatsOffered > 0 ? Math.round((v.seatsReserved / v.seatsOffered) * 100) : 0,
-      }))
-      .sort((a, b) => b.trips - a.trips)
-      .slice(0, 5);
-
-    const totalOfferedSeats = rides.reduce((s, r) => s + r.available_seats, 0);
-
-    return {
-      completed,
-      cancelled,
-      ongoing,
-      activeDrivers,
-      inactiveDrivers,
-      passengers,
-      occupancy:
-        totalOfferedSeats > 0 ? Math.round((passengers / totalOfferedSeats) * 100) : 0,
-      revenue: Math.round(revenue),
-      // No existe todavía una tabla de pagos en la base de datos.
-      // Este número es un ESTIMADO (precio x asientos reservados confirmados),
-      // no un monto realmente cobrado. Ajustar cuando exista esa tabla.
-      paid: null as number | null,
-      pending: null as number | null,
-      trend,
-      topRoutes,
-    };
-  }
-
-  private client(user: AuthenticatedUser): ReportsClient {
-    return this.supabase.forUser(user.accessToken);
+  private calendarDate(value: string): number {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(value))
+      throw new BadRequestException('Usa fechas con formato AAAA-MM-DD.');
+    const timestamp = Date.parse(`${value}T00:00:00Z`);
+    if (
+      !Number.isFinite(timestamp) ||
+      new Date(timestamp).toISOString().slice(0, 10) !== value
+    )
+      throw new BadRequestException('La fecha no es válida.');
+    return timestamp;
   }
 }

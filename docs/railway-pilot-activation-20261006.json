@@ -1,0 +1,45 @@
+{
+  "checkedAt": "2026-10-07T00:26:10.129Z",
+  "origin": "https://krow-api-production.up.railway.app",
+  "deploymentId": "1aefd56f-8751-435e-8699-c6155ab14e22",
+  "deploymentStatus": "SUCCESS",
+  "verifiedAfterFinalPermissionCutover": true,
+  "pilot": "ready",
+  "http": [
+    {
+      "path": "/v1/health",
+      "status": 200,
+      "expectedStatus": 200,
+      "durationMs": 156,
+      "passed": true
+    },
+    {
+      "path": "/v1/health/ready",
+      "status": 200,
+      "expectedStatus": 200,
+      "durationMs": 566,
+      "passed": true,
+      "pilot": "ready"
+    },
+    {
+      "path": "/v1/me",
+      "status": 401,
+      "expectedStatus": 401,
+      "durationMs": 78,
+      "passed": true
+    },
+    {
+      "path": "/v1/rides/1/tracking",
+      "status": 401,
+      "expectedStatus": 401,
+      "durationMs": 90,
+      "passed": true
+    }
+  ],
+  "websocketTransport": true,
+  "passed": true,
+  "limits": [
+    "No authenticated trip or physical GPS was exercised.",
+    "No account, JWT or database credential was sent to this verifier."
+  ]
+}

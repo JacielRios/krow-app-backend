@@ -3,9 +3,11 @@ import {
   ArrayUnique,
   IsArray,
   IsDateString,
+  IsDefined,
   IsIn,
   IsInt,
   IsNumber,
+  IsObject,
   IsOptional,
   IsString,
   IsUUID,
@@ -14,6 +16,7 @@ import {
   Min,
   ValidateNested,
 } from 'class-validator';
+import { CAMPUS_ORIGIN } from '../../routes/domain/campus-origin.js';
 
 export class CoordinateDto {
   @IsNumber() @Min(-90) @Max(90) lat!: number;
@@ -23,8 +26,19 @@ export class CoordinateDto {
 export class CreateRideDto {
   @IsUUID() vehicleId!: string;
   @IsOptional() @IsUUID() favoriteRouteId?: string;
-  @ValidateNested() @Type(() => CoordinateDto) origin!: CoordinateDto;
-  @ValidateNested() @Type(() => CoordinateDto) destination!: CoordinateDto;
+  @IsDefined()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => CoordinateDto)
+  origin: CoordinateDto = Object.assign(new CoordinateDto(), {
+    lat: CAMPUS_ORIGIN.lat,
+    lng: CAMPUS_ORIGIN.lng,
+  });
+  @IsDefined()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => CoordinateDto)
+  destination!: CoordinateDto;
   @IsOptional() @IsString() originAddress?: string;
   @IsOptional() @IsString() destinationAddress?: string;
   @IsOptional() @IsString() routePolyline?: string;
@@ -35,13 +49,24 @@ export class CreateRideDto {
   transportStopIds?: string[];
   @IsDateString() departureTime!: string;
   @IsInt() @Min(1) @Max(20) availableSeats!: number;
-  @IsInt() @Min(1) pricePerSeatCents!: number;
+  // A reservation of up to twenty seats must still fit the committed int cents.
+  @IsInt()
+  @Min(1)
+  @Max(Math.floor(2_147_483_647 / 20))
+  pricePerSeatCents!: number;
 }
 
 export class SearchRidesDto {
+  @IsDefined()
+  @IsObject()
   @ValidateNested()
   @Type(() => CoordinateDto)
-  origin!: CoordinateDto;
+  origin: CoordinateDto = Object.assign(new CoordinateDto(), {
+    lat: CAMPUS_ORIGIN.lat,
+    lng: CAMPUS_ORIGIN.lng,
+  });
+  @IsDefined()
+  @IsObject()
   @ValidateNested()
   @Type(() => CoordinateDto)
   destination!: CoordinateDto;
@@ -59,15 +84,36 @@ export class UpdateRideDto extends CreateRideDto {
 }
 
 export class RideStopOptionsDto {
-  @ValidateNested() @Type(() => CoordinateDto) origin!: CoordinateDto;
-  @ValidateNested() @Type(() => CoordinateDto) destination!: CoordinateDto;
+  @IsDefined()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => CoordinateDto)
+  origin!: CoordinateDto;
+  @IsDefined()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => CoordinateDto)
+  destination!: CoordinateDto;
   @IsOptional() @IsInt() @Min(1) @Max(5000) maxDistanceMeters = 1000;
 }
 
 export class PassengerStopCandidatesDto {
-  @ValidateNested() @Type(() => CoordinateDto) origin!: CoordinateDto;
-  @ValidateNested() @Type(() => CoordinateDto) destination!: CoordinateDto;
+  @IsDefined()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => CoordinateDto)
+  origin: CoordinateDto = Object.assign(new CoordinateDto(), {
+    lat: CAMPUS_ORIGIN.lat,
+    lng: CAMPUS_ORIGIN.lng,
+  });
+  @IsDefined()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => CoordinateDto)
+  destination!: CoordinateDto;
   @IsOptional() @IsInt() @Min(1) @Max(5000) maxDistanceMeters = 1000;
+  @IsOptional() @IsIn(['campus', 'route']) pickupScope: 'campus' | 'route' =
+    'campus';
 }
 
 export class RideReasonDto {
@@ -75,6 +121,7 @@ export class RideReasonDto {
 }
 
 export class RecentRidesQueryDto {
+  @IsOptional() @IsIn(['driver', 'passenger']) context?: 'driver' | 'passenger';
   @IsOptional()
   @Type(() => Number)
   @IsInt()
@@ -84,6 +131,10 @@ export class RecentRidesQueryDto {
 }
 
 export class DriverRidesQueryDto {
+  @IsOptional() @IsIn(['upcoming', 'active', 'history']) group?:
+    | 'upcoming'
+    | 'active'
+    | 'history';
   @IsOptional()
   @IsIn(['scheduled', 'full', 'in_progress', 'completed', 'cancelled'])
   status?: string;

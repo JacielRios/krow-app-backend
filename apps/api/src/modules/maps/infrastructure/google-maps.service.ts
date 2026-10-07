@@ -22,6 +22,9 @@ export interface GoogleRoutePreview {
 @Injectable()
 export class GoogleMapsService {
   private readonly apiKey?: string;
+  private readonly inflight = new Map<string, Promise<unknown>>();
+  private readonly requestsPerMinute: number;
+  private budget = { startedAt: Date.now(), count: 0 };
   private readonly cache = new Map<
     string,
     { expiresAt: number; value: unknown }
@@ -29,6 +32,9 @@ export class GoogleMapsService {
 
   constructor(config: ConfigService) {
     this.apiKey = config.get<string>('GOOGLE_MAPS_API_KEY');
+    this.requestsPerMinute = Number(
+      config.get<string>('GOOGLE_MAPS_REQUESTS_PER_MINUTE', '250'),
+    );
   }
 
   async autocomplete(query: string, sessionToken?: string) {
@@ -89,6 +95,7 @@ export class GoogleMapsService {
     origin: { lat: number; lng: number },
     destination: { lat: number; lng: number },
     departureTime?: string,
+    waypoints: Array<{ lat: number; lng: number }> = [],
   ): Promise<GoogleRoutePreview | null> {
     const json = await this.get(
       'https://maps.googleapis.com/maps/api/directions/json',
@@ -97,6 +104,9 @@ export class GoogleMapsService {
         destination: `${destination.lat},${destination.lng}`,
         mode: 'driving',
         language: 'es',
+        waypoints: waypoints.length
+          ? waypoints.map((p) => `${p.lat},${p.lng}`).join('|')
+          : undefined,
         departure_time: departureTime
           ? Math.floor(new Date(departureTime).getTime() / 1000)
           : undefined,
@@ -133,15 +143,32 @@ export class GoogleMapsService {
     const url = `${base}?${search.toString()}`;
     const cached = this.cache.get(url);
     if (cached && cached.expiresAt > Date.now()) return cached.value;
-
+    const pending = this.inflight.get(url);
+    if (pending) return pending;
+    const request = this.fetchAndCache(url).finally(() =>
+      this.inflight.delete(url),
+    );
+    this.inflight.set(url, request);
+    return request;
+  }
+  private async fetchAndCache(url: string): Promise<unknown> {
     let lastError: unknown;
     for (let attempt = 0; attempt < 2; attempt += 1) {
+      if (Date.now() - this.budget.startedAt >= 60000)
+        this.budget = { startedAt: Date.now(), count: 0 };
+      if (this.budget.count >= this.requestsPerMinute)
+        throw new ServiceUnavailableException(
+          'Mapas temporalmente ocupados. Intenta nuevamente.',
+        );
+      this.budget.count++;
       try {
         const response = await fetch(url, {
           signal: AbortSignal.timeout(8000),
         });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const value = await response.json();
+        if (this.cache.size >= 256)
+          this.cache.delete(String(this.cache.keys().next().value));
         this.cache.set(url, { value, expiresAt: Date.now() + 60_000 });
         return value;
       } catch (error) {

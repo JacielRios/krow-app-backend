@@ -4,17 +4,23 @@ import {
   ExceptionFilter,
   HttpException,
   HttpStatus,
+  Logger,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { randomUUID } from 'node:crypto';
 
 @Catch()
 export class ApiExceptionFilter implements ExceptionFilter {
+  private readonly logger = new Logger(ApiExceptionFilter.name);
   catch(exception: unknown, host: ArgumentsHost) {
     const context = host.switchToHttp();
     const request = context.getRequest<Request>();
     const response = context.getResponse<Response>();
-    const requestId = request.header('x-request-id') ?? randomUUID();
+    const incoming = request.header('x-request-id');
+    const requestId =
+      incoming && /^[a-zA-Z0-9-]{1,64}$/.test(incoming)
+        ? incoming
+        : randomUUID();
     const status =
       exception instanceof HttpException
         ? exception.getStatus()
@@ -30,10 +36,23 @@ export class ApiExceptionFilter implements ExceptionFilter {
       : (candidate ??
         (exception instanceof Error ? exception.message : 'Error interno'));
 
+    if (status >= 500)
+      this.logger.error(
+        JSON.stringify({
+          event: 'api_request_failed',
+          requestId,
+          status,
+          errorType:
+            exception instanceof Error ? exception.name : 'UnknownError',
+        }),
+      );
+    response.setHeader('x-request-id', requestId);
     response.status(status).json({
       code: this.codeFor(status),
-      message,
-      details: typeof raw === 'object' ? raw : undefined,
+      message:
+        status >= 500
+          ? 'KROW no pudo completar la operación. Intenta nuevamente.'
+          : message,
       requestId,
       path: request.url,
       timestamp: new Date().toISOString(),
