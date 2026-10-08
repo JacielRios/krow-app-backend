@@ -1,0 +1,66 @@
+{
+  "checkedAt": "2026-10-07T20:56:51.000Z",
+  "origin": "https://krow-api-production.up.railway.app/v1",
+  "passed": true,
+  "checks": [
+    {
+      "name": "readiness",
+      "passed": true
+    },
+    {
+      "name": "catalog_requires_authentication",
+      "passed": true
+    },
+    {
+      "name": "three_active_corridors",
+      "passed": true
+    },
+    {
+      "name": "eighteen_available_catalog_stops",
+      "passed": true
+    },
+    {
+      "name": "route_pablo-livas",
+      "passed": true
+    },
+    {
+      "name": "corridor_guidance_pablo-livas",
+      "passed": true,
+      "maximumDistanceFromRouteMeters": 27
+    },
+    {
+      "name": "route_eloy-cavazos",
+      "passed": true
+    },
+    {
+      "name": "corridor_guidance_eloy-cavazos",
+      "passed": true,
+      "maximumDistanceFromRouteMeters": 11
+    },
+    {
+      "name": "route_reynosa",
+      "passed": true
+    },
+    {
+      "name": "corridor_guidance_reynosa",
+      "passed": true,
+      "maximumDistanceFromRouteMeters": 20
+    },
+    {
+      "name": "other_avenue_stop_rejected",
+      "passed": true
+    },
+    {
+      "name": "destination_only_search",
+      "passed": true
+    },
+    {
+      "name": "distance_rank_order",
+      "passed": true
+    }
+  ],
+  "realRideStopOptionsChecked": false,
+  "realDataModified": false,
+  "mapsProvider": "google",
+  "matchingDefaultMeters": 3000
+}

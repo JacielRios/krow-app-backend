@@ -90,6 +90,13 @@ describe('RidesService commands', () => {
     } as unknown as SupabaseService;
     const routes = {
       computeWithCompatibleStops: compute,
+      publicationStops: jest
+        .fn<() => Promise<string[]>>()
+        .mockResolvedValue([
+          '44444444-4444-4444-8444-444444444444',
+          '22222222-2222-4222-8222-222222222222',
+          '33333333-3333-4333-8333-333333333333',
+        ]),
     } as unknown as RoutesService;
 
     return {
@@ -101,6 +108,7 @@ describe('RidesService commands', () => {
   }
 
   const rideDto = {
+    corridorId: '77777777-7777-4777-8777-777777777777',
     vehicleId: '11111111-1111-4111-8111-111111111111',
     origin: { lat: 25.66, lng: -100.24 },
     destination: { lat: 25.67, lng: -100.25 },
@@ -127,6 +135,8 @@ describe('RidesService commands', () => {
       origin: CAMPUS_ORIGIN,
       destination: rideDto.destination,
       departureTime: rideDto.departureTime,
+      corridorId: rideDto.corridorId,
+      transportStopIds: rideDto.transportStopIds,
     });
     expect(rpc.mock.calls[0]?.[0]).toBe('create_ride_v2');
     const callPayload = rpc.mock.calls[0]?.[1] as {
@@ -140,7 +150,8 @@ describe('RidesService commands', () => {
       route_distance_meters: 1200,
       transport_stop_ids: [
         '44444444-4444-4444-8444-444444444444',
-        '55555555-5555-4555-8555-555555555555',
+        '22222222-2222-4222-8222-222222222222',
+        '33333333-3333-4333-8333-333333333333',
       ],
       price_per_seat: 45,
     });
@@ -157,6 +168,8 @@ describe('RidesService commands', () => {
       origin: rideDto.origin,
       destination: rideDto.destination,
       departureTime: rideDto.departureTime,
+      corridorId: rideDto.corridorId,
+      transportStopIds: rideDto.transportStopIds,
     });
     expect(rpc.mock.calls[0]?.[0]).toBe('update_ride_v2');
     const updateArgs = rpc.mock.calls[0]?.[1] as {

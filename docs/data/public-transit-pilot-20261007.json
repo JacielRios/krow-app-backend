@@ -1,0 +1,114 @@
+{
+  "verifiedAt": "2026-10-07",
+  "municipality": "Guadalupe, Nuevo León",
+  "method": "Coordinates and names extracted from the paradas JSON embedded in public server-rendered Flight payloads on the official Guadalupe Nos Mueve route pages.",
+  "interpretation": "The official source establishes stop names and coordinates. Avenue membership marked proximity_to_verified_avenue_reference is a geographic inference. Direction, safe boarding access, side of road and current service require a local check before admitting real passengers.",
+  "routesChecked": [
+    {
+      "sourceUrl": "https://nosmueve.guadalupe.gob.mx/rutas/ruta-azul",
+      "publishedStopCount": 6
+    },
+    {
+      "sourceUrl": "https://nosmueve.guadalupe.gob.mx/rutas/ruta-blanca",
+      "publishedStopCount": 13
+    },
+    {
+      "sourceUrl": "https://nosmueve.guadalupe.gob.mx/rutas/ruta-evolucion",
+      "publishedStopCount": 0
+    },
+    {
+      "sourceUrl": "https://nosmueve.guadalupe.gob.mx/rutas/ruta-naranja",
+      "publishedStopCount": 7
+    },
+    {
+      "sourceUrl": "https://nosmueve.guadalupe.gob.mx/rutas/ruta-salud",
+      "publishedStopCount": 8
+    },
+    {
+      "sourceUrl": "https://nosmueve.guadalupe.gob.mx/rutas/ruta-vespertina",
+      "publishedStopCount": 0
+    }
+  ],
+  "stops": [
+    {
+      "name": "SAN SEBASTIÁN",
+      "latitude": 25.65437941821169,
+      "longitude": -100.20861089229584,
+      "avenue": "Eloy Cavazos",
+      "stop_type": "bus_stop",
+      "classification": "official_published_bus_stop",
+      "source": "municipal_official",
+      "sourceUrl": "https://nosmueve.guadalupe.gob.mx/rutas/ruta-azul",
+      "sourceRouteOrder": 2,
+      "avenueAssignment": "proximity_to_verified_avenue_reference",
+      "nearestCuratedReference": "krow-itnl-eloy-san-sebastian",
+      "distanceToCuratedReferenceMeters": 19,
+      "direction": null,
+      "fieldValidationRequired": true
+    },
+    {
+      "name": "AV. PABLO LIVAS",
+      "latitude": 25.665410364306176,
+      "longitude": -100.21033287048341,
+      "avenue": "Pablo Livas",
+      "stop_type": "bus_stop",
+      "classification": "official_published_bus_stop",
+      "source": "municipal_official",
+      "sourceUrl": "https://nosmueve.guadalupe.gob.mx/rutas/ruta-azul",
+      "sourceRouteOrder": 3,
+      "avenueAssignment": "avenue_named_by_official_source",
+      "nearestCuratedReference": "krow-itnl-pablo-serafin",
+      "distanceToCuratedReferenceMeters": 367,
+      "direction": null,
+      "fieldValidationRequired": true
+    },
+    {
+      "name": "AV. ELOY CAVAZOS",
+      "latitude": 25.663896878520493,
+      "longitude": -100.24575412273408,
+      "avenue": "Eloy Cavazos",
+      "stop_type": "bus_stop",
+      "classification": "official_published_bus_stop",
+      "source": "municipal_official",
+      "sourceUrl": "https://nosmueve.guadalupe.gob.mx/rutas/ruta-azul",
+      "sourceRouteOrder": 4,
+      "avenueAssignment": "avenue_named_by_official_source",
+      "nearestCuratedReference": null,
+      "distanceToCuratedReferenceMeters": null,
+      "direction": null,
+      "fieldValidationRequired": true
+    },
+    {
+      "name": "AV. ELOY CAVAZOS",
+      "latitude": 25.651431917018765,
+      "longitude": -100.19735097885133,
+      "avenue": "Eloy Cavazos",
+      "stop_type": "bus_stop",
+      "classification": "official_published_bus_stop",
+      "source": "municipal_official",
+      "sourceUrl": "https://nosmueve.guadalupe.gob.mx/rutas/ruta-azul",
+      "sourceRouteOrder": 6,
+      "avenueAssignment": "avenue_named_by_official_source",
+      "nearestCuratedReference": "krow-itnl-eloy-mexico86",
+      "distanceToCuratedReferenceMeters": 124,
+      "direction": null,
+      "fieldValidationRequired": true
+    },
+    {
+      "name": "ENREDADERA",
+      "latitude": 25.670888973033485,
+      "longitude": -100.18335696331856,
+      "avenue": "Reynosa",
+      "stop_type": "bus_stop",
+      "classification": "official_published_bus_stop",
+      "source": "municipal_official",
+      "sourceUrl": "https://nosmueve.guadalupe.gob.mx/rutas/ruta-naranja",
+      "sourceRouteOrder": 2,
+      "avenueAssignment": "proximity_to_verified_avenue_reference",
+      "nearestCuratedReference": "krow-itnl-reynosa-409",
+      "distanceToCuratedReferenceMeters": 66,
+      "direction": null,
+      "fieldValidationRequired": true
+    }
+  ]
+}

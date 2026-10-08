@@ -24,6 +24,12 @@ export class RouteEndpointDto extends CoordinateDto {
 }
 
 export class RoutePreviewRequestDto {
+  @IsOptional() @IsUUID() corridorId?: string;
+  @IsOptional()
+  @IsArray()
+  @ArrayUnique()
+  @IsUUID('4', { each: true })
+  transportStopIds?: string[];
   @IsDefined()
   @IsObject()
   @ValidateNested()
@@ -41,6 +47,7 @@ export class RoutePreviewRequestDto {
 }
 
 export class SaveFavoriteRouteDto {
+  @IsDefined() @IsUUID() corridorId!: string;
   @IsString() @MinLength(1) @MaxLength(80) name!: string;
   @IsDefined()
   @IsObject()

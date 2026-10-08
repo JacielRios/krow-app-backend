@@ -6,6 +6,7 @@ export interface Environment {
   SUPABASE_URL: string;
   SUPABASE_ANON_KEY: string;
   GOOGLE_MAPS_API_KEY?: string;
+  PILOT_MATCHING_MAX_DISTANCE_METERS: number;
 }
 
 export function validateEnvironment(
@@ -19,6 +20,17 @@ export function validateEnvironment(
     throw new Error(`Faltan variables de entorno: ${missing.join(', ')}`);
 
   const port = input.PORT ? Number(input.PORT) : 3000;
+  const matchingDistance = Number(
+    read('PILOT_MATCHING_MAX_DISTANCE_METERS', '3000'),
+  );
+  if (
+    !Number.isInteger(matchingDistance) ||
+    matchingDistance < 100 ||
+    matchingDistance > 20000
+  )
+    throw new Error(
+      'PILOT_MATCHING_MAX_DISTANCE_METERS debe ser un entero entre 100 y 20000',
+    );
   const mapsQuota = Number(read('GOOGLE_MAPS_REQUESTS_PER_MINUTE', '250'));
   if (!Number.isInteger(mapsQuota) || mapsQuota < 1)
     throw new Error('Cuota de Google Maps inválida');
@@ -132,5 +144,6 @@ export function validateEnvironment(
     SUPABASE_URL: read('SUPABASE_URL'),
     SUPABASE_ANON_KEY: read('SUPABASE_ANON_KEY'),
     GOOGLE_MAPS_API_KEY: read('GOOGLE_MAPS_API_KEY') || undefined,
+    PILOT_MATCHING_MAX_DISTANCE_METERS: matchingDistance,
   };
 }

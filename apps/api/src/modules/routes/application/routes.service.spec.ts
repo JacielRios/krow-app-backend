@@ -23,10 +23,11 @@ describe('RoutesService origin and failure safeguards', () => {
     lng: -100.3,
   };
   const dto: SaveFavoriteRouteDto = {
+    corridorId: '77777777-7777-4777-8777-777777777777',
     name: 'Ruta frecuente',
     origin: historicalOrigin,
     destination: { address: 'Destino', lat: 25.68, lng: -100.2 },
-    transportStopIds: ['untrusted-stop'],
+    transportStopIds: ['verified-stop'],
   };
   const preview = {
     // Geometría sintética válida; el proveedor se sustituye completamente.
@@ -84,7 +85,41 @@ describe('RoutesService origin and failure safeguards', () => {
         ? ({ enabled: true, routeRpc } as unknown as PilotDatabase)
         : undefined,
     );
-    return { service, rpc, forUser, routePreview, routeRpc };
+    const corridorSpy = jest.spyOn(service, 'corridors').mockResolvedValue([
+      {
+        corridorId: dto.corridorId,
+        name: 'Avenida',
+        code: 'test',
+        direction: null,
+        stops: [
+          {
+            stopId: 'verified-stop',
+            externalId: 'catalog-stop',
+            name: 'Parada verificada',
+            address: 'Avenida',
+            municipality: 'Guadalupe',
+            location: { lat: 25.67, lng: -100.24 },
+            direction: null,
+            active: true,
+            stopOrder: 1,
+            stopType: 'general',
+            source: 'synthetic',
+          },
+        ],
+      },
+    ]);
+    const publicationSpy = jest
+      .spyOn(service, 'publicationStops')
+      .mockResolvedValue(['campus-stop', 'verified-stop']);
+    return {
+      service,
+      rpc,
+      forUser,
+      routePreview,
+      routeRpc,
+      corridorSpy,
+      publicationSpy,
+    };
   }
 
   it.each([
@@ -105,6 +140,7 @@ describe('RoutesService origin and failure safeguards', () => {
         CAMPUS_ORIGIN,
         dto.destination,
         undefined,
+        [{ lat: 25.67, lng: -100.24 }],
       );
       const payload = usePilot
         ? routeRpc.mock.calls[0][2][0]
@@ -115,7 +151,8 @@ describe('RoutesService origin and failure safeguards', () => {
         origin_address: CAMPUS_ORIGIN.address,
         origin_lat: CAMPUS_ORIGIN.lat,
         origin_lng: CAMPUS_ORIGIN.lng,
-        transport_stop_ids: ['verified-stop'],
+        transport_stop_ids: ['campus-stop', 'verified-stop'],
+        corridor_id: dto.corridorId,
       });
       expect(payload).toHaveProperty(
         'route_id',
@@ -127,7 +164,7 @@ describe('RoutesService origin and failure safeguards', () => {
           'upsert_favorite_route',
           [payload],
         );
-      expect(forUser).toHaveBeenCalledWith(user.accessToken);
+      if (!usePilot) expect(forUser).toHaveBeenCalledWith(user.accessToken);
       expect(dto.origin).toEqual(historicalOrigin);
     },
   );
@@ -137,7 +174,7 @@ describe('RoutesService origin and failure safeguards', () => {
     await expect(service.createFavorite(user, dto)).resolves.toEqual({
       routeId: 'saved-favorite',
     });
-    const payload = rpc.mock.calls[1][1].p_payload as Record<string, unknown>;
+    const payload = rpc.mock.calls[0][1].p_payload as Record<string, unknown>;
     expect(payload.default_vehicle_id).toBeUndefined();
     expect(payload.default_available_seats).toBeUndefined();
     expect(payload.default_price_per_seat).toBeUndefined();
@@ -171,5 +208,89 @@ describe('RoutesService origin and failure safeguards', () => {
     );
     expect(rpc).not.toHaveBeenCalled();
     expect(routeRpc).not.toHaveBeenCalled();
+  });
+
+  it('keeps avenue guide points when the driver enables only its last stop', async () => {
+    const { service, routePreview, corridorSpy } = setup();
+    const locations = [
+      { lat: 25.664, lng: -100.238 },
+      { lat: 25.662, lng: -100.228 },
+      { lat: 25.66, lng: -100.218 },
+    ];
+    const stops = locations.map((location, index) => ({
+      stopId: `selected-${index}`,
+      externalId: `catalog-${index}`,
+      name: `Synthetic ${index}`,
+      address: 'Avenida',
+      municipality: 'Guadalupe',
+      location,
+      direction: null,
+      active: true,
+      stopOrder: index + 1,
+      stopType: 'general',
+      source: 'synthetic',
+    }));
+    corridorSpy.mockResolvedValue([
+      {
+        corridorId: dto.corridorId,
+        name: 'Avenida',
+        code: 'test',
+        direction: null,
+        stops,
+      },
+    ]);
+    await service.preview(user, {
+      origin: CAMPUS_ORIGIN,
+      destination: locations[2],
+      corridorId: dto.corridorId,
+      transportStopIds: ['selected-2'],
+    });
+    expect(routePreview).toHaveBeenCalledWith(
+      CAMPUS_ORIGIN,
+      locations[2],
+      undefined,
+      locations,
+    );
+    await expect(
+      service.preview(user, {
+        origin: CAMPUS_ORIGIN,
+        destination: locations[0],
+        corridorId: dto.corridorId,
+        transportStopIds: ['selected-2'],
+      }),
+    ).rejects.toThrow('dentro del trayecto');
+  });
+
+  it('validates explicit selections and silently adds only the campus pickup', async () => {
+    const { service, publicationSpy } = setup();
+    publicationSpy.mockRestore();
+    const campusId = 'campus-central';
+    const campusQuery = {
+      eq: jest.fn(),
+      maybeSingle: jest
+        .fn<() => Promise<{ data: { stop_id: string }; error: null }>>()
+        .mockResolvedValue({ data: { stop_id: campusId }, error: null }),
+    };
+    campusQuery.eq.mockReturnValue(campusQuery);
+    const supabaseClient = { from: () => ({ select: () => campusQuery }) };
+    // The fixture supplies only the catalog lookup, without persistence calls.
+    jest
+      .spyOn(service as unknown as { client: () => unknown }, 'client')
+      .mockReturnValue(supabaseClient);
+    expect(
+      await service.publicationStops(user, dto.corridorId, ['verified-stop']),
+    ).toEqual([campusId, 'verified-stop']);
+    await expect(
+      service.publicationStops(user, dto.corridorId, []),
+    ).rejects.toThrow('al menos una');
+    await expect(
+      service.publicationStops(user, dto.corridorId, ['foreign-stop']),
+    ).rejects.toThrow('avenida activa');
+    await expect(
+      service.publicationStops(user, dto.corridorId, [
+        'verified-stop',
+        'verified-stop',
+      ]),
+    ).rejects.toThrow('avenida activa');
   });
 });

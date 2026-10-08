@@ -1,0 +1,139 @@
+{
+  "checkedAt": "2026-10-07T21:03:11.725Z",
+  "mode": "live PostgreSQL transaction with mandatory ROLLBACK",
+  "physicalDeviceOrRoadTest": false,
+  "mapsGeometryProvider": "google",
+  "realDataCommitted": false,
+  "passed": true,
+  "rolledBack": true,
+  "matchingDefaultMeters": 3000,
+  "checks": [
+    {
+      "name": "uses_limited_database_role",
+      "passed": true
+    },
+    {
+      "name": "existing_approved_driver_and_active_vehicle",
+      "passed": true
+    },
+    {
+      "name": "passenger_has_no_active_booking",
+      "passed": true
+    },
+    {
+      "name": "isolated_future_search_window",
+      "passed": true
+    },
+    {
+      "name": "active_actor_driver",
+      "passed": true
+    },
+    {
+      "name": "only_selected_stops_plus_campus_6",
+      "passed": true,
+      "selectedDescents": 1,
+      "persistedStopCount": 2
+    },
+    {
+      "name": "active_actor_driver",
+      "passed": true
+    },
+    {
+      "name": "only_selected_stops_plus_campus_4",
+      "passed": true,
+      "selectedDescents": 1,
+      "persistedStopCount": 2
+    },
+    {
+      "name": "active_actor_driver",
+      "passed": true
+    },
+    {
+      "name": "only_selected_stops_plus_campus_2",
+      "passed": true,
+      "selectedDescents": 1,
+      "persistedStopCount": 2
+    },
+    {
+      "name": "active_actor_passenger",
+      "passed": true
+    },
+    {
+      "name": "distance_rank_before_departure",
+      "passed": true,
+      "distancesMeters": [
+        0,
+        1240,
+        2479
+      ]
+    },
+    {
+      "name": "distance_rank_before_limit",
+      "passed": true
+    },
+    {
+      "name": "configurable_radius_filters_irrelevant_rides",
+      "passed": true,
+      "defaultRadiusMeters": 3000,
+      "adjustedRadiusMeters": 1000
+    },
+    {
+      "name": "active_actor_driver",
+      "passed": true
+    },
+    {
+      "name": "only_selected_stops_plus_campus_8",
+      "passed": true,
+      "selectedDescents": 2,
+      "persistedStopCount": 3
+    },
+    {
+      "name": "active_actor_passenger",
+      "passed": true
+    },
+    {
+      "name": "all_enabled_descents_including_far_stop",
+      "passed": true,
+      "distancesMeters": [
+        0,
+        4404
+      ],
+      "availableDescents": 2
+    },
+    {
+      "name": "near_match_keeps_trip_with_far_alternative",
+      "passed": true
+    },
+    {
+      "name": "far_option_is_actual_published_stop",
+      "passed": true
+    },
+    {
+      "name": "far_descent_booking_commits_price_inside_transaction",
+      "passed": true,
+      "amountCents": 1234
+    },
+    {
+      "name": "rollback_preserves_original_counts",
+      "passed": true,
+      "before": {
+        "rides": 50,
+        "bookings": 34,
+        "drivers": 2,
+        "vehicles": 2,
+        "ride_stops": 104,
+        "booking_prices": 34,
+        "outbox": 15
+      },
+      "after": {
+        "rides": 50,
+        "bookings": 34,
+        "drivers": 2,
+        "vehicles": 2,
+        "ride_stops": 104,
+        "booking_prices": 34,
+        "outbox": 15
+      }
+    }
+  ]
+}

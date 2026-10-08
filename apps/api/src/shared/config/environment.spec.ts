@@ -20,6 +20,25 @@ describe('validateEnvironment', () => {
       validateEnvironment({ ...required, PORT: 'not-a-port' }),
     ).toThrow('PORT debe ser un número entero entre 1 y 65535');
   });
+  it('permite ajustar el radio de búsqueda y rechaza valores inválidos', () => {
+    expect(
+      validateEnvironment(required).PILOT_MATCHING_MAX_DISTANCE_METERS,
+    ).toBe(3000);
+    expect(
+      validateEnvironment({
+        ...required,
+        PILOT_MATCHING_MAX_DISTANCE_METERS: '4500',
+      }).PILOT_MATCHING_MAX_DISTANCE_METERS,
+    ).toBe(4500);
+    for (const value of ['0', '99', '20001', '3.5', 'invalid']) {
+      expect(() =>
+        validateEnvironment({
+          ...required,
+          PILOT_MATCHING_MAX_DISTANCE_METERS: value,
+        }),
+      ).toThrow('PILOT_MATCHING_MAX_DISTANCE_METERS');
+    }
+  });
 
   it('no habilita GPS online sin proveedor de rutas configurado', () => {
     const pilot = {

@@ -85,6 +85,8 @@ y el cambio de permisos ya están aplicados en Supabase. La API está activa en
 Railway con TLS y aprobó health/readiness y comprobaciones de autorización.
 La integración administrativa y sus verificaciones reales están registradas en
 [el informe de integración](docs/admin-integration-20261007.md).
+La publicación por avenida, selección explícita de bajadas y búsqueda por destino
+del piloto se describen en [avenidas y emparejamiento](docs/pilot-corridors-20261007.md).
 
 La API valida tokens de Supabase Auth y expone perfiles, vehículos, viajes,
 reservas, matching y Google Maps bajo `/v1`. Los flujos protegidos esperan

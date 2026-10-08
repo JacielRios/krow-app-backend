@@ -24,6 +24,7 @@ export class CoordinateDto {
 }
 
 export class CreateRideDto {
+  @IsDefined() @IsUUID() corridorId!: string;
   @IsUUID() vehicleId!: string;
   @IsOptional() @IsUUID() favoriteRouteId?: string;
   @IsDefined()
@@ -74,7 +75,7 @@ export class SearchRidesDto {
   @IsOptional() @IsDateString() toTime?: string;
   @IsOptional() @IsInt() @Min(1) @Max(100) maxResults = 50;
   @IsOptional() @IsNumber() @Min(0.1) @Max(100) maxDistanceKm = 8;
-  @IsOptional() @IsInt() @Min(1) @Max(5000) maxDistanceMeters = 1000;
+  @IsOptional() @IsInt() @Min(1) @Max(20000) maxDistanceMeters?: number;
   @IsOptional() @IsUUID() pickupTransportStopId?: string;
   @IsOptional() @IsUUID() dropoffTransportStopId?: string;
 }
@@ -88,13 +89,13 @@ export class RideStopOptionsDto {
   @IsObject()
   @ValidateNested()
   @Type(() => CoordinateDto)
-  origin!: CoordinateDto;
+  origin: CoordinateDto = Object.assign(new CoordinateDto(), CAMPUS_ORIGIN);
   @IsDefined()
   @IsObject()
   @ValidateNested()
   @Type(() => CoordinateDto)
   destination!: CoordinateDto;
-  @IsOptional() @IsInt() @Min(1) @Max(5000) maxDistanceMeters = 1000;
+  @IsOptional() @IsInt() @Min(1) @Max(20000) maxDistanceMeters?: number;
 }
 
 export class PassengerStopCandidatesDto {

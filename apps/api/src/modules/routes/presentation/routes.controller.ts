@@ -24,6 +24,11 @@ import { RoutePreviewRequestDto, SaveFavoriteRouteDto } from './route.dto.js';
 export class RoutesController {
   constructor(private readonly routes: RoutesService) {}
 
+  @Get('corridors')
+  corridors(@CurrentUser() user: AuthenticatedUser) {
+    return this.routes.corridors(user);
+  }
+
   @Post('preview')
   preview(
     @CurrentUser() user: AuthenticatedUser,

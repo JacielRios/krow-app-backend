@@ -22,6 +22,32 @@ export type Database = {
   };
   public: {
     Tables: {
+      transport_corridors: {
+        Row: {
+          corridor_id: string;
+          code: string;
+          name: string;
+          direction: string | null;
+          active: boolean;
+          display_order: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          corridor_id?: string;
+          code: string;
+          name: string;
+          direction?: string | null;
+          active?: boolean;
+          display_order?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<
+          Database['public']['Tables']['transport_corridors']['Insert']
+        >;
+        Relationships: Relationship[];
+      };
       users: {
         Row: {
           id: number;
@@ -108,6 +134,7 @@ export type Database = {
       };
       rides: {
         Row: {
+          corridor_id: string | null;
           ride_id: string;
           driver_id: string;
           vehicle_id: string;
@@ -133,6 +160,7 @@ export type Database = {
         };
         Insert: {
           ride_id?: string;
+          corridor_id?: string | null;
           driver_id: string;
           vehicle_id: string;
           origin_lat: number;
@@ -160,6 +188,9 @@ export type Database = {
       };
       transport_stops: {
         Row: {
+          corridor_id: string | null;
+          corridor_order: number | null;
+          direction: string | null;
           stop_id: string;
           external_id: string;
           name: string;
@@ -176,6 +207,9 @@ export type Database = {
         };
         Insert: {
           stop_id?: string;
+          corridor_id?: string | null;
+          corridor_order?: number | null;
+          direction?: string | null;
           external_id: string;
           name: string;
           address?: string | null;
@@ -196,6 +230,7 @@ export type Database = {
       };
       favorite_routes: {
         Row: {
+          corridor_id: string | null;
           route_id: string;
           driver_id: string;
           name: string;
@@ -215,6 +250,7 @@ export type Database = {
         };
         Insert: {
           route_id?: string;
+          corridor_id?: string | null;
           driver_id: string;
           name: string;
           origin_place_id?: string | null;
@@ -311,6 +347,8 @@ export type Database = {
     };
     Views: { [_ in never]: never };
     Functions: {
+      search_available_rides_pilot: Database['public']['Functions']['search_available_rides_v2'];
+      get_ride_stop_options_pilot: Database['public']['Functions']['get_ride_stop_options'];
       admin_upsert_transport_stop: {
         Args: { p_payload: Json };
         Returns: string;

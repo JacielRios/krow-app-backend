@@ -29,6 +29,9 @@ export interface RideRow {
   destination_lat: number;
   destination_lng: number;
   route_polyline: string;
+  corridor_id?: string | null;
+  route_duration_seconds?: number | null;
+  route_calculated_at?: Date | string | null;
   version: number;
   available_seats: number;
   driver_id: string;
@@ -724,9 +727,26 @@ export class PilotService {
         ? position
         : null;
     const key = `${rideId}:${ride.version}:${pending.map((b) => `${b.booking_id}:${b.status}`).join(',')}:${liveOrigin ? 'gps' : 'published'}`;
-    let route = this.routeCache.get(key)?.value;
+    // Corridor trips commit to the published route and enabled stops. Removing
+    // unbooked stops during GPS updates could silently change the avenue that
+    // the driver offered. Position and ETA still advance along this geometry.
+    const publishedCorridorRoute = ride.corridor_id
+      ? {
+          polyline: ride.route_polyline,
+          durationSeconds: Number(ride.route_duration_seconds) || 0,
+          calculatedAt: ride.route_calculated_at
+            ? new Date(ride.route_calculated_at).toISOString()
+            : '',
+          error: undefined as string | undefined,
+        }
+      : undefined;
+    let route = publishedCorridorRoute ?? this.routeCache.get(key)?.value;
     let routeError: string | null = route?.error ?? null;
-    if (!route || this.routeCache.get(key)!.expires < Date.now()) {
+    if (
+      !route ||
+      (!publishedCorridorRoute &&
+        this.routeCache.get(key)!.expires < Date.now())
+    ) {
       try {
         const computed = await this.maps.routePreview(
           liveOrigin ?? {

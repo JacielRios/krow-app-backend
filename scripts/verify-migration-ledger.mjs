@@ -11,6 +11,7 @@ for (const ledger of [
   'migration-ledger-20261006.json',
   'migration-ledger-20261007.json',
   'migration-ledger-admin-20261007.json',
+  'migration-ledger-corridors-20261007.json',
 ]) {
   const rows = JSON.parse(
     await readFile(new URL('../docs/' + ledger, import.meta.url), 'utf8'),

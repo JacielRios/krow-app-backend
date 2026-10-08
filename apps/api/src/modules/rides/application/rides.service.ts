@@ -5,6 +5,7 @@ import {
   NotFoundException,
   Optional,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { SupabaseService } from '../../../infrastructure/supabase/supabase.service.js';
 import type { Database } from '../../../infrastructure/supabase/database.types.js';
@@ -49,6 +50,7 @@ type RideStopView = Pick<
 };
 type BookingStatusView = { status: string };
 type RideDetailRow = RideRow & {
+  corridor: { name: string } | Array<{ name: string }> | null;
   vehicle: VehicleView | VehicleView[] | null;
   ride_stops: RideStopView[];
   bookings: BookingStatusView[];
@@ -102,6 +104,8 @@ type SearchRideRow = StopPairRow &
     | 'price_per_seat'
     | 'status'
   > & {
+    corridor_id: string | null;
+    corridor_name: string | null;
     driver_name: string | null;
     driver_rating: number | null;
     vehicle_id: string;
@@ -119,9 +123,15 @@ export class RidesService {
     private readonly supabase: SupabaseService,
     private readonly routes: RoutesService,
     @Optional() private readonly pilot?: PilotService,
+    @Optional() private readonly config?: ConfigService,
   ) {}
 
   async create(user: AuthenticatedUser, dto: CreateRideDto) {
+    const selectedStops = await this.routes.publicationStops(
+      user,
+      dto.corridorId,
+      dto.transportStopIds,
+    );
     const campusRide = {
       ...dto,
       origin: CAMPUS_ORIGIN,
@@ -131,21 +141,28 @@ export class RidesService {
       origin: CAMPUS_ORIGIN,
       destination: dto.destination,
       departureTime: dto.departureTime,
+      corridorId: dto.corridorId,
+      transportStopIds: dto.transportStopIds,
     });
     if (this.pilot?.db.enabled)
       return {
         rideId: await this.pilot.db.routeRpc(user.id, 'create_ride_v2', [
-          this.ridePayload(campusRide, computed),
+          this.ridePayload(campusRide, computed, selectedStops),
         ]),
       };
     const { data, error } = await this.client(user).rpc('create_ride_v2', {
-      p_payload: this.ridePayload(campusRide, computed),
+      p_payload: this.ridePayload(campusRide, computed, selectedStops),
     });
     if (error) this.throwRpcError(error.message);
     return { rideId: data };
   }
 
   async update(user: AuthenticatedUser, rideId: string, dto: UpdateRideDto) {
+    const selectedStops = await this.routes.publicationStops(
+      user,
+      dto.corridorId,
+      dto.transportStopIds,
+    );
     // An edit changes destination/details, never the existing trip's departure.
     // This also preserves booked/historical origins when older clients send one.
     const { data: ride, error: originError } = await this.client(user)
@@ -180,6 +197,8 @@ export class RidesService {
       origin,
       destination: dto.destination,
       departureTime: dto.departureTime,
+      corridorId: dto.corridorId,
+      transportStopIds: dto.transportStopIds,
     });
     if (this.pilot?.db.enabled)
       return {
@@ -187,13 +206,13 @@ export class RidesService {
         version: await this.pilot.db.routeRpc(user.id, 'update_ride_v2', [
           rideId,
           dto.version,
-          this.ridePayload(existingRide, computed),
+          this.ridePayload(existingRide, computed, selectedStops),
         ]),
       };
     const { data, error } = await this.client(user).rpc('update_ride_v2', {
       p_ride_id: rideId,
       p_expected_version: dto.version,
-      p_payload: this.ridePayload(existingRide, computed),
+      p_payload: this.ridePayload(existingRide, computed, selectedStops),
     });
     if (error) this.throwRpcError(error.message);
     return { rideId, version: data };
@@ -203,7 +222,7 @@ export class RidesService {
     const { data, error } = await this.client(user)
       .from('rides')
       .select(
-        `*,
+        `*, corridor:transport_corridors(name),
          vehicle:vehicles(
            vehicle_id, brand, model, car_year, license_plate, car_color, capacity
          ),
@@ -272,14 +291,7 @@ export class RidesService {
   }
 
   async search(user: AuthenticatedUser, dto: SearchRidesDto) {
-    const pickupLocation = dto.origin ?? CAMPUS_ORIGIN;
-    const hasPickup = Boolean(dto.pickupTransportStopId);
-    const hasDropoff = Boolean(dto.dropoffTransportStopId);
-    if (hasPickup !== hasDropoff) {
-      throw new BadRequestException(
-        'Selecciona tanto la parada de subida como la de bajada',
-      );
-    }
+    const pickupLocation = CAMPUS_ORIGIN;
     const commonArgs = {
       p_origin_lat: pickupLocation.lat,
       p_origin_lng: pickupLocation.lng,
@@ -288,16 +300,12 @@ export class RidesService {
       p_max_results: dto.maxResults,
       p_from_time: dto.fromTime ?? null,
       p_to_time: dto.toTime ?? null,
-      p_max_distance_m: dto.maxDistanceMeters,
+      p_max_distance_m: this.matchingRadius(dto.maxDistanceMeters),
     };
-    const request =
-      hasPickup && hasDropoff
-        ? this.client(user).rpc('search_available_rides_by_stops', {
-            ...commonArgs,
-            p_pickup_transport_stop_id: dto.pickupTransportStopId!,
-            p_dropoff_transport_stop_id: dto.dropoffTransportStopId!,
-          })
-        : this.client(user).rpc('search_available_rides_v2', commonArgs);
+    const request = this.client(user).rpc(
+      'search_available_rides_pilot',
+      commonArgs,
+    );
     const { data, error } = await request;
     if (error) throw new BadRequestException(error.message);
     const rows = (data ?? []) as unknown as SearchRideRow[];
@@ -362,18 +370,21 @@ export class RidesService {
     dto: RideStopOptionsDto,
   ) {
     const { data, error } = await this.client(user).rpc(
-      'get_ride_stop_options',
+      'get_ride_stop_options_pilot',
       {
         p_ride_id: rideId,
-        p_origin_lat: dto.origin.lat,
-        p_origin_lng: dto.origin.lng,
+        p_origin_lat: CAMPUS_ORIGIN.lat,
+        p_origin_lng: CAMPUS_ORIGIN.lng,
         p_destination_lat: dto.destination.lat,
         p_destination_lng: dto.destination.lng,
-        p_max_distance_m: dto.maxDistanceMeters,
+        p_max_distance_m: this.matchingRadius(dto.maxDistanceMeters),
       },
     );
     if (error) throw new BadRequestException(error.message);
     return {
+      radiusMeters: this.matchingRadius(dto.maxDistanceMeters),
+      recommendedDropoffStopId:
+        ((data ?? []) as unknown as StopPairRow[])[0]?.dropoff_stop_id ?? null,
       pairs: ((data ?? []) as unknown as StopPairRow[]).map((pair) => ({
         pickup: this.mapStopOption(pair, 'pickup'),
         dropoff: this.mapStopOption(pair, 'dropoff'),
@@ -439,10 +450,12 @@ export class RidesService {
   private ridePayload(
     dto: CreateRideDto,
     computed: Awaited<ReturnType<RoutesService['computeWithCompatibleStops']>>,
+    selectedStopIds: string[],
   ) {
     return {
       vehicle_id: dto.vehicleId,
       favorite_route_id: dto.favoriteRouteId,
+      corridor_id: dto.corridorId,
       origin_lat: dto.origin.lat,
       origin_lng: dto.origin.lng,
       destination_lat: dto.destination.lat,
@@ -458,7 +471,7 @@ export class RidesService {
       departure_time: dto.departureTime,
       available_seats: dto.availableSeats,
       price_per_seat: dto.pricePerSeatCents / 100,
-      transport_stop_ids: computed.compatibleStops.map((stop) => stop.stopId),
+      transport_stop_ids: selectedStopIds,
     };
   }
 
@@ -489,6 +502,8 @@ export class RidesService {
     return {
       rideId: ride.ride_id,
       favoriteRouteId: ride.favorite_route_id,
+      corridorId: ride.corridor_id,
+      corridorName: this.flatten(ride.corridor)?.name ?? null,
       origin: {
         lat: Number(ride.origin_lat),
         lng: Number(ride.origin_lng),
@@ -545,6 +560,8 @@ export class RidesService {
   private mapSearchRow(row: SearchRideRow) {
     return {
       rideId: row.ride_id,
+      corridorId: row.corridor_id,
+      corridorName: row.corridor_name,
       driverId: row.driver_id,
       driverName: row.driver_name,
       driverRating:
@@ -595,6 +612,17 @@ export class RidesService {
 
   private flatten<T>(value: T | T[] | null | undefined): T | null {
     return Array.isArray(value) ? (value[0] ?? null) : (value ?? null);
+  }
+
+  private matchingRadius(requested?: number) {
+    const configured = Number(
+      this.config?.get<string>('PILOT_MATCHING_MAX_DISTANCE_METERS', '3000') ??
+        3000,
+    );
+    const radius = requested ?? configured;
+    return Number.isFinite(radius) && radius >= 1 && radius <= 20000
+      ? Math.round(radius)
+      : 3000;
   }
 
   private client(user: AuthenticatedUser): RidesClient {

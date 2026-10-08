@@ -81,6 +81,10 @@ describe('pilot SQL integration (isolated embedded PostgreSQL)', () => {
     await pg.exec(
       'alter table public.bookings alter column booking_id set default gen_random_uuid()',
     );
+    await pg.exec(`alter table public.rides
+      add column corridor_id uuid,
+      add column route_duration_seconds integer,
+      add column route_calculated_at timestamptz`);
     await pg.exec(
       await readFile(
         new URL('../../../test/pilot-booking-rpc.sql', import.meta.url),
@@ -204,6 +208,47 @@ describe('pilot SQL integration (isolated embedded PostgreSQL)', () => {
     expect(preview).toHaveBeenCalledTimes(2);
     expect(recovered.route.polyline).toBe('operative');
     expect(recovered.route.error).toBeNull();
+  });
+  it('keeps the committed corridor route while boarding and GPS state change', async () => {
+    const calculatedAt = new Date().toISOString();
+    await db.query(
+      `update public.rides set corridor_id=$2, route_polyline='published-corridor',
+       route_duration_seconds=600,route_calculated_at=$3 where ride_id=$1`,
+      [rideId, randomUUID(), calculatedAt],
+    );
+    await service.lifecycle(driver, rideId, 'start');
+    const preview = jest.spyOn(maps, 'routePreview');
+    preview.mockRejectedValue(new Error('Provider unavailable'));
+    const beforeBoarding = await service.snapshot(driver, rideId);
+    expect(beforeBoarding.route).toMatchObject({
+      polyline: 'published-corridor',
+      durationSeconds: 600,
+      calculatedAt,
+      error: null,
+    });
+    await service.attend(driver, rideId, bookingId, 'board');
+    const passengerSnapshot = await service.snapshot(passenger, rideId);
+    expect(passengerSnapshot.route.polyline).toBe('published-corridor');
+    expect(passengerSnapshot.myStop).not.toBeNull();
+    expect(passengerSnapshot.etaSeconds).toBeNull();
+    const session = await service.openSession(driver, rideId, randomUUID());
+    await service.upload(rideId, session.sessionId, session.uploadToken, [
+      {
+        seq: 1,
+        lat: 25.67,
+        lng: -100.3,
+        accuracy: 10,
+        capturedAt: new Date().toISOString(),
+      },
+    ]);
+    const moving = await service.snapshot(driver, rideId);
+    expect(moving.position?.lat).toBe(25.67);
+    expect(moving.route.polyline).toBe('published-corridor');
+    await service.attend(driver, rideId, bookingId, 'dropoff');
+    expect((await service.snapshot(driver, rideId)).route.polyline).toBe(
+      'published-corridor',
+    );
+    expect(preview).not.toHaveBeenCalled();
   });
   it('completes the entire ride without auto-boarding or requiring cash', async () => {
     await service.lifecycle(driver, rideId, 'start');

@@ -30,6 +30,7 @@ describe('required route coordinate HTTP validation', () => {
     {
       dto: CreateRideDto,
       payload: {
+        corridorId: randomUUID(),
         vehicleId: randomUUID(),
         origin: point,
         destination: point,
@@ -54,6 +55,7 @@ describe('required route coordinate HTTP validation', () => {
     {
       dto: SaveFavoriteRouteDto,
       payload: {
+        corridorId: randomUUID(),
         name: 'Campus',
         origin: { ...point, address: 'Campus' },
         destination: { ...point, address: 'Destino' },

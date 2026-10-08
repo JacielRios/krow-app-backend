@@ -224,7 +224,7 @@ describe('pilot HTTP contracts', () => {
     expect(response.body).toEqual([]);
     expect(searchRequests).toEqual([
       {
-        name: 'search_available_rides_v2',
+        name: 'search_available_rides_pilot',
         args: {
           p_origin_lat: 25.664011,
           p_origin_lng: -100.243225,
@@ -233,7 +233,7 @@ describe('pilot HTTP contracts', () => {
           p_max_results: 50,
           p_from_time: null,
           p_to_time: null,
-          p_max_distance_m: 1000,
+          p_max_distance_m: 3000,
         },
       },
     ]);
