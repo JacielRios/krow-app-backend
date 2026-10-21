@@ -5,6 +5,7 @@ import { AdminDialog, Feedback } from './AdminUi';
 import { useAdminApi } from '@/lib/admin-api';
 import { readableError } from '@/lib/admin-utils';
 import type {
+  GoogleStopReference,
   StopCoordinates,
   TransportCorridor,
   TransportStop,
@@ -14,12 +15,14 @@ import { validStopCoordinates } from '@/lib/transport-stops';
 export function StopEditor({
   stop,
   coordinates,
+  reference,
   corridors,
   onClose,
   onSaved,
 }: {
   stop: TransportStop | null;
   coordinates?: StopCoordinates | null;
+  reference?: GoogleStopReference;
   corridors: TransportCorridor[];
   onClose: () => void;
   onSaved: (stopId: string) => void;
@@ -116,7 +119,15 @@ export function StopEditor({
                 <input
                   id={`stop-${key}`}
                   name={key}
-                  defaultValue={stop?.[key] ?? ''}
+                  defaultValue={
+                    stop?.[key] ??
+                    (key === 'name'
+                      ? reference?.name
+                      : key === 'address'
+                        ? reference?.address
+                        : '') ??
+                    ''
+                  }
                   maxLength={max}
                   required={key === 'name' || key === 'externalId'}
                 />

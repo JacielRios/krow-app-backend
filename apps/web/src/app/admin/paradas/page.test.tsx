@@ -15,7 +15,11 @@ import {
   vi,
   type Mock,
 } from 'vitest';
-import type { StopCoordinates, TransportStop } from '@/lib/transport-stops';
+import type {
+  GoogleStopReference,
+  StopCoordinates,
+  TransportStop,
+} from '@/lib/transport-stops';
 const auth = vi.hoisted(() => ({ token: vi.fn(), invalidate: vi.fn() }));
 vi.mock('@/lib/admin-auth', () => ({
   useAdminAuth: () => ({
@@ -23,22 +27,40 @@ vi.mock('@/lib/admin-auth', () => ({
     invalidate: auth.invalidate,
   }),
 }));
-// Page tests use the real authenticated API/resource hooks. Leaflet itself is tested separately.
+// Page tests use real authenticated hooks. Google Maps events are tested separately.
 vi.mock('@/components/admin/StopsMap', () => ({
   default: ({
     stops,
     selectedId,
     onSelect,
     onPick,
+    onReference,
     disabled,
   }: {
     stops: TransportStop[];
     selectedId: string | null;
     onSelect: (id: string) => void;
     onPick?: (point: StopCoordinates) => void;
+    onReference?: (point: GoogleStopReference) => void;
     disabled: boolean;
   }) => (
     <div data-testid="stop-map">
+      {onReference && (
+        <button
+          disabled={disabled}
+          onClick={() =>
+            onReference({
+              placeId: 'google-bus',
+              name: 'Autobús Google',
+              address: 'Avenida de prueba',
+              latitude: 25.72,
+              longitude: -100.25,
+            })
+          }
+        >
+          Elegir referencia Google
+        </button>
+      )}
       {stops.map((stop) => (
         <button
           key={stop.stopId}
@@ -189,6 +211,60 @@ describe('stop administration map and persistence', () => {
     vi.unstubAllGlobals();
   });
 
+  it('reviews a Google reference before explicitly creating and reloading the KROW record', async () => {
+    await ready();
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Elegir referencia Google' }),
+    );
+    expect(
+      screen.getByRole('heading', { name: 'Autobús Google' }),
+    ).toBeInTheDocument();
+    expect(mutations()).toHaveLength(0);
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Continuar con los datos' }),
+    );
+    const dialog = within(screen.getByRole('dialog'));
+    expect(dialog.getByLabelText('Nombre')).toHaveValue('Autobús Google');
+    expect(dialog.getByLabelText('Dirección')).toHaveValue('Avenida de prueba');
+    expect(dialog.getByLabelText('Latitud')).toHaveValue(25.72);
+    expect(dialog.getByLabelText('Identificador')).toHaveValue('');
+    fireEvent.change(dialog.getByLabelText('Identificador'), {
+      target: { value: 'BUS-NEW' },
+    });
+    fireEvent.click(dialog.getByRole('button', { name: 'Guardar parada' }));
+    await waitFor(() =>
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument(),
+    );
+    await waitFor(() => expect(marker('Autobús Google')).toBeEnabled());
+    expect(mutations()).toHaveLength(1);
+    expect(JSON.parse(String(mutations()[0][1].body))).toEqual(
+      expect.objectContaining({
+        externalId: 'BUS-NEW',
+        name: 'Autobús Google',
+        latitude: 25.72,
+        longitude: -100.25,
+      }),
+    );
+  });
+
+  it('clears Google suggested data when replacing its location with a custom point', async () => {
+    await ready();
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Elegir referencia Google' }),
+    );
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Elegir punto de prueba' }),
+    );
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Continuar con los datos' }),
+    );
+    const dialog = within(screen.getByRole('dialog'));
+    expect(dialog.getByLabelText('Nombre')).toHaveValue('');
+    expect(dialog.getByLabelText('Dirección')).toHaveValue('');
+    expect(dialog.getByLabelText('Latitud')).toHaveValue(25.712345);
+    expect(mutations()).toHaveLength(0);
+  });
+
   it('selects registered markers and keeps map/list selection and filters consistent', async () => {
     await ready();
     fireEvent.click(marker());
@@ -209,7 +285,9 @@ describe('stop administration map and persistence', () => {
       target: { value: 'inactive' },
     });
     expect(
-      within(screen.getByTestId('stop-map')).getAllByRole('button'),
+      within(screen.getByTestId('stop-map')).getAllByRole('button', {
+        name: /^Marcador/,
+      }),
     ).toHaveLength(1);
     expect(
       within(screen.getByRole('table')).queryByText(firstStop.name),
@@ -218,7 +296,9 @@ describe('stop administration map and persistence', () => {
       target: { value: 'inexistente' },
     });
     expect(
-      within(screen.getByTestId('stop-map')).queryAllByRole('button'),
+      within(screen.getByTestId('stop-map')).queryAllByRole('button', {
+        name: /^Marcador/,
+      }),
     ).toHaveLength(0);
     expect(screen.getByText('No hay resultados')).toBeInTheDocument();
   });

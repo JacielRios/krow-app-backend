@@ -13,6 +13,7 @@ import { StopEditor } from '@/components/admin/StopEditor';
 import { useAdminApi, useAdminResource } from '@/lib/admin-api';
 import { readableError } from '@/lib/admin-utils';
 import type {
+  GoogleStopReference,
   StopCoordinates,
   TransportCorridor,
   TransportStop,
@@ -23,6 +24,7 @@ import './stops.css';
 type Placement = {
   stop: TransportStop | null;
   coordinates: StopCoordinates | null;
+  reference?: GoogleStopReference;
 };
 
 export default function StopsPage() {
@@ -65,8 +67,12 @@ export default function StopsPage() {
     stops.loading || corridors.loading || !!stops.error || !!corridors.error;
   const pickLocation = useCallback((coordinates: StopCoordinates) => {
     setPlacement((current) =>
-      current ? { ...current, coordinates } : current,
+      current ? { ...current, coordinates, reference: undefined } : current,
     );
+  }, []);
+  const pickReference = useCallback((reference: GoogleStopReference) => {
+    setPlacement({ stop: null, coordinates: reference, reference });
+    setMessage('');
   }, []);
   useEffect(() => {
     const refresh = () => stops.reload();
@@ -196,7 +202,8 @@ export default function StopsPage() {
               draft={placement?.coordinates ?? null}
               onSelect={setSelectedId}
               onPick={placement ? pickLocation : undefined}
-              disabled={unavailable || busy}
+              onReference={placement?.stop ? undefined : pickReference}
+              disabled={unavailable || busy || !!editor || !!statusTarget}
             />
             <aside
               className="admin-stop-detail"
@@ -209,7 +216,20 @@ export default function StopsPage() {
                   <p className="eyebrow">
                     {placement.stop ? 'Cambiar ubicación' : 'Nueva parada'}
                   </p>
-                  <h2>{placement.stop?.name ?? 'Elige un punto en el mapa'}</h2>
+                  <h2>
+                    {placement.stop?.name ??
+                      placement.reference?.name ??
+                      'Elige un punto en el mapa'}
+                  </h2>
+                  {placement.reference && (
+                    <p className="admin-stop-location-note">
+                      Referencia de Google ·{' '}
+                      {placement.reference.address ||
+                        'Sin dirección disponible'}
+                      . Revisa la ubicación y los datos antes de registrarla en
+                      KROW.
+                    </p>
+                  )}
                   <p className="admin-description">
                     {placement.coordinates
                       ? 'Puedes tocar otro punto para ajustar la ubicación. Todavía no se ha guardado.'
@@ -333,7 +353,9 @@ export default function StopsPage() {
                   <h2>Una vista de tus paradas</h2>
                   <p className="admin-description">
                     Selecciona un marcador o una fila del listado para consultar
-                    sus datos y administrar su estado.
+                    sus datos y administrar su estado. Busca las paradas de
+                    autobús de Google para agregar una referencia, o usa
+                    «Agregar parada» para elegir cualquier otro punto.
                   </p>
                   <small>{visible.length} paradas en esta vista</small>
                 </div>
@@ -416,6 +438,7 @@ export default function StopsPage() {
         <StopEditor
           stop={editor.stop}
           coordinates={editor.coordinates}
+          reference={editor.reference}
           corridors={corridors.data ?? []}
           onClose={() => setEditor(null)}
           onSaved={(id) => {

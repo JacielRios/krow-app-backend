@@ -39,30 +39,62 @@
   z-index: 0;
   font: inherit;
 }
-.admin-stops-map.is-picking .leaflet-container {
+.admin-stops-map.is-picking .admin-stops-map-canvas {
   cursor: crosshair;
 }
-.admin-stops-map .leaflet-bar {
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 3px 12px #1a23401a;
-}
-.admin-stops-map .leaflet-bar a {
+.admin-stop-marker {
+  position: absolute;
+  transform: translate(-50%, -50%);
   width: 44px;
   height: 44px;
-  line-height: 44px;
-  color: var(--brand);
-}
-.admin-stops-map .leaflet-control-attribution {
-  font-size: 11px;
-  max-width: 100%;
-}
-.admin-stop-marker {
+  padding: 0;
+  cursor: pointer;
   background: transparent;
   border: 0;
   display: grid;
   place-items: center;
+}
+.admin-stop-marker:focus-visible .admin-map-pin {
+  outline: 3px solid #252675;
+  outline-offset: 3px;
+}
+.admin-stop-marker.is-draft {
+  pointer-events: none;
+}
+.admin-stop-marker.is-google .admin-map-pin {
+  background: #176b72;
+  border-radius: 10px;
+}
+.admin-map-dot.is-google {
+  background: #176b72;
+  border-radius: 3px;
+}
+.admin-google-results {
+  margin-top: 16px;
+  font-size: 0.85rem;
+}
+.admin-google-results summary {
+  cursor: pointer;
+  padding: 12px 0;
+}
+.admin-google-results ul {
+  list-style: none;
+  padding: 0;
+  max-height: 260px;
+  overflow: auto;
+}
+.admin-google-results li {
+  border-top: 1px solid var(--line);
+  padding: 10px 0;
+}
+.admin-google-results button {
+  min-height: 44px;
+  text-align: left;
+}
+.admin-google-results small {
+  display: block;
+  color: var(--muted);
+  overflow-wrap: anywhere;
 }
 .admin-map-pin {
   display: grid;

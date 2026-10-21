@@ -3,6 +3,13 @@ export interface StopCoordinates {
   longitude: number;
 }
 
+/** Google references remain transient until the administrator confirms a KROW record. */
+export interface GoogleStopReference extends StopCoordinates {
+  placeId: string;
+  name: string;
+  address: string;
+}
+
 export interface TransportStop extends StopCoordinates {
   stopId: string;
   externalId: string;
