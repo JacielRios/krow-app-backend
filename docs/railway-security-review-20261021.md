@@ -25,7 +25,9 @@ No se revocaron credenciales durante esta revisión: los despliegues siguen bloq
 
 ## Publicación preparada
 
-La compilación final del panel se subió a Vercel en `dpl_ACrGFouFhHrrqsp3WJ6AfiHkiMdb`, producción sin asignación del dominio. Incluye la automatización de descensos y el texto actualizado del módulo. El dominio público conserva la versión anterior hasta que el API soporte el nuevo formulario.
+La compilación final del panel se subió a Vercel en `dpl_ACrGFouFhHrrqsp3WJ6AfiHkiMdb`, producción sin asignación del dominio, con estado **READY**. Pasaron las comprobaciones de siete páginas y trece recursos, incluidos el mapa Google, el contrato `dropoff_only` y la llamada de autocompletado. Incluye la automatización de descensos y el texto actualizado del módulo. El dominio público conserva la versión anterior hasta que el API soporte el nuevo formulario.
+
+El APK móvil **0.8.1-trial**, código de versión 14, se generó con ARM64 y ARM de 32 bits. Su firma de pruebas coincide con la versión anterior; se verificaron el bytecode Hermes integrado, la ausencia de modo depurable y HTTP sin cifrar, y la presencia del contrato de descenso exclusivo. La evidencia de compilación está en el repositorio móvil; no se comprobó instalación física.
 
 Para finalizar cuando Railway restablezca el servicio:
 
