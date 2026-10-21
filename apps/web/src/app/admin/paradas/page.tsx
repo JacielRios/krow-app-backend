@@ -290,9 +290,11 @@ export default function StopsPage() {
                       <dt>Orden / tipo</dt>
                       <dd>
                         {selected.stopOrder ?? 'Sin orden'} ·{' '}
-                        {selected.stopType === 'official_boarding_zone'
-                          ? 'Zona oficial de abordaje'
-                          : 'Punto de encuentro'}
+                        {selected.stopType === 'dropoff_only'
+                          ? 'Solo descenso de pasajeros'
+                          : selected.stopType === 'official_boarding_zone'
+                            ? 'Zona oficial de abordaje'
+                            : 'Punto de encuentro'}
                       </dd>
                     </div>
                     {selected.municipality && (
@@ -341,7 +343,9 @@ export default function StopsPage() {
                   </div>
                   <p className="admin-description admin-small">
                     {selected.active
-                      ? 'Disponible para nuevas selecciones. Las reservas pendientes protegen su desactivación.'
+                      ? selected.stopType === 'dropoff_only'
+                        ? 'Disponible exclusivamente para descenso en los viajes que la incluyan. No permite ascensos.'
+                        : 'Disponible para nuevas selecciones. Las reservas pendientes protegen su desactivación.'
                       : 'No se ofrece en nuevas selecciones de la app móvil.'}
                   </p>
                 </>

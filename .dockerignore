@@ -17,6 +17,8 @@
 .agents
 .tmp
 .temp
+tmp
+output
 artifacts
 docs
 supabase/.temp

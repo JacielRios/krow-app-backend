@@ -16,7 +16,7 @@ export interface TransportStop extends StopCoordinates {
   name: string;
   address: string | null;
   municipality: string | null;
-  stopType: 'general' | 'official_boarding_zone';
+  stopType: 'general' | 'official_boarding_zone' | 'dropoff_only';
   active: boolean;
   corridorId: string | null;
   stopOrder: number | null;
@@ -28,6 +28,27 @@ export interface TransportCorridor {
   name: string;
   direction: string | null;
   active: boolean;
+  code?: string;
+}
+
+export interface StopSuggestions {
+  catalogVersion?: string | null;
+  values: {
+    externalId: string;
+    name: string;
+    address: string;
+    municipality: string;
+    latitude: number;
+    longitude: number;
+    stopType: 'dropoff_only';
+    direction: string;
+    corridorId: string;
+    stopOrder: number | null;
+  };
+  warnings: string[];
+  orderSource: 'catalog_geometry' | null;
+  directionSource: 'google_reference_label' | 'catalog' | null;
+  shiftedStops: number;
 }
 
 export function validStopCoordinates(point: StopCoordinates): boolean {

@@ -5,6 +5,8 @@
 .agents
 .tmp
 .temp
+tmp
+output
 artifacts
 docs
 **/node_modules

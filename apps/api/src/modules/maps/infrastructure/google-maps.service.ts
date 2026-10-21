@@ -85,9 +85,21 @@ export class GoogleMapsService {
     );
     if (json.status === 'ZERO_RESULTS') return null;
     this.assertOk(json);
+    const result = json.results[0];
+    const components = (result.address_components ?? []) as Array<{
+      long_name: string;
+      types: string[];
+    }>;
+    const component = (type: string) =>
+      components.find((item) => item.types.includes(type))?.long_name ?? null;
     return {
-      formattedAddress: json.results[0].formatted_address,
-      placeId: json.results[0].place_id ?? null,
+      formattedAddress: result.formatted_address as string,
+      placeId: (result.place_id as string | undefined) ?? null,
+      municipality: component('administrative_area_level_2'),
+      road: component('route'),
+      streetNumber: component('street_number'),
+      neighborhood:
+        component('neighborhood') ?? component('sublocality_level_1'),
     };
   }
 

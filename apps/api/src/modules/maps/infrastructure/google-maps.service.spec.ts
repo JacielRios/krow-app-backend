@@ -4,6 +4,39 @@ import { ConfigService } from '@nestjs/config';
 import { GoogleMapsService } from './google-maps.service.js';
 
 describe('GoogleMapsService', () => {
+  it('returns explicit structured address fields without guessing a municipality or driving direction', async () => {
+    jest.spyOn(global, 'fetch').mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          status: 'OK',
+          results: [
+            {
+              formatted_address: 'Av. Eloy Cavazos 7010, Guadalupe',
+              place_id: 'synthetic',
+              address_components: [
+                { long_name: 'Av. Eloy Cavazos', types: ['route'] },
+                { long_name: '7010', types: ['street_number'] },
+                {
+                  long_name: 'Guadalupe',
+                  types: ['administrative_area_level_2'],
+                },
+              ],
+            },
+          ],
+        }),
+      ),
+    );
+    await expect(
+      service('synthetic-server-key').reverseGeocode({
+        lat: 25.65,
+        lng: -100.2,
+      }),
+    ).resolves.toMatchObject({
+      municipality: 'Guadalupe',
+      road: 'Av. Eloy Cavazos',
+      streetNumber: '7010',
+    });
+  });
   afterEach(() => jest.restoreAllMocks());
 
   const service = (apiKey?: string) =>

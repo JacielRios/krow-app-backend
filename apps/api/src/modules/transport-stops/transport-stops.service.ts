@@ -11,11 +11,12 @@ export class TransportStopsService {
     const { data, error } = await this.supabase
       .forUser(user.accessToken)
       .from('transport_corridors')
-      .select('corridor_id,name,direction,active')
+      .select('corridor_id,code,name,direction,active')
       .order('display_order');
     if (error) throw new BadRequestException('No pudimos cargar las avenidas');
     return (data ?? []).map((row) => ({
       corridorId: row.corridor_id,
+      code: row.code,
       name: row.name,
       direction: row.direction,
       active: row.active,
@@ -80,6 +81,8 @@ export class TransportStopsService {
           longitude: dto.longitude,
           stop_type: dto.stopType,
           active: dto.active,
+          insert_at_order: dto.insertAtOrder ?? false,
+          expected_catalog_version: dto.expectedCatalogVersion,
           ...(dto.corridorId !== undefined
             ? { corridor_id: dto.corridorId }
             : {}),

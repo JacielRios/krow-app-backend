@@ -105,7 +105,9 @@ let rejectSave: string | null;
 let fetcher: Mock<(url: string, init: RequestInit) => Promise<Response>>;
 const mutations = () =>
   fetcher.mock.calls.filter(
-    ([, init]) => init.method === 'PATCH' || init.method === 'POST',
+    ([url, init]) =>
+      !url.endsWith('/suggest') &&
+      (init.method === 'PATCH' || init.method === 'POST'),
   );
 const marker = (name = 'Referencia existente', active = true) =>
   within(screen.getByTestId('stop-map')).getByRole('button', {
@@ -161,6 +163,28 @@ describe('stop administration map and persistence', () => {
     ];
     rejectSave = null;
     fetcher = vi.fn(async (url: string, init: RequestInit) => {
+      if (url.endsWith('/suggest')) {
+        const point = JSON.parse(String(init.body));
+        return new Response(
+          JSON.stringify({
+            values: {
+              ...point,
+              externalId: 'krow-itnl-pablo-descenso-abcdef1234',
+              name: point.referenceName || 'Parada generada',
+              address: 'Dirección verificada',
+              municipality: 'Guadalupe',
+              direction: '',
+              corridorId: point.corridorId || 'avenue-1',
+              stopOrder: 2,
+              stopType: 'dropoff_only',
+            },
+            warnings: [],
+            orderSource: 'catalog_geometry',
+            directionSource: null,
+            shiftedStops: 1,
+          }),
+        );
+      }
       if (init.method === 'POST' || init.method === 'PATCH') {
         if (rejectSave)
           return new Response(JSON.stringify({ message: rejectSave }), {
@@ -231,6 +255,11 @@ describe('stop administration map and persistence', () => {
     fireEvent.change(dialog.getByLabelText('Identificador'), {
       target: { value: 'BUS-NEW' },
     });
+    await waitFor(() =>
+      expect(
+        dialog.getByRole('button', { name: 'Guardar parada' }),
+      ).toBeEnabled(),
+    );
     fireEvent.click(dialog.getByRole('button', { name: 'Guardar parada' }));
     await waitFor(() =>
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument(),
@@ -320,6 +349,11 @@ describe('stop administration map and persistence', () => {
     const dialog = fillNewStop();
     expect(dialog.getByLabelText('Latitud')).toHaveValue(25.712345);
     expect(dialog.getByLabelText('Longitud')).toHaveValue(-100.254321);
+    await waitFor(() =>
+      expect(
+        dialog.getByRole('button', { name: 'Guardar parada' }),
+      ).toBeEnabled(),
+    );
     fireEvent.click(dialog.getByRole('button', { name: 'Guardar parada' }));
     await waitFor(() => expect(marker('Nueva referencia')).toBeEnabled());
     expect(
@@ -358,6 +392,11 @@ describe('stop administration map and persistence', () => {
     fireEvent.change(dialog.getByLabelText('Longitud'), {
       target: { value: '-100.25' },
     });
+    await waitFor(() =>
+      expect(
+        dialog.getByRole('button', { name: 'Guardar parada' }),
+      ).toBeEnabled(),
+    );
     fireEvent.click(dialog.getByRole('button', { name: 'Guardar parada' }));
     await waitFor(() => expect(marker('Nueva referencia')).toBeEnabled());
   });
@@ -436,6 +475,11 @@ describe('stop administration map and persistence', () => {
       screen.getByRole('button', { name: 'Continuar con los datos' }),
     );
     const dialog = fillNewStop();
+    await waitFor(() =>
+      expect(
+        dialog.getByRole('button', { name: 'Guardar parada' }),
+      ).toBeEnabled(),
+    );
     fireEvent.click(dialog.getByRole('button', { name: 'Guardar parada' }));
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'ya están en uso',
@@ -462,6 +506,11 @@ describe('stop administration map and persistence', () => {
     );
     const dialog = within(screen.getByRole('dialog'));
     expect(dialog.getByLabelText('Nombre')).toHaveValue(firstStop.name);
+    await waitFor(() =>
+      expect(
+        dialog.getByRole('button', { name: 'Guardar parada' }),
+      ).toBeEnabled(),
+    );
     fireEvent.click(dialog.getByRole('button', { name: 'Guardar parada' }));
     await waitFor(() => expect(catalog[0].latitude).toBe(25.712345));
     await waitFor(() =>
