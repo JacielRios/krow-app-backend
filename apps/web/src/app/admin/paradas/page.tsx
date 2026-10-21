@@ -117,7 +117,7 @@ export default function StopsPage() {
     <>
       <AdminHeader
         title="Paradas"
-        description="Gestiona los puntos de encuentro desde el mapa. Los viajes publicados conservan sus coordenadas."
+        description="Administra las paradas del catálogo y agrega puntos de descenso desde el mapa. Los viajes publicados conservan sus coordenadas."
         action={
           <button
             className="button"

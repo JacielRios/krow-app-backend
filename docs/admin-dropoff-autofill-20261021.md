@@ -41,3 +41,15 @@ La app móvil recibe las nuevas paradas dentro de las avenidas activas, los cond
 - Revisiones de seguridad antes y después del despliegue y prueba visual conectada se registran en las evidencias locales de la entrega.
 
 Skills: Supabase, React best practices y despliegue/configuración Vercel. [Documentación oficial de geocodificación inversa](https://developers.google.com/maps/documentation/geocoding/guides-v3/requests-reverse-geocoding).
+
+## Entrega y prueba conectada
+
+La migración quedó aplicada en Supabase sin convertir ni agregar paradas. El catálogo conserva sus **22 registros**. Las revisiones de seguridad no incorporaron hallazgos respecto de la línea base.
+
+El nuevo API se verificó en una instancia local con Google y el catálogo reales, la autenticación habitual y los trabajos de notificaciones desactivados: consulta autorizada 200, sugerencia 201, acceso anónimo 401, coordenadas inválidas 400 y catálogo sin cambios. El punto de la captura original generó identificador `krow-itnl-eloy-descenso-b0db190778`, nombre y dirección de la referencia, avenida Eloy Cavazos, sentido explícito Poniente a Oriente y orden sugerido 11. Google no entregó el municipio como componente explícito; se mantuvo vacío con un aviso.
+
+En el navegador se seleccionó la referencia real GPE-0994 de Pablo Livas directamente en Google Maps y se comprobó el formulario autocompletado: identificador, nombre, dirección, sentido, avenida, orden 4 y coordenadas del marcador. Tipo fijo de alta: “Solo descenso de pasajeros”. El municipio quedó pendiente de confirmación. Se revisó el modal a ancho de teléfono, sin desbordamiento horizontal, y se canceló el borrador sin guardar.
+
+Vercel compiló la versión de revisión `dpl_F15NvhBvsgWVKTSz6yMHCw4ByDL3` y pasaron las comprobaciones de siete páginas y trece recursos, incluidos los nuevos textos y la llamada de autocompletado. Esa versión sigue sin promover al dominio público.
+
+**Publicación pendiente:** Railway rechazó el envío del API con `Deploys have been paused temporarily`. Su [página de estado](https://status.railway.com/) confirmó una incidencia general con compilaciones pausadas. Hay que desplegar el API en el servicio existente, verificar `/admin/transport-stops/suggest` y promover la versión web después de que Railway restablezca los despliegues. La versión pública anterior sigue atendiendo los flujos existentes.
