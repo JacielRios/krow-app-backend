@@ -136,6 +136,8 @@ export class AdminRideListDto extends AdminListDto {
   @IsOptional() @IsDateString({ strict: true }) to?: string;
 }
 export class AdminAuditListDto extends AdminListDto {
-  @IsOptional() @IsIn(['driver', 'vehicle', 'document']) entityType?: string;
+  @IsOptional()
+  @IsIn(['driver', 'vehicle', 'document', 'transport_stop', 'incident'])
+  entityType?: string;
   @IsOptional() @IsUUID() entityId?: string;
 }

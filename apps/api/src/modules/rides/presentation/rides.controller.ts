@@ -7,8 +7,10 @@ import {
   Post,
   Put,
   Query,
+  Res,
   UseGuards,
 } from '@nestjs/common';
+import type { Response } from 'express';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import type { AuthenticatedUser } from '../../auth/domain/authenticated-user.js';
 import { CurrentUser } from '../../auth/presentation/current-user.decorator.js';
@@ -60,11 +62,14 @@ export class RidesController {
   ) {
     return this.views.recent(user, query.limit, query.context);
   }
-  @Get('mine/active') active(
+  @Get('mine/active') async active(
     @CurrentUser() user: AuthenticatedUser,
     @Query() query: RecentRidesQueryDto,
+    @Res({ passthrough: true }) response: Response,
   ) {
-    return this.views.active(user, query.context);
+    const active = await this.views.active(user, query.context);
+    if (active == null) response.status(204);
+    return active;
   }
   @Get('mine') mine(
     @CurrentUser() user: AuthenticatedUser,

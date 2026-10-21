@@ -12,12 +12,14 @@ import { randomUUID } from 'node:crypto';
 import type { PoolClient, QueryResultRow } from 'pg';
 import { PilotDatabase } from './pilot.database.js';
 import { PilotService } from './pilot.service.js';
+import { PilotOperations } from './pilot.operations.js';
 import type { GoogleMapsService } from '../maps/infrastructure/google-maps.service.js';
 import type { AuthenticatedUser } from '../auth/domain/authenticated-user.js';
 import { UsersService } from '../users/users.service.js';
 import type { SupabaseService } from '../../infrastructure/supabase/supabase.service.js';
 import { AppController } from '../../app.controller.js';
 import { PilotNotifications } from './pilot.notifications.js';
+import { enqueueRideReminders, reminderIsCurrent } from './pilot.reminders.js';
 import {
   NotificationProviders,
   DeliveryError,
@@ -121,6 +123,22 @@ describe('pilot SQL integration (isolated embedded PostgreSQL)', () => {
         'utf8',
       ),
     );
+    await pg.exec(
+      'create schema if not exists private; create role krow_pilot_service nologin noinherit nosuperuser nobypassrls',
+    );
+    for (const name of [
+      '20261020191646_booking_departure_deadline.sql',
+      '20261020191658_ride_publication_idempotency.sql',
+    ])
+      await pg.exec(
+        await readFile(
+          new URL(
+            '../../../../../supabase/migrations/' + name,
+            import.meta.url,
+          ),
+          'utf8',
+        ),
+      );
     maps = {
       routePreview: () =>
         Promise.resolve({
@@ -137,6 +155,85 @@ describe('pilot SQL integration (isolated embedded PostgreSQL)', () => {
     await pg?.close();
   });
   afterEach(() => jest.restoreAllMocks());
+  it('recovers pending requests and current passenger responses without depending on push delivery', async () => {
+    await db.query(
+      "update public.bookings set status='pending' where booking_id=$1",
+      [bookingId],
+    );
+    const pending = (await service.bookingInbox(driver)) as Record<
+      string,
+      unknown
+    >[];
+    expect(pending).toHaveLength(1);
+    expect(pending[0]).toMatchObject({
+      bookingId,
+      role: 'driver',
+      canRespond: true,
+      pickupAddress: 'Parada sintética 0',
+      dropoffAddress: 'Parada sintética 1',
+    });
+    expect(await service.bookingInbox(outsider)).toEqual([]);
+    await expect(service.bookingInbox(outsider, bookingId)).rejects.toThrow(
+      'Solicitud no disponible',
+    );
+    const seats = (
+      await db.query<{ available_seats: number }>(
+        'select available_seats from public.rides where ride_id=$1',
+        [rideId],
+      )
+    )[0].available_seats;
+    await service.updateBooking(driver, bookingId, 'confirmed');
+    await service.updateBooking(driver, bookingId, 'confirmed');
+    expect(
+      (
+        await db.query<{ available_seats: number }>(
+          'select available_seats from public.rides where ride_id=$1',
+          [rideId],
+        )
+      )[0].available_seats,
+    ).toBe(seats - 1);
+    const responses = (await service.bookingInbox(passenger)) as Record<
+      string,
+      unknown
+    >[];
+    expect(responses).toHaveLength(1);
+    expect(responses[0]).toMatchObject({
+      bookingId,
+      status: 'confirmed',
+      role: 'passenger',
+      canRespond: false,
+    });
+    expect(await service.bookingInbox(driver)).toEqual([]);
+    await service.updateBooking(passenger, bookingId, 'cancelled');
+    const cancelled = (await service.bookingInbox(passenger)) as Record<
+      string,
+      unknown
+    >[];
+    expect(cancelled).toHaveLength(1);
+    expect(cancelled[0].status).toBe('cancelled');
+    await expect(
+      service.updateBooking(driver, bookingId, 'confirmed'),
+    ).rejects.toThrow(ConflictException);
+  });
+  it('excludes expired requests and rejects acceptance after departure while retaining a readable result', async () => {
+    await db.query(
+      "update public.bookings set status='pending' where booking_id=$1",
+      [bookingId],
+    );
+    await db.query(
+      "update public.rides set departure_time=now()-interval '1 minute' where ride_id=$1",
+      [rideId],
+    );
+    expect(await service.bookingInbox(driver)).toEqual([]);
+    expect(await service.activeRide(driver, 'driver')).toBeNull();
+    expect(await service.bookingInbox(driver, bookingId)).toMatchObject({
+      bookingId,
+      canRespond: false,
+    });
+    await expect(
+      service.updateBooking(driver, bookingId, 'confirmed'),
+    ).rejects.toThrow('hora de salida ya pasó');
+  });
   beforeEach(async () => {
     driver = actor(randomUUID());
     passenger = actor(randomUUID());
@@ -162,7 +259,7 @@ describe('pilot SQL integration (isolated embedded PostgreSQL)', () => {
       [vehicleId, driverId],
     );
     await db.query(
-      'insert into public.rides(ride_id,driver_id,vehicle_id) values($1,$2,$3)',
+      "insert into public.rides(ride_id,driver_id,vehicle_id,departure_time) values($1,$2,$3,now()+interval '1 hour')",
       [rideId, driverId, vehicleId],
     );
     for (let i = 0; i < 2; i++)
@@ -250,6 +347,68 @@ describe('pilot SQL integration (isolated embedded PostgreSQL)', () => {
     );
     expect(preview).not.toHaveBeenCalled();
   });
+  it('publishes one shared reroute, rejects stale revisions and retains it after boarding', async () => {
+    await service.lifecycle(driver, rideId, 'start');
+    const session = await service.openSession(driver, rideId, randomUUID());
+    await service.upload(rideId, session.sessionId, session.uploadToken, [
+      {
+        seq: 1,
+        lat: 25.67,
+        lng: -100.3,
+        accuracy: 10,
+        capturedAt: new Date().toISOString(),
+      },
+    ]);
+    const operations = new PilotOperations(db, service, maps);
+    const before = await service.snapshot(driver, rideId);
+    const preview = jest.spyOn(maps, 'routePreview').mockResolvedValue({
+      encodedPolyline: 'shared-updated-route',
+      durationSeconds: 160,
+      distanceMeters: 1600,
+      provider: 'google',
+      calculatedAt: new Date().toISOString(),
+      bounds: {
+        northeast: { lat: 25.68, lng: -100.3 },
+        southwest: { lat: 25.67, lng: -100.31 },
+      },
+    });
+    await operations.reroute(driver, rideId, before.route.version);
+    expect(preview).toHaveBeenLastCalledWith(
+      expect.objectContaining({ lat: 25.67 }),
+      expect.any(Object),
+      undefined,
+      expect.any(Array),
+    );
+    expect(
+      preview.mock.calls
+        .at(-1)?.[3]
+        ?.map((p) => [Number(p.lat.toFixed(5)), Number(p.lng.toFixed(5))]),
+    ).toEqual([
+      [25.67, -100.3],
+      [25.68, -100.31],
+    ]);
+    expect((await service.snapshot(passenger, rideId)).route.polyline).toBe(
+      'shared-updated-route',
+    );
+    await expect(
+      operations.reroute(driver, rideId, before.route.version),
+    ).rejects.toThrow(ConflictException);
+    const current = await service.snapshot(driver, rideId);
+    await expect(
+      operations.reroute(passenger, rideId, current.route.version),
+    ).rejects.toThrow(ForbiddenException);
+    await service.attend(driver, rideId, bookingId, 'board');
+    expect((await service.snapshot(passenger, rideId)).route.polyline).toBe(
+      'shared-updated-route',
+    );
+    await service.lifecycle(driver, rideId, 'cancel');
+    expect(
+      await db.query(
+        'select * from krow_pilot.operational_routes where ride_id=$1',
+        [rideId],
+      ),
+    ).toHaveLength(0);
+  });
   it('completes the entire ride without auto-boarding or requiring cash', async () => {
     await service.lifecycle(driver, rideId, 'start');
     expect(
@@ -286,6 +445,29 @@ describe('pilot SQL integration (isolated embedded PostgreSQL)', () => {
         ])
       )[0].rating,
     ).toBe('5.00');
+  });
+  it('scopes driver metrics and distinguishes committed fares from collected cash', async () => {
+    await db.query(
+      "update public.rides set departure_time=now()-interval '1 minute' where ride_id=$1",
+      [rideId],
+    );
+    await service.lifecycle(driver, rideId, 'start');
+    await service.attend(driver, rideId, bookingId, 'board');
+    await service.attend(driver, rideId, bookingId, 'dropoff');
+    await service.collect(driver, bookingId);
+    await service.lifecycle(driver, rideId, 'complete');
+    const users = new UsersService({} as SupabaseService, db);
+    expect(await users.driverMetrics(driver)).toMatchObject({
+      completed: 1,
+      transportedPassengers: 1,
+      committedCents: 1234,
+      collectedCents: 1234,
+      pendingCents: 0,
+    });
+    expect(await users.driverMetrics(outsider)).toMatchObject({
+      completed: 0,
+      collectedCents: 0,
+    });
   });
   it('uses only the latest reservation after cancellation and rebooking', async () => {
     await service.updateBooking(passenger, bookingId, 'cancelled');
@@ -373,6 +555,17 @@ describe('pilot SQL integration (isolated embedded PostgreSQL)', () => {
       expect(await users.me(fresh)).toMatchObject({
         fullName: 'Nombre actualizado',
         academicPeriod: 4,
+      });
+      fresh.userMetadata.institutional_id = 'OLD-METADATA';
+      await users.upsertProfile(fresh, {
+        fullName: 'Nombre actualizado',
+        institutionalId: '',
+        academicProgram: '',
+        academicPeriod: null,
+      });
+      expect(await users.me(fresh)).toMatchObject({
+        institutionalId: null,
+        academicPeriod: null,
       });
       await service.requestClosure(fresh);
       await expect(
@@ -776,7 +969,7 @@ describe('pilot SQL integration (isolated embedded PostgreSQL)', () => {
     )[0].token_encrypted;
     await db.query('delete from krow_pilot.outbox');
     await db.query(
-      "insert into krow_pilot.outbox(event_key,ride_id,booking_id,recipient_id,kind) values('rotation-check',$1,$2,$3,'booking')",
+      "insert into krow_pilot.outbox(event_key,ride_id,booking_id,recipient_id,kind) values($2::uuid::text||':confirmed',$1,$2::uuid,$3,'booking')",
       [rideId, bookingId, driver.id],
     );
     await notifications.dispatch();
@@ -800,6 +993,123 @@ describe('pilot SQL integration (isolated embedded PostgreSQL)', () => {
         'token-from-a-closed-account',
       ),
     ).rejects.toThrow(ForbiddenException);
+  });
+  it('expires superseded request pushes and addresses the current response to its exact booking', async () => {
+    await db.query('delete from krow_pilot.outbox');
+    await db.query(
+      "update public.bookings set status='pending' where booking_id=$1",
+      [bookingId],
+    );
+    await db.query(
+      "update public.bookings set status='confirmed' where booking_id=$1",
+      [bookingId],
+    );
+    const push = jest.fn(() => Promise.resolve('provider-message-id'));
+    const notifications = new PilotNotifications(
+      db,
+      new ConfigService({
+        PILOT_PUSH_ENABLED: 'true',
+        PILOT_PUSH_ENCRYPTION_KEY: Buffer.alloc(32, 2).toString('base64'),
+      }),
+      { push } as unknown as NotificationProviders,
+    );
+    await notifications.register(
+      driver.id,
+      randomUUID(),
+      'synthetic-driver-token',
+    );
+    await notifications.dispatch();
+    expect(push).toHaveBeenCalledTimes(1);
+    expect(push.mock.calls[0]).toEqual([
+      'android',
+      'synthetic-driver-token',
+      expect.objectContaining({ bookingId, rideId, recipientId: driver.id }),
+    ]);
+    const old = await db.query<{ status: string }>(
+      'select status from krow_pilot.outbox where event_key=$1',
+      [bookingId + ':pending'],
+    );
+    expect(old).toHaveLength(2);
+    expect(old.every((row) => row.status === 'expired')).toBe(true);
+  });
+  it('shares a minimal invitation, preserves participant access and rejects unavailable trips', async () => {
+    const invitation = await service.invitation(outsider, rideId);
+    expect(invitation).toMatchObject({
+      rideId,
+      owned: false,
+      bookingId: null,
+      canRequest: true,
+    });
+    expect(invitation.stops).toHaveLength(2);
+    expect(invitation).not.toHaveProperty('bookings');
+    expect(invitation).not.toHaveProperty('license_plate');
+    expect(await service.invitation(passenger, rideId)).toMatchObject({
+      bookingId,
+      canRequest: false,
+    });
+    expect(await service.invitation(driver, rideId)).toMatchObject({
+      owned: true,
+      canRequest: false,
+    });
+    await db.query(
+      "update public.bookings set status='cancelled' where booking_id=$1",
+      [bookingId],
+    );
+    expect(await service.invitation(passenger, rideId)).toMatchObject({
+      bookingId: null,
+      canRequest: true,
+    });
+    await db.query(
+      "update public.rides set status='cancelled' where ride_id=$1",
+      [rideId],
+    );
+    await expect(service.invitation(outsider, rideId)).rejects.toThrow(
+      'ya no está disponible',
+    );
+    expect(await service.invitation(driver, rideId)).toMatchObject({
+      owned: true,
+    });
+  });
+  it('queues one reminder per participant and departure, excluding pending and cancelled bookings', async () => {
+    await db.query(
+      "update public.rides set departure_time=now()+interval '20 minutes' where ride_id=$1",
+      [rideId],
+    );
+    const created = await enqueueRideReminders(db);
+    expect(created).toHaveLength(2);
+    expect(await enqueueRideReminders(db)).toHaveLength(0);
+    const intents = await db.query<{
+      ride_id: string;
+      booking_id: string | null;
+      recipient_id: string;
+      event_key: string;
+    }>("select * from krow_pilot.outbox where ride_id=$1 and kind='reminder'", [
+      rideId,
+    ]);
+    expect(intents.map((i) => i.recipient_id).sort()).toEqual(
+      [driver.id, passenger.id].sort(),
+    );
+    for (const intent of intents)
+      expect(await reminderIsCurrent(db, intent)).toBe(true);
+    await db.query(
+      "update public.bookings set status='cancelled' where booking_id=$1",
+      [bookingId],
+    );
+    expect(
+      await reminderIsCurrent(db, intents.find((i) => i.booking_id)!),
+    ).toBe(false);
+    await db.query(
+      "update public.rides set departure_time=departure_time+interval '1 minute' where ride_id=$1",
+      [rideId],
+    );
+    for (const intent of intents)
+      expect(await reminderIsCurrent(db, intent)).toBe(false);
+    expect(await enqueueRideReminders(db)).toHaveLength(1);
+    await db.query(
+      "update public.rides set status='cancelled' where ride_id=$1",
+      [rideId],
+    );
+    expect(await enqueueRideReminders(db)).toHaveLength(0);
   });
   it('blocks account closure during a trip and queues data processing separately', async () => {
     await expect(service.requestClosure(passenger)).rejects.toThrow(

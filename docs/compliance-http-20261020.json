@@ -1,0 +1,36 @@
+{
+  "checkedAt": "2026-10-20T19:22:07.448Z",
+  "origin": "https://krow-api-production.up.railway.app/v1",
+  "scope": "Existing API availability after DB migrations; new requestId contract still pending deployment",
+  "checks": [
+    {
+      "path": "/health",
+      "method": "GET",
+      "expected": 200,
+      "status": 200,
+      "passed": true
+    },
+    {
+      "path": "/health/ready",
+      "method": "GET",
+      "expected": 200,
+      "status": 200,
+      "passed": true
+    },
+    {
+      "path": "/me",
+      "method": "GET",
+      "expected": 401,
+      "status": 401,
+      "passed": true
+    },
+    {
+      "path": "/rides",
+      "method": "POST",
+      "expected": 401,
+      "status": 401,
+      "passed": true
+    }
+  ],
+  "passed": true
+}

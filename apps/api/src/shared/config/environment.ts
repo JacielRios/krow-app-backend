@@ -37,6 +37,7 @@ export function validateEnvironment(
   for (const flag of [
     'RIDE_PILOT_ENABLED',
     'RIDE_TRACKING_ENABLED',
+    'RIDE_DOCUMENT_CHECKS_REQUIRED',
     'PILOT_PUSH_ENABLED',
     'PILOT_ACCOUNT_CLOSURE_ENABLED',
   ]) {

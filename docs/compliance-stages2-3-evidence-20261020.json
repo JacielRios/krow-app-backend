@@ -1,0 +1,123 @@
+{
+  "checkedAt": "2026-10-20T20:00:58.840Z",
+  "scope": "Android; existing approved HTTPS domain",
+  "source": {
+    "backendHead": "6b28829f224f7a70b28a2da329e5f765ad206eac",
+    "mobileHead": "6eb13012d1a52476207cb586a64b0715c756b375",
+    "dirtyWorkingTrees": true,
+    "committed": false
+  },
+  "mobile": {
+    "checkedAt": "2026-10-20T19:55:33.6689346Z",
+    "apk": "artifacts/android/krow-0.5.2-trial.apk",
+    "sha256": "0F69224036D72C217288AFAACA5AB2E042D4BC7210B91E15CBF4D803D412D588",
+    "bytes": 137027094,
+    "package": "com.krownmobileapp",
+    "versionCode": 9,
+    "versionName": "0.5.2-trial",
+    "minimumAndroidApi": 24,
+    "signing": "Debug certificate for private testing",
+    "signingSha1": "5E:8F:16:06:2E:A3:CD:2C:4A:0D:54:78:76:BA:A6:F3:8C:AB:F6:25",
+    "signatureVerified": true,
+    "debuggable": false,
+    "cleartextTraffic": false,
+    "bundledHermes": true,
+    "bundleBytes": 3909432,
+    "architectures": [
+      "arm64-v8a",
+      "armeabi-v7a"
+    ],
+    "physicalInstallationVerified": false,
+    "physicalGpsVerified": false,
+    "linkOrigin": "https://krow-web-gamma.vercel.app",
+    "nativeManifestLinksVerified": true,
+    "pushConfigured": false,
+    "installationGate": "API deployment pending; Supabase Auth redirect allowlist still requires confirmation",
+    "tests": {
+      "passed": 237,
+      "suites": 38
+    },
+    "typecheck": true,
+    "lint": true,
+    "installed": false
+  },
+  "web": {
+    "origin": "https://krow-web-gamma.vercel.app",
+    "deploymentId": "dpl_2ZpcGXJnHMaf9VkccHFDPuAvqGyM",
+    "state": "READY",
+    "promoted": true,
+    "tests": {
+      "passed": 55,
+      "files": 12
+    },
+    "typecheck": true,
+    "build": true,
+    "publicChecks": [
+      {
+        "path": "/.well-known/assetlinks.json",
+        "status": 200,
+        "expected": 200,
+        "passed": true
+      },
+      {
+        "path": "/auth/callback",
+        "status": 200,
+        "expected": 200,
+        "passed": true
+      },
+      {
+        "path": "/rides/11111111-1111-4111-8111-111111111111",
+        "status": 200,
+        "expected": 200,
+        "passed": true
+      },
+      {
+        "path": "/rides/invalid",
+        "status": 404,
+        "expected": 404,
+        "passed": true
+      },
+      {
+        "path": "/admin/login",
+        "status": 200,
+        "expected": 200,
+        "passed": true
+      }
+    ]
+  },
+  "firebase": {
+    "projectCreated": false,
+    "credentialsConfigured": false,
+    "pushEnabled": false,
+    "guide": "mobile:docs/firebase-android-setup.md",
+    "syntheticConfigChecks": 4
+  },
+  "offline": {
+    "mode": "read-only network-first fallback",
+    "protectedNativeStore": true,
+    "ttlHours": 24,
+    "firstPageLimit": 30,
+    "mutationsQueued": false,
+    "physicalAcceptance": false
+  },
+  "auth": {
+    "redirect": "https://krow-web-gamma.vercel.app/auth/callback",
+    "allowlistVerified": false,
+    "reason": "Dashboard requires sign-in and connector does not expose Auth config",
+    "emailsSent": false
+  },
+  "railway": {
+    "newApiDeployment": false,
+    "globalBuildPause": true,
+    "statusReference": "https://status.railway.com/",
+    "newDeploymentAttemptsThisStage": 0,
+    "billingChanged": false
+  },
+  "remaining": [
+    "Firebase project/configuration and real FCM delivery",
+    "Supabase Auth redirect verification and real access-link acceptance",
+    "API deployment and new HTTP contract acceptance",
+    "Physical App Links, airplane mode and two-device GPS acceptance",
+    "Recurring trips and invitation requirements"
+  ]
+}

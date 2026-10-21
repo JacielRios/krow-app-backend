@@ -1,0 +1,125 @@
+{
+  "date": "2026-10-16",
+  "authorization": "User explicitly authorized updating the existing pilot",
+  "source": {
+    "baseCommit": "6b28829f224f7a70b28a2da329e5f765ad206eac",
+    "dirtyWorkingTree": true,
+    "committed": false,
+    "localToolchainSecurityPatchAfterBuild": "handlebars 4.7.10 (development only; absent from production dependencies)"
+  },
+  "api": {
+    "origin": "https://krow-api-production.up.railway.app/v1",
+    "provider": "Railway",
+    "deploymentId": "d2f5d2f9-742d-4b7f-8be4-ec12aa4fa21d",
+    "state": "SUCCESS"
+  },
+  "web": {
+    "origin": "https://krow-web-gamma.vercel.app",
+    "provider": "Vercel",
+    "deploymentId": "dpl_Dq9jUTWk3XdAhubsWzrkLh4JG6Hs",
+    "deploymentUrl": "https://krow-ecoj5qtcx-jacielrios-projects.vercel.app",
+    "state": "READY",
+    "promoted": true,
+    "nextVersion": "16.3.8",
+    "anonymousBrowser": "Protected access, sign-in required"
+  },
+  "database": {
+    "projectId": "yyjbqzsokxpzhevpanyq",
+    "migrations": [
+      {
+        "version": "20261016175150",
+        "name": "launch_profile_security"
+      },
+      {
+        "version": "20261016175213",
+        "name": "admin_corridor_stops"
+      },
+      {
+        "version": "20261016175233",
+        "name": "pilot_operations"
+      },
+      {
+        "version": "20261016175249",
+        "name": "launch_query_indexes"
+      },
+      {
+        "version": "20261016175940",
+        "name": "harden_admin_stop_actor"
+      }
+    ],
+    "recoveredMigrationsVerified": 43,
+    "beforeAndAfterCounts": {
+      "rides": 52,
+      "bookings": 36,
+      "users": 12,
+      "transportStops": 21
+    },
+    "academicMetadataMismatchAfter": 0,
+    "pendingExpiredPushAfter": 0,
+    "authenticatedCanInsertPayments": false,
+    "administrativeCatalogRoundtrip": "Passed against PostgreSQL with role authenticated, transaction rolled back"
+  },
+  "tests": {
+    "apiPassed": 178,
+    "apiSkipped": 0,
+    "apiGeneralPassed": 165,
+    "apiRealPostgresPassed": 13,
+    "postgresVersion": "17.11",
+    "webPassed": 41,
+    "mobilePassed": 172,
+    "httpContractsPassed": 6,
+    "stopsImporterPassed": 6,
+    "nativeAndroidBuild": "passed"
+  },
+  "supabaseAdvisors": [
+    {
+      "type": "security",
+      "lints": [
+        {
+          "name": "authenticated_security_definer_function_executable",
+          "count": 12,
+          "level": "WARN",
+          "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable"
+        },
+        {
+          "name": "auth_leaked_password_protection",
+          "count": 1,
+          "level": "WARN",
+          "remediation": "https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection"
+        }
+      ]
+    },
+    {
+      "type": "performance",
+      "lints": [
+        {
+          "name": "auth_rls_initplan",
+          "count": 19,
+          "level": "WARN",
+          "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0003_auth_rls_initplan"
+        },
+        {
+          "name": "unused_index",
+          "count": 32,
+          "level": "INFO",
+          "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0005_unused_index"
+        },
+        {
+          "name": "multiple_permissive_policies",
+          "count": 4,
+          "level": "WARN",
+          "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0006_multiple_permissive_policies"
+        }
+      ]
+    }
+  ],
+  "publicLaunchReady": false,
+  "externalInputsMissing": [
+    "Domain and app redirects",
+    "Approved support/privacy/terms URLs",
+    "Firebase project/configuration",
+    "Production signing and physical Android/iOS acceptance"
+  ],
+  "digitalPaymentsImplemented": false,
+  "paidServicesPurchased": false
+}

@@ -12,8 +12,8 @@ grant update(status,version,updated_at,available_seats) on public.rides to krow_
 grant update(status) on public.bookings to krow_pilot_service;
 grant update(rating) on public.users,public.driver_profiles to krow_pilot_service;
 grant update(is_active) on public.users to krow_pilot_service;
-grant insert(uuid,email_address,full_name,institutional_id,academic_program,academic_period),
-  update(email_address,full_name,institutional_id,academic_program,academic_period)
+grant insert(uuid,email_address,full_name,institutional_id,academic_program,academic_period,profile_photo),
+  update(email_address,full_name,institutional_id,academic_program,academic_period,profile_photo)
   on public.users to krow_pilot_service;
 drop policy if exists krow_pilot_user_insert on public.users;
 create policy krow_pilot_user_insert on public.users for insert to krow_pilot_service with check(true);

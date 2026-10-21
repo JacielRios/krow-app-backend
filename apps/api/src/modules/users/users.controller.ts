@@ -16,6 +16,10 @@ export class UsersController {
   me(@CurrentUser() user: AuthenticatedUser) {
     return this.users.me(user);
   }
+  @Get('driver-metrics')
+  driverMetrics(@CurrentUser() user: AuthenticatedUser) {
+    return this.users.driverMetrics(user);
+  }
   @Put('profile')
   upsertProfile(
     @CurrentUser() user: AuthenticatedUser,

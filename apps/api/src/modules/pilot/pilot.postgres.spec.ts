@@ -39,7 +39,7 @@ integration('pilot real PostgreSQL concurrency and private login', () => {
     await owner.query(
       fixture.replace(
         'create role anon; create role authenticated;',
-        `do $$ begin
+        () => `do $$ begin
       begin create role anon; exception when duplicate_object then null; end;
       begin create role authenticated; exception when duplicate_object then null; end;
     end $$;`,
@@ -81,6 +81,16 @@ integration('pilot real PostgreSQL concurrency and private login', () => {
     await owner.query(
       await readFile(
         new URL('../../../test/pilot-legacy-triggers.sql', import.meta.url),
+        'utf8',
+      ),
+    );
+    await owner.query('create schema if not exists private');
+    await owner.query(
+      await readFile(
+        new URL(
+          '../../../../../supabase/migrations/20261020191646_booking_departure_deadline.sql',
+          import.meta.url,
+        ),
         'utf8',
       ),
     );
@@ -142,7 +152,7 @@ integration('pilot real PostgreSQL concurrency and private login', () => {
       [vehicleId, driverId],
     );
     await owner.query(
-      'insert into public.rides(ride_id,driver_id,vehicle_id,available_seats) values($1,$2,$3,1)',
+      "insert into public.rides(ride_id,driver_id,vehicle_id,available_seats,departure_time) values($1,$2,$3,1,now()+interval '1 hour')",
       [rideId, driverId, vehicleId],
     );
     for (let index = 0; index < stops.length; index++) {
@@ -217,6 +227,23 @@ integration('pilot real PostgreSQL concurrency and private login', () => {
       'select rolsuper,rolbypassrls from pg_roles where rolname=current_user',
     );
     expect(role).toEqual({ rolsuper: false, rolbypassrls: false });
+  });
+  it('rejects expired departure through the private API role without creating a reservation', async () => {
+    const { passengers, rideId, payload } = await seed();
+    await owner.query(
+      "update public.rides set departure_time=now()-interval '1 second' where ride_id=$1",
+      [rideId],
+    );
+    await expect(
+      db.routeRpc(passengers[0].id, 'request_booking_v2', [payload]),
+    ).rejects.toMatchObject({ status: 409 });
+    expect(
+      (
+        await owner.query('select * from public.bookings where ride_id=$1', [
+          rideId,
+        ])
+      ).rows,
+    ).toHaveLength(0);
   });
   it('serializes starts on different trips belonging to the same driver', async () => {
     const { driver, rideId } = await seed();

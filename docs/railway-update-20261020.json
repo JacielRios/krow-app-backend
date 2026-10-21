@@ -1,0 +1,81 @@
+{
+  "checkedAt": "2026-10-20 21:08:47 UTC",
+  "authorization": "User requested checking Railway availability and uploading the prepared API update if possible",
+  "provider": "Railway",
+  "projectId": "6662debb-cb31-44bc-a057-dcdf64927d71",
+  "environmentId": "0d12e292-e100-41d3-8fc3-ba8350c1cc55",
+  "serviceId": "3092ac58-1684-4dbc-bdef-776c6dfb5980",
+  "deployment": {
+    "id": "5d625538-76ab-4961-890d-493a72978442",
+    "previousId": "d2f5d2f9-742d-4b7f-8be4-ec12aa4fa21d",
+    "status": "SUCCESS",
+    "successAt": "2026-10-20T21:05:46.000Z",
+    "imageDigest": "sha256:598e72006f88165d5b61f0537b3c8a5b86eb6702df270af25af80535d3b17881",
+    "origin": "https://krow-api-production.up.railway.app/v1",
+    "replicas": 1,
+    "method": "CLI local-source upload; explicit project/service/environment IDs"
+  },
+  "source": {
+    "head": "6b28829f224f7a70b28a2da329e5f765ad206eac",
+    "dirtyWorkingTree": true,
+    "committed": false,
+    "uploadCandidateCheck": {
+      "files": 323,
+      "bytes": 1926641,
+      "sensitiveCandidates": 0,
+      "compressedUploadMeasured": false
+    },
+    "hashes": {
+      "dockerfileApi": "69BA3C83BDDA727BCF716493C12E32CB50937A13F4164007DD475E65CD3DCF9A",
+      "packageLock": "DE06ADA68E3F9B8084C019D6E520806B926BACA21F0281C4C6FDD91A9E5C7BDC",
+      "rideDto": "5FDC28DA512B0BD2EA89096FF1CDFCC15B00D0DCE41ECB317E5FBC07C18C2848",
+      "ridesService": "395B2C40B9438C3B346411398020D300040A7F44A04EAF3A4B6B55F2CA134ACF"
+    }
+  },
+  "preflight": {
+    "activeRides": 0,
+    "localApiBuild": true,
+    "localApiTypecheck": true
+  },
+  "acceptance": {
+    "httpChecks": 11,
+    "httpPassed": true,
+    "httpEvidence": "railway-update-http-20261020.json",
+    "websocketTransportPassed": true,
+    "websocketEvidence": "railway-update-websocket-20261020.json",
+    "authenticatedTrackingVerified": false,
+    "newRequestIdContractVerified": true,
+    "positivePublicationReplayOverHttpVerified": false
+  },
+  "database": {
+    "migrationsAppliedThisStage": false,
+    "before": {
+      "rides": 55,
+      "bookings": 37,
+      "publicationReceipts": 0
+    },
+    "after": {
+      "rides": 55,
+      "bookings": 37,
+      "publicationReceipts": 0
+    }
+  },
+  "changes": {
+    "paidPlanActivated": false,
+    "billingChanged": false,
+    "newServicesCreated": false,
+    "pushEnabled": false,
+    "notificationsSent": 0,
+    "createdTrips": 0,
+    "createdBookings": 0
+  },
+  "mobile": {
+    "apk": "0.5.3-trial",
+    "apiCompatibilityBlockCleared": true,
+    "rebuildRequiredForThisDeploy": false,
+    "installed": false,
+    "physicalAcceptancePending": true,
+    "supabaseAuthRedirectVerified": false,
+    "pushEnabled": false
+  }
+}

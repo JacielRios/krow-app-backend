@@ -1,0 +1,67 @@
+{
+  "checkedAt": "2026-10-20T19:20:26.929Z",
+  "scope": "publication receipts; deadline verified separately because no eligible expired trip exists",
+  "mode": "live Supabase SQL using limited API login and mandatory rollback",
+  "cachedGoogleGeometry": true,
+  "providerCalledNow": false,
+  "physicalGpsVerified": false,
+  "realDataCommitted": false,
+  "rolledBack": true,
+  "before": {
+    "rides": 55,
+    "bookings": 37,
+    "ride_stops": 134,
+    "prices": 37,
+    "outbox": 37
+  },
+  "after": {
+    "rides": 55,
+    "bookings": 37,
+    "ride_stops": 134,
+    "prices": 37,
+    "outbox": 37
+  },
+  "checks": [
+    {
+      "name": "limited_api_login",
+      "passed": true
+    },
+    {
+      "name": "existing_eligible_driver",
+      "passed": true
+    },
+    {
+      "name": "existing_eligible_passenger",
+      "passed": true
+    },
+    {
+      "name": "published_in_transaction",
+      "passed": true
+    },
+    {
+      "name": "replay_returns_original_before_geometry_validation",
+      "passed": true
+    },
+    {
+      "name": "own_receipt_recovered",
+      "passed": true
+    },
+    {
+      "name": "changed_intent_rejected",
+      "passed": true
+    },
+    {
+      "name": "private_receipts_deny_direct_api_read",
+      "passed": true
+    },
+    {
+      "name": "other_actor_cannot_recover_receipt",
+      "passed": true
+    },
+    {
+      "name": "rollback_preserves_data_counts",
+      "passed": true
+    }
+  ],
+  "passed": true
+}

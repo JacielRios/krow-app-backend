@@ -1,0 +1,27 @@
+{
+  "checkedAt": "2026-10-20T19:48:28.084Z",
+  "deploymentId": "dpl_2ZpcGXJnHMaf9VkccHFDPuAvqGyM",
+  "checks": [
+    {
+      "name": "association_matches_trial_certificate",
+      "passed": true
+    },
+    {
+      "name": "auth_fallback",
+      "passed": true
+    },
+    {
+      "name": "trip_fallback",
+      "passed": true
+    },
+    {
+      "name": "auth_no_store",
+      "passed": true
+    },
+    {
+      "name": "no_referrer",
+      "passed": true
+    }
+  ],
+  "passed": true
+}

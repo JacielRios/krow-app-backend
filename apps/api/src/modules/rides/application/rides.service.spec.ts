@@ -178,6 +178,62 @@ describe('RidesService commands', () => {
     expect(updateArgs.p_payload.origin_lat).toBe(rideDto.origin.lat);
   });
 
+  it('recovers a committed publication before calling the maps provider or catalog', async () => {
+    const { service, rpc, compute } = createService();
+    rpc.mockResolvedValueOnce({ data: 'committed-ride', error: null });
+    const dto = {
+      ...rideDto,
+      requestId: '88888888-8888-4888-8888-888888888888',
+    };
+    await expect(service.create(user, dto)).resolves.toEqual({
+      rideId: 'committed-ride',
+    });
+    expect(compute).not.toHaveBeenCalled();
+    expect(rpc).toHaveBeenCalledTimes(1);
+    expect(rpc).toHaveBeenCalledWith('get_ride_publication', {
+      p_request_id: dto.requestId,
+      p_request: expect.objectContaining({
+        vehicleId: dto.vehicleId,
+        destination: dto.destination,
+        pricePerSeatCents: dto.pricePerSeatCents,
+      }) as unknown,
+    });
+  });
+
+  it('commits a new request ID with its logical intent and server-computed route', async () => {
+    const { service, rpc } = createService();
+    rpc.mockResolvedValueOnce({ data: null, error: null });
+    rpc.mockResolvedValueOnce({ data: 'new-ride', error: null });
+    const requestId = '88888888-8888-4888-8888-888888888888';
+    await expect(
+      service.create(user, { ...rideDto, requestId }),
+    ).resolves.toEqual({ rideId: 'new-ride' });
+    expect(rpc).toHaveBeenLastCalledWith('create_ride_v2', {
+      p_payload: expect.objectContaining({
+        publication_request_id: requestId,
+        publication_request: expect.objectContaining({
+          availableSeats: 2,
+        }) as unknown,
+        route_polyline: 'polyline-from-google',
+      }) as unknown,
+    });
+  });
+
+  it('rejects request ID reuse with other details before computing another route', async () => {
+    const { service, rpc, compute } = createService();
+    rpc.mockResolvedValueOnce({
+      data: null,
+      error: { message: 'Conflicto de publicación: otros datos' },
+    });
+    await expect(
+      service.create(user, {
+        ...rideDto,
+        requestId: '88888888-8888-4888-8888-888888888888',
+      }),
+    ).rejects.toBeInstanceOf(ConflictException);
+    expect(compute).not.toHaveBeenCalled();
+  });
+
   it('keeps campus pickups fixed and allows an explicit intermediate pickup scope', async () => {
     const { service, rpc } = createService();
     const dto = {

@@ -127,6 +127,29 @@ export class RidesService {
   ) {}
 
   async create(user: AuthenticatedUser, dto: CreateRideDto) {
+    const publicationRequest = dto.requestId
+      ? this.publicationRequest(dto)
+      : undefined;
+    if (dto.requestId && publicationRequest) {
+      // Recover a committed response before consulting Maps or today's catalog.
+      // The creation RPC repeats this check under lock to cover concurrent retries.
+      let existing: string | number | null;
+      if (this.pilot?.db.enabled) {
+        existing = await this.pilot.db.routeRpc(
+          user.id,
+          'get_ride_publication',
+          [dto.requestId, publicationRequest],
+        );
+      } else {
+        const { data, error } = await this.client(user).rpc(
+          'get_ride_publication',
+          { p_request_id: dto.requestId, p_request: publicationRequest },
+        );
+        if (error) this.throwRpcError(error.message);
+        existing = data;
+      }
+      if (existing) return { rideId: existing };
+    }
     const selectedStops = await this.routes.publicationStops(
       user,
       dto.corridorId,
@@ -144,14 +167,23 @@ export class RidesService {
       corridorId: dto.corridorId,
       transportStopIds: dto.transportStopIds,
     });
+    const payload = {
+      ...this.ridePayload(campusRide, computed, selectedStops),
+      ...(dto.requestId && publicationRequest
+        ? {
+            publication_request_id: dto.requestId,
+            publication_request: publicationRequest,
+          }
+        : {}),
+    };
     if (this.pilot?.db.enabled)
       return {
         rideId: await this.pilot.db.routeRpc(user.id, 'create_ride_v2', [
-          this.ridePayload(campusRide, computed, selectedStops),
+          payload,
         ]),
       };
     const { data, error } = await this.client(user).rpc('create_ride_v2', {
-      p_payload: this.ridePayload(campusRide, computed, selectedStops),
+      p_payload: payload,
     });
     if (error) this.throwRpcError(error.message);
     return { rideId: data };
@@ -445,6 +477,22 @@ export class RidesService {
     });
     if (error) throw new BadRequestException(error.message);
     return { success: true };
+  }
+
+  private publicationRequest(dto: CreateRideDto) {
+    // Only user intent participates in equality. Provider timestamps, generated
+    // geometry and the client's ignored origin/polyline can vary across retries.
+    return {
+      vehicleId: dto.vehicleId,
+      corridorId: dto.corridorId,
+      favoriteRouteId: dto.favoriteRouteId ?? null,
+      destination: { lat: dto.destination.lat, lng: dto.destination.lng },
+      destinationAddress: dto.destinationAddress?.trim() || null,
+      departureTime: new Date(dto.departureTime).toISOString(),
+      availableSeats: dto.availableSeats,
+      pricePerSeatCents: dto.pricePerSeatCents,
+      transportStopIds: dto.transportStopIds ?? [],
+    };
   }
 
   private ridePayload(

@@ -2,6 +2,7 @@ import { Global, Module } from '@nestjs/common';
 import { MapsModule } from '../maps/maps.module.js';
 import { PilotDatabase } from './pilot.database.js';
 import { PilotService } from './pilot.service.js';
+import { PilotOperations } from './pilot.operations.js';
 import { PilotController, PilotUploadController } from './pilot.controller.js';
 import { PilotGateway } from './pilot.gateway.js';
 import { PilotNotifications } from './pilot.notifications.js';
@@ -13,6 +14,7 @@ import { NotificationProviders } from '../ride-runtime/infrastructure/notificati
   providers: [
     PilotDatabase,
     PilotService,
+    PilotOperations,
     PilotGateway,
     PilotNotifications,
     PilotRateLimitGuard,

@@ -1,0 +1,9 @@
+{
+  "checkedAt": "2026-10-20T21:38:07.562Z",
+  "projectId": "krowapp",
+  "mode": "FCM HTTP v1 validate_only",
+  "physicalDeliveryVerified": false,
+  "notificationsSent": 0,
+  "passed": true,
+  "httpStatus": 200
+}

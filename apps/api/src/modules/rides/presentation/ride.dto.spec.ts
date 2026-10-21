@@ -120,4 +120,19 @@ describe('required route coordinate HTTP validation', () => {
       ),
     ).rejects.toThrow(BadRequestException);
   });
+  it('accepts legacy publications and UUID v4 request IDs, but rejects malformed IDs', async () => {
+    const { payload } = cases[0];
+    await expect(
+      pipe.transform(
+        { ...payload, requestId: randomUUID() },
+        { type: 'body', metatype: CreateRideDto },
+      ),
+    ).resolves.toBeInstanceOf(CreateRideDto);
+    await expect(
+      pipe.transform(
+        { ...payload, requestId: 'not-a-request-id' },
+        { type: 'body', metatype: CreateRideDto },
+      ),
+    ).rejects.toThrow(BadRequestException);
+  });
 });

@@ -1,0 +1,44 @@
+{
+  "checkedAt": "2026-10-20T19:29:29.585Z",
+  "scope": "Existing published API date search compatibility; read-only business requests",
+  "createdTrips": false,
+  "createdBookings": false,
+  "physicalDeviceVerified": false,
+  "checks": [
+    {
+      "name": "both_bounds",
+      "status": 201,
+      "expected": 201,
+      "resultCount": 0,
+      "passed": true
+    },
+    {
+      "name": "lower_bound",
+      "status": 201,
+      "expected": 201,
+      "resultCount": 0,
+      "passed": true
+    },
+    {
+      "name": "upper_bound",
+      "status": 201,
+      "expected": 201,
+      "resultCount": 0,
+      "passed": true
+    },
+    {
+      "name": "no_bounds",
+      "status": 201,
+      "expected": 201,
+      "resultCount": 0,
+      "passed": true
+    },
+    {
+      "name": "reversed_bounds_rejected",
+      "status": 400,
+      "expected": 400,
+      "passed": true
+    }
+  ],
+  "passed": true
+}

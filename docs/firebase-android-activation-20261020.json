@@ -1,0 +1,103 @@
+{
+  "checkedAt": "2026-10-20 20:58:36 UTC",
+  "scope": "Android only",
+  "firebase": {
+    "projectId": "krowapp",
+    "projectNumber": "671728344534",
+    "appId": "1:671728344534:android:8b8c61c0ec6b88fe801877",
+    "package": "com.krownmobileapp",
+    "appRegistered": true,
+    "clientConfigDownloaded": true,
+    "clientConfig": "mobile:android/app/google-services.json",
+    "clientConfigIgnoredByGit": true,
+    "nativeConfigValidated": true,
+    "httpV1Enabled": {
+      "confirmedBy": "user",
+      "independentlyVerified": false
+    }
+  },
+  "server": {
+    "provider": "Railway",
+    "projectId": "6662debb-cb31-44bc-a057-dcdf64927d71",
+    "environmentId": "0d12e292-e100-41d3-8fc3-ba8350c1cc55",
+    "serviceId": "3092ac58-1684-4dbc-bdef-776c6dfb5980",
+    "configuredVariables": [
+      "FCM_PROJECT_ID",
+      "FCM_CLIENT_EMAIL",
+      "FCM_PRIVATE_KEY",
+      "PILOT_PUSH_ENCRYPTION_KEY"
+    ],
+    "allFourWerePreviouslyMissing": true,
+    "encryptionKeyBytes": 32,
+    "skipDeploys": true,
+    "pushEnabled": false,
+    "variablesPresentVerified": true,
+    "credentialOutsideRepositories": true,
+    "localRsaSignatureVerified": true,
+    "googleOAuthAccepted": true,
+    "oauthImplementation": "Existing compiled NotificationProviders.fcmToken",
+    "tokensPrinted": false,
+    "fcmSendPermissionVerified": false,
+    "notificationsSent": 0,
+    "activeDeploymentId": "d2f5d2f9-742d-4b7f-8be4-ec12aa4fa21d",
+    "activeDeploymentChanged": false,
+    "publicHealthHttpStatus": 200
+  },
+  "mobile": {
+    "checkedAt": "2026-10-20T20:55:56.9334785Z",
+    "apk": "artifacts\\android\\krow-0.5.3-trial.apk",
+    "sha256": "2DF4BAE4F0B4ACE510CECDD72E31D1449C91C43DC730BA23B87E8D0CDF3DAEEA",
+    "bytes": 137027226,
+    "package": "com.krownmobileapp",
+    "versionCode": 10,
+    "versionName": "0.5.3-trial",
+    "minimumAndroidApi": 24,
+    "signing": "Debug certificate for private testing",
+    "signingSha1": "5E:8F:16:06:2E:A3:CD:2C:4A:0D:54:78:76:BA:A6:F3:8C:AB:F6:25",
+    "signatureVerified": true,
+    "debuggable": false,
+    "cleartextTraffic": false,
+    "bundledHermes": true,
+    "bundleBytes": 3909432,
+    "architectures": [
+      "arm64-v8a",
+      "armeabi-v7a"
+    ],
+    "physicalInstallationVerified": false,
+    "physicalGpsVerified": false,
+    "firebase": {
+      "projectId": "krowapp",
+      "appId": "1:671728344534:android:8b8c61c0ec6b88fe801877",
+      "nativeResourcesVerified": true,
+      "clientConfigIgnoredByGit": true,
+      "pushEnabled": false,
+      "deliveryVerified": false
+    },
+    "linkOrigin": "https://krow-web-gamma.vercel.app",
+    "nativeManifestLinksVerified": true,
+    "installationGate": "Hold until compatible API deployment, Supabase Auth redirects and physical acceptance"
+  },
+  "checks": {
+    "syntheticConfigChecks": 4,
+    "passedOn": [
+      "PowerShell 7.6.5",
+      "Windows PowerShell"
+    ],
+    "initialNullRestorationFailureFixed": true,
+    "realClientConfigPassed": true,
+    "apkNativeFirebaseFieldsVerified": 4,
+    "adbDevices": 0,
+    "installed": false
+  },
+  "acceptance": {
+    "status": "Partially completed",
+    "pushEnabled": false,
+    "deliveryVerified": false,
+    "remaining": [
+      "Compatible API deployment",
+      "Confirm Supabase Auth redirect and Android App Links",
+      "Coordinated backend/mobile push activation",
+      "Physical registration, FCM delivery and opening in foreground/background/closed process"
+    ]
+  }
+}

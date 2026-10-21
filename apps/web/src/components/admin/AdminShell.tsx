@@ -10,6 +10,8 @@ const links = [
   ['Vehículos', '/admin/vehiculos'],
   ['Documentos', '/admin/documentos'],
   ['Viajes', '/admin/viajes'],
+  ['Paradas', '/admin/paradas'],
+  ['Operación', '/admin/operacion'],
   ['Auditoría', '/admin/auditoria'],
 ];
 export function AdminShell({ children }: { children: ReactNode }) {

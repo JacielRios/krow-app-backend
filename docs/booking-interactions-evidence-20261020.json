@@ -1,0 +1,74 @@
+{
+  "checkedAt": "2026-10-20T21:44:35Z",
+  "scope": "Booking requests, passenger responses, active-trip empty response, chat and Android delivery preparation",
+  "automated": {
+    "api": { "passed": 195, "suites": 28, "database": "isolated temporary PostgreSQL" },
+    "httpE2e": { "passed": 8, "suites": 2, "authAndMaps": "test doubles" },
+    "mobile": { "passed": 246, "suites": 39, "subsequentTargetedPassed": 9 },
+    "web": { "passed": 56, "files": 12 },
+    "apiTypesLintBuild": "passed",
+    "mobileTypesLint": "passed",
+    "androidBuild": "passed"
+  },
+  "api": {
+    "deploymentId": "0345808e-4574-4930-a27a-601df20ba262",
+    "deploymentStatus": "SUCCESS",
+    "origin": "https://krow-api-production.up.railway.app/v1",
+    "pushEnabled": true,
+    "httpChecksPassed": 15,
+    "activeTripEmptyStatus": 204,
+    "evidence": "booking-interactions-http-20261020.json"
+  },
+  "web": {
+    "deploymentId": "dpl_8bkobhFGaaqv2PiV9cf8P3jGbMgQ",
+    "deploymentStatus": "READY",
+    "origin": "https://krow-web-gamma.vercel.app",
+    "promoted": true,
+    "publicChecksPassed": 3,
+    "hydratedBrowserVerified": false,
+    "evidence": "booking-links-public-20261020.json"
+  },
+  "fcm": {
+    "projectId": "krowapp",
+    "mode": "validate_only",
+    "httpStatus": 200,
+    "notificationsSent": 0,
+    "physicalDeliveryVerified": false,
+    "evidence": "booking-fcm-validation-20261020.json"
+  },
+  "android": {
+    "apkPath": "C:/Users/Novasys/Documents/krow-app-mobile/artifacts/android/krow-0.6.0-trial.apk",
+    "versionName": "0.6.0-trial",
+    "versionCode": 11,
+    "sha256": "ADBA4B1F475B830B0CE1D551CD6480AA5C6A452F78C9071B46311CF8246ECB33",
+    "signatureVerified": true,
+    "nativeFirebaseResourcesVerified": true,
+    "pushEnabled": true,
+    "signingScope": "existing debug certificate for private testing",
+    "installed": false,
+    "evidencePath": "C:/Users/Novasys/Documents/krow-app-mobile/docs/android-apk-0.6.0-20261020.json"
+  },
+  "productionTestWrites": { "createdTrips": false, "createdBookings": false, "notificationsSent": 0 },
+  "physicalValidationPending": [
+    "Android token registration and granted or denied notification permission",
+    "FCM reception and opening with app in foreground, background and process closed",
+    "Opening the exact booking through Android App Links",
+    "Driver and passenger consistency with two participants",
+    "Airplane-mode recovery and real Keystore acknowledgement persistence",
+    "Chat keyboard, scroll, themes and accessibility on a device",
+    "GPS and maps during a real trip"
+  ],
+  "otherLimits": [
+    "iOS has not been built or physically tested",
+    "Supabase Auth redirect configuration remains unverified",
+    "Acknowledgements are local per account and API, not synchronized across devices",
+    "No guarantee of push delivery after user force-stop"
+  ],
+  "remainingGeneralPlan": [
+    "Recurring trips",
+    "Invitation model",
+    "Scheduled reminders",
+    "Physical performance and accessibility validation",
+    "Final academic acceptance evidence"
+  ]
+}

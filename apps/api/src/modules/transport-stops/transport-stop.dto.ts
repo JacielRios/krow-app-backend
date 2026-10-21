@@ -2,6 +2,8 @@ import {
   IsBoolean,
   IsIn,
   IsNumber,
+  IsInt,
+  IsUUID,
   IsOptional,
   IsString,
   Max,
@@ -20,4 +22,7 @@ export class SaveTransportStopDto {
   @IsIn(['general', 'official_boarding_zone'])
   stopType!: 'general' | 'official_boarding_zone';
   @IsBoolean() active!: boolean;
+  @IsOptional() @IsUUID() corridorId?: string | null;
+  @IsOptional() @IsInt() @Min(1) @Max(10000) stopOrder?: number | null;
+  @IsOptional() @IsString() @MaxLength(160) direction?: string | null;
 }

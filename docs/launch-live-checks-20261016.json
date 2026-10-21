@@ -1,0 +1,95 @@
+{
+  "checkedAt": "2026-10-16T17:57:09.500Z",
+  "api": "https://krow-api-production.up.railway.app/v1",
+  "transactionRolledBack": true,
+  "checks": [
+    {
+      "path": "/health",
+      "authenticated": false,
+      "status": 200,
+      "expected": 200,
+      "ok": true
+    },
+    {
+      "path": "/health/ready",
+      "authenticated": false,
+      "status": 200,
+      "expected": 200,
+      "ok": true
+    },
+    {
+      "path": "/me/driver-metrics",
+      "authenticated": false,
+      "status": 401,
+      "expected": 401,
+      "ok": true
+    },
+    {
+      "path": "/admin/operations",
+      "authenticated": false,
+      "status": 401,
+      "expected": 401,
+      "ok": true
+    },
+    {
+      "path": "/admin/transport-stops/corridors",
+      "authenticated": false,
+      "status": 401,
+      "expected": 401,
+      "ok": true
+    },
+    {
+      "path": "/me",
+      "authenticated": true,
+      "status": 200,
+      "expected": 200,
+      "ok": true
+    },
+    {
+      "path": "/me/driver-metrics",
+      "authenticated": true,
+      "status": 200,
+      "expected": 200,
+      "ok": true
+    },
+    {
+      "path": "/admin/operations",
+      "authenticated": true,
+      "status": 200,
+      "expected": 200,
+      "ok": true
+    },
+    {
+      "path": "/admin/operations/incidents",
+      "authenticated": true,
+      "status": 200,
+      "expected": 200,
+      "ok": true
+    },
+    {
+      "path": "/admin/operations/incidents?status=invalid",
+      "authenticated": true,
+      "status": 400,
+      "expected": 400,
+      "ok": true
+    },
+    {
+      "path": "/admin/transport-stops",
+      "authenticated": true,
+      "status": 200,
+      "expected": 200,
+      "ok": true
+    },
+    {
+      "path": "/admin/transport-stops/corridors",
+      "authenticated": true,
+      "status": 200,
+      "expected": 200,
+      "ok": true
+    },
+    {
+      "check": "Limited API can edit photo; clients cannot confirm payments or read private operations tables",
+      "ok": true
+    }
+  ]
+}

@@ -355,6 +355,10 @@ export type Database = {
       };
       create_ride: { Args: { p_payload: Json }; Returns: string };
       create_ride_v2: { Args: { p_payload: Json }; Returns: string };
+      get_ride_publication: {
+        Args: { p_request_id: string; p_request: Json };
+        Returns: string | null;
+      };
       update_ride_v2: {
         Args: {
           p_ride_id: string;

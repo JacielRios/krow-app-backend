@@ -59,16 +59,21 @@ export class NotificationProviders {
       kind: string;
       expiresAt: Date;
       recipientId?: string;
+      bookingId?: string;
     },
   ): Promise<string> {
     const title =
       notification.kind === 'safety'
         ? 'KROW · Atención de seguridad'
-        : 'KROW · Actualización de viaje';
+        : notification.kind === 'reminder'
+          ? 'KROW · Tu viaje sale pronto'
+          : 'KROW · Actualización de viaje';
     const body =
       notification.kind === 'proximity'
         ? 'Tu parada está cerca. Abre el viaje para ver la información actual.'
-        : 'Hay una actualización importante. Abre el viaje para consultarla.';
+        : notification.kind === 'reminder'
+          ? 'Revisa el horario y tu parada antes de salir.'
+          : 'Hay una actualización importante. Abre el viaje para consultarla.';
     const data = {
       intentId: notification.intentId,
       rideId: notification.rideId,
@@ -77,6 +82,7 @@ export class NotificationProviders {
       ...(notification.recipientId
         ? { recipientId: notification.recipientId }
         : {}),
+      ...(notification.bookingId ? { bookingId: notification.bookingId } : {}),
     };
     if (platform === 'android') {
       const project = this.config.getOrThrow<string>('FCM_PROJECT_ID');

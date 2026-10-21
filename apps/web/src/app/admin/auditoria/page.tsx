@@ -41,6 +41,8 @@ export default function AuditPage() {
               <option value="driver">Conductor</option>
               <option value="vehicle">Vehículo</option>
               <option value="document">Documento</option>
+              <option value="transport_stop">Parada</option>
+              <option value="incident">Incidencia</option>
             </select>
           </div>
           <div className="field">

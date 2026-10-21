@@ -33,6 +33,14 @@ La API está publicada en [Railway](https://krow-api-production.up.railway.app/v
 con piloto/GPS activados y conexión PostgreSQL limitada verificada. Consulta la
 [evidencia de activación](docs/railway-pilot-activation-20261006.json).
 
+La actualización de la API del 20 de octubre ya está desplegada: readiness, once comprobaciones HTTP y transporte WebSocket aprobaron. Consulta la [evidencia de publicación](docs/railway-update-20261020.md).
+
+La actualización posterior incorpora bandeja recuperable de solicitudes, respuestas al pasajero, corrección del caso sin viaje activo y enlaces de reserva. Firebase `krowapp` y push están habilitados para aceptación privada Android; FCM aprobó validación sin envío y aún falta recepción física. Consulta el [estado actual y las pruebas](docs/booking-interactions-20261020.md). La [preparación anterior de Firebase](docs/firebase-android-activation-20261020.md) conserva su evidencia histórica.
+
+La continuación Android **0.7.0** incorpora permiso de notificaciones al abrir, registro automático tras login, publicación recurrente con vista previa y recuperación, invitaciones compartidas con aprobación y recordatorios de salida. La API compatible ya está publicada; consulta [el alcance y la aceptación pendiente](docs/permissions-recurrence-20261020.md). Se conservan arquitectura, servicios y esquema de datos.
+
+La [matriz actual de las nueve actividades](docs/compliance-current-20261020.md) distingue implementación, pruebas automatizadas y aceptación física pendiente. Los informes de etapas anteriores conservan su estado histórico.
+
 ## Requisitos
 
 - Node.js 24 recomendado, o 22.22.2 o superior dentro de la rama 22.
@@ -114,11 +122,21 @@ alcance terminado, las pruebas y las verificaciones manuales pendientes.
 
 ## Base de datos
 
-Se recuperaron 21 migraciones de mayo, se reconciliaron cinco versiones de
-septiembre y se registraron once cambios de piloto, campus y administración.
-`npm run test:migrations` comprueba que esos 37 archivos conservan el SQL aplicado.
+El ledger actual registra 45 migraciones recuperadas de mayo a octubre.
+`npm run test:migrations` comprueba que esos archivos conservan el SQL aplicado.
 La auditoría y los ledgers están en `docs`; todavía faltan el esquema inicial
 anterior a mayo y dos migraciones históricas de septiembre para reproducir toda
 la base desde cero. Las fixtures de prueba no sustituyen una baseline productiva.
 No realizar un `db push` ciego;
 seguir la secuencia coordinada de la guía piloto y ensayar restauración en staging.
+
+La [primera etapa de cumplimiento móvil](docs/compliance-stage1-20261020.md)
+documenta los cambios locales de vigencia de reservas, publicación idempotente y
+actualización de listas, sus pruebas y el orden de activación. Sus dos migraciones
+ya se aplicaron en Supabase; el despliegue de la API sigue pendiente por una pausa
+temporal de Railway. Consulta la [evidencia de activación](docs/compliance-activation-20261020.json).
+
+Las etapas siguientes publicaron los [enlaces Android](docs/mobile-links-android-20261020.md)
+en el dominio existente y añadieron consulta móvil parcial sin conexión. El
+[registro de etapas 2–3](docs/compliance-stages2-3-20261020.md) distingue código,
+pruebas, publicación web y configuraciones/aceptación todavía pendientes.

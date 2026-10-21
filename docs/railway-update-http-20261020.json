@@ -1,0 +1,76 @@
+{
+  "checkedAt": "2026-10-20T21:07:02.689Z",
+  "origin": "https://krow-api-production.up.railway.app/v1",
+  "deploymentId": "5d625538-76ab-4961-890d-493a72978442",
+  "scope": "Public availability, authenticated reads and new requestId contract with guaranteed non-creating input",
+  "checks": [
+    {
+      "name": "public_health",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "pilot_database_and_new_schema_ready",
+      "passed": true,
+      "status": 200,
+      "pilot": "ready"
+    },
+    {
+      "name": "authentication_required_/me",
+      "passed": true,
+      "status": 401
+    },
+    {
+      "name": "authentication_required_/rides",
+      "passed": true,
+      "status": 401
+    },
+    {
+      "name": "authenticated_profile",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "authenticated_corridor_catalog",
+      "passed": true,
+      "status": 200,
+      "count": 3
+    },
+    {
+      "name": "request_id_accepted_and_sql_lookup_reached",
+      "passed": true,
+      "status": 400,
+      "rejectedAt": "business stops validation after idempotency lookup",
+      "createdRide": false
+    },
+    {
+      "name": "request_id_requires_uuid_v4",
+      "passed": true,
+      "status": 400
+    },
+    {
+      "name": "unknown_fields_remain_rejected",
+      "passed": true,
+      "status": 400
+    },
+    {
+      "name": "future_date_search",
+      "passed": true,
+      "status": 201,
+      "resultCount": 0
+    },
+    {
+      "name": "reversed_dates_rejected",
+      "passed": true,
+      "status": 400
+    }
+  ],
+  "passed": true,
+  "createdTrips": false,
+  "createdBookings": false,
+  "mapsRequests": false,
+  "positivePublicationReplayVerifiedOverHttp": false,
+  "physicalDeviceVerified": false,
+  "notificationsSent": 0,
+  "validationMessageFormat": "String from existing ApiExceptionFilter; initial harness array assumption corrected"
+}

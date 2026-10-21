@@ -33,6 +33,17 @@ import type { AuthenticatedUser } from '../auth/domain/authenticated-user.js';
 import { PilotService } from './pilot.service.js';
 import { PilotNotifications } from './pilot.notifications.js';
 import { PilotRateLimitGuard } from './pilot-rate-limit.guard.js';
+import { PilotOperations } from './pilot.operations.js';
+import { MapsRateLimitGuard } from '../maps/presentation/maps-rate-limit.guard.js';
+
+class RerouteDto {
+  @IsString() @MaxLength(8192) expectedVersion!: string;
+}
+class IncidentDto {
+  @IsUUID() clientId!: string;
+  @IsIn(['safety', 'vehicle', 'conduct', 'other']) kind!: string;
+  @IsString() @MinLength(1) @MaxLength(2000) details!: string;
+}
 
 class ActivityQuery {
   @IsIn(['driver', 'passenger']) context: 'driver' | 'passenger' = 'passenger';
@@ -97,7 +108,40 @@ export class PilotController {
   constructor(
     private readonly pilot: PilotService,
     private readonly notifications: PilotNotifications,
+    private readonly operations: PilotOperations,
   ) {}
+  @Get('booking-inbox') inbox(@CurrentUser() u: AuthenticatedUser) {
+    return this.pilot.bookingInbox(u);
+  }
+  @Get('rides/:rideId/invitation') invitation(
+    @CurrentUser() u: AuthenticatedUser,
+    @Param('rideId', ParseUUIDPipe) rideId: string,
+  ) {
+    return this.pilot.invitation(u, rideId);
+  }
+  @Get('booking-inbox/:bookingId') bookingNotice(
+    @CurrentUser() u: AuthenticatedUser,
+    @Param('bookingId', ParseUUIDPipe) id: string,
+  ) {
+    return this.pilot.bookingInbox(u, id);
+  }
+  @Post('rides/:rideId/tracking/route')
+  @UseGuards(MapsRateLimitGuard)
+  reroute(
+    @CurrentUser() u: AuthenticatedUser,
+    @Param('rideId', ParseUUIDPipe) id: string,
+    @Body() dto: RerouteDto,
+  ) {
+    return this.operations.reroute(u, id, dto.expectedVersion);
+  }
+  @Post('rides/:rideId/incidents')
+  incident(
+    @CurrentUser() u: AuthenticatedUser,
+    @Param('rideId', ParseUUIDPipe) id: string,
+    @Body() dto: IncidentDto,
+  ) {
+    return this.operations.report(u, id, dto.clientId, dto.kind, dto.details);
+  }
   @Post('me/closure') closure(@CurrentUser() u: AuthenticatedUser) {
     return this.pilot.requestClosure(u);
   }

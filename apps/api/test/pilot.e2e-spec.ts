@@ -14,6 +14,7 @@ import { readFile } from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
 import { PilotDatabase } from '../src/modules/pilot/pilot.database.js';
 import { PilotService } from '../src/modules/pilot/pilot.service.js';
+import { PilotOperations } from '../src/modules/pilot/pilot.operations.js';
 import {
   PilotController,
   PilotUploadController,
@@ -114,6 +115,10 @@ describe('pilot HTTP contracts', () => {
       controllers: [PilotController, PilotUploadController, RidesController],
       providers: [
         PilotRateLimitGuard,
+        {
+          provide: PilotOperations,
+          useValue: new PilotOperations(db, pilot, {} as GoogleMapsService),
+        },
         MapsRateLimitGuard,
         { provide: PilotService, useValue: pilot },
         { provide: PilotNotifications, useValue: {} },
@@ -201,7 +206,7 @@ describe('pilot HTTP contracts', () => {
       [v, d],
     );
     await db.query(
-      'insert into public.rides(ride_id,driver_id,vehicle_id) values($1,$2,$3)',
+      "insert into public.rides(ride_id,driver_id,vehicle_id,departure_time) values($1,$2,$3,now()+interval '1 hour')",
       [ride, d, v],
     );
     for (const [i, id] of [a, b].entries())
@@ -215,6 +220,76 @@ describe('pilot HTTP contracts', () => {
     );
   });
   const http = () => request(app.getHttpServer());
+  it('returns HTTP 204 with no body when the account has no active trip', async () => {
+    const result = await http()
+      .get('/v1/rides/mine/active?context=driver')
+      .set('Authorization', 'Bearer ' + outsider)
+      .expect(204);
+    expect(result.text).toBe('');
+    await http()
+      .get('/v1/rides/mine/active?context=driver')
+      .set('Authorization', 'Bearer ' + driver)
+      .expect(200);
+  });
+  it('recovers only the current actors booking and rejects an unrelated booking link', async () => {
+    await db.query(
+      "update public.bookings set status='pending' where booking_id=$1",
+      [booking],
+    );
+    const inbox = await http()
+      .get('/v1/booking-inbox')
+      .set('Authorization', 'Bearer ' + driver)
+      .expect(200);
+    expect(inbox.body).toHaveLength(1);
+    expect((inbox.body as Array<Record<string, unknown>>)[0]).toMatchObject({
+      bookingId: booking,
+      canRespond: true,
+    });
+    await http()
+      .get('/v1/booking-inbox/' + booking)
+      .set('Authorization', 'Bearer ' + outsider)
+      .expect(404);
+    await db.query(
+      "update public.bookings set status='cancelled' where booking_id=$1",
+      [booking],
+    );
+    const detail = await http()
+      .get('/v1/booking-inbox/' + booking)
+      .set('Authorization', 'Bearer ' + driver)
+      .expect(200);
+    expect(detail.body).toMatchObject({
+      status: 'cancelled',
+      canRespond: false,
+    });
+  });
+  it('opens a minimal authenticated invitation and rejects expired or cancelled links', async () => {
+    const response = await request(app.getHttpServer())
+      .get(`/v1/rides/${ride}/invitation`)
+      .set('Authorization', 'Bearer ' + outsider)
+      .expect(200);
+    expect(response.body).toMatchObject({
+      rideId: ride,
+      owned: false,
+      bookingId: null,
+      canRequest: true,
+    });
+    expect(response.body).not.toHaveProperty('bookings');
+    await request(app.getHttpServer())
+      .get(`/v1/rides/${ride}/invitation`)
+      .expect(403);
+    await request(app.getHttpServer())
+      .get('/v1/rides/invalid/invitation')
+      .set('Authorization', 'Bearer ' + outsider)
+      .expect(400);
+    await db.query(
+      "update public.rides set status='cancelled' where ride_id=$1",
+      [ride],
+    );
+    await request(app.getHttpServer())
+      .get(`/v1/rides/${ride}/invitation`)
+      .set('Authorization', 'Bearer ' + outsider)
+      .expect(404);
+  });
   it('defaults omitted trip origin to the Instituto through the HTTP contract', async () => {
     const response = await http()
       .post('/v1/rides/search')

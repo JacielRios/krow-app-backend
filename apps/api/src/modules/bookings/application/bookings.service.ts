@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, Optional } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  Optional,
+} from '@nestjs/common';
 import { PilotService } from '../../pilot/pilot.service.js';
 import { SupabaseService } from '../../../infrastructure/supabase/supabase.service.js';
 import type { AuthenticatedUser } from '../../auth/domain/authenticated-user.js';
@@ -38,7 +43,11 @@ export class BookingsService {
           dropoff_stop_id: dto.dropoffStopId,
         },
       });
-    if (error) throw new BadRequestException(error.message);
+    if (error) {
+      if (error.message.includes('la hora de salida ya pasó'))
+        throw new ConflictException(error.message);
+      throw new BadRequestException(error.message);
+    }
     return { bookingId: data };
   }
 

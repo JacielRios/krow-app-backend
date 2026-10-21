@@ -1,0 +1,129 @@
+{
+  "checkedAt": "2026-10-20T19:23:12.993Z",
+  "authorization": "User requested: continua con lo pendiente",
+  "source": {
+    "baseCommit": "6b28829f224f7a70b28a2da329e5f765ad206eac",
+    "dirtyWorkingTree": true,
+    "committed": false
+  },
+  "database": {
+    "projectId": "yyjbqzsokxpzhevpanyq",
+    "migrations": [
+      {
+        "version": "20261020191646",
+        "name": "booking_departure_deadline"
+      },
+      {
+        "version": "20261020191658",
+        "name": "ride_publication_idempotency"
+      }
+    ],
+    "applied": true,
+    "countsBefore": {
+      "rides": 55,
+      "bookings": 37,
+      "users": 12,
+      "stops": 21
+    },
+    "countsAfter": {
+      "rides": 55,
+      "stops": 21,
+      "users": 12,
+      "bookings": 37
+    },
+    "receiptRls": true,
+    "deadlineTriggerEnabled": true,
+    "apiLookup": true,
+    "anonLookup": false,
+    "clientCreate": false,
+    "clientRead": false,
+    "apiDirectRead": false,
+    "publicationLiveChecks": "compliance-live-sql-20261020.json",
+    "deadlineLiveCheck": {
+      "passed": true,
+      "mode": "Privileged Supabase SQL transaction; existing authenticated actors; newly-created trip only; mandatory ROLLBACK; no eligible expired trip was available",
+      "checks": [
+        "Insert rejected with the expected departure error",
+        "No booking persisted",
+        "Global counts unchanged afterward"
+      ],
+      "limitedRoleTest": "Covered independently by the 190-test API run with isolated PostgreSQL"
+    },
+    "advisors": {
+      "newWarnings": [
+        {
+          "name": "authenticated_security_definer_function_executable",
+          "entity": "public.get_ride_publication",
+          "intentional": true,
+          "reason": "Only the active authenticated owner can recover a receipt; no direct table access",
+          "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable"
+        }
+      ],
+      "newInfo": [
+        {
+          "name": "rls_enabled_no_policy",
+          "entity": "private.ride_publication_requests",
+          "intentional": true,
+          "reason": "Default deny; no client or limited LOGIN access; only validated definer functions access receipts",
+          "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy"
+        }
+      ],
+      "preexistingPasswordProtectionWarning": true
+    }
+  },
+  "api": {
+    "origin": "https://krow-api-production.up.railway.app/v1",
+    "provider": "Railway",
+    "previousDeploymentId": "d2f5d2f9-742d-4b7f-8be4-ec12aa4fa21d",
+    "newDeploymentId": null,
+    "state": "BLOCKED_BY_PROVIDER",
+    "attempts": 2,
+    "providerMessage": "Deploys have been paused temporarily",
+    "reference": "https://docs.railway.com/deployments/reference#deployments-paused---limited-access",
+    "configurationChanged": false,
+    "billingChanged": false,
+    "availabilityAfterMigrations": "compliance-http-20261020.json"
+  },
+  "mobile": {
+    "targetVersion": "0.5.1-trial",
+    "versionCode": 8,
+    "buildState": "SUCCESS",
+    "installationVerified": false,
+    "physicalGpsVerified": false,
+    "adbDevices": 0,
+    "distribution": "HOLD_UNTIL_API_UPDATED",
+    "signatureVerified": true,
+    "hermesVerified": true,
+    "apk": "artifacts/android/krow-0.5.1-trial.apk",
+    "sha256": "D986F9403E65F3D2806CA6D7CDE19F5939B2E49266F6EC401FD6B89BE5284CA7",
+    "architectures": [
+      "arm64-v8a",
+      "armeabi-v7a"
+    ],
+    "evidence": "../krow-app-mobile/docs/android-apk-0.5.1-20261020.json"
+  },
+  "tests": {
+    "api": {
+      "suites": 28,
+      "tests": 190,
+      "passed": true,
+      "skipped": 0
+    },
+    "mobile": {
+      "suites": 35,
+      "tests": 208,
+      "passed": true,
+      "executedInPreviousTurn": true
+    },
+    "migrationLedger": {
+      "count": 45,
+      "passed": true
+    }
+  },
+  "remaining": [
+    "API deployment when Railway allows builds",
+    "HTTP acceptance of the new POST /rides contract after deployment",
+    "Install the verified APK only after API activation",
+    "Two-device GPS acceptance"
+  ]
+}

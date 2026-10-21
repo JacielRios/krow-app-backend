@@ -1,0 +1,27 @@
+{
+  "checkedAt": "2026-10-20T21:42:34.757Z",
+  "deploymentId": "dpl_8bkobhFGaaqv2PiV9cf8P3jGbMgQ",
+  "origin": "https://krow-web-gamma.vercel.app",
+  "promoted": true,
+  "checks": [
+    {
+      "path": "/rides/11111111-1111-4111-8111-111111111111?bookingId=22222222-2222-4222-8222-222222222222",
+      "expected": 200,
+      "status": 200,
+      "passed": true
+    },
+    {
+      "path": "/.well-known/assetlinks.json",
+      "expected": 200,
+      "status": 200,
+      "passed": true
+    },
+    {
+      "path": "/auth/callback",
+      "expected": 200,
+      "status": 200,
+      "passed": true
+    }
+  ],
+  "hydratedBrowserVerified": false
+}

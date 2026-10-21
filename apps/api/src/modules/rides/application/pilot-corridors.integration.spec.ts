@@ -54,10 +54,15 @@ describe('pilot corridors and destination matching (isolated PostgreSQL)', () =>
     await asActor(actor);
     return result.rows[0].id;
   };
-  const search = (radius = 3000, limit = 50) =>
+  const search = (
+    radius = 3000,
+    limit = 50,
+    from: string | null = null,
+    to: string | null = null,
+  ) =>
     db.query<{ ride_id: string; dropoff_distance_m: number }>(
-      'select * from public.search_available_rides_pilot(25.664011,-100.243225,$1,$2,$3,null,null,$4)',
-      [destination.lat, destination.lng, limit, radius],
+      'select * from public.search_available_rides_pilot(25.664011,-100.243225,$1,$2,$3,$4,$5,$6)',
+      [destination.lat, destination.lng, limit, from, to, radius],
     );
 
   beforeAll(async () => {
@@ -121,6 +126,19 @@ describe('pilot corridors and destination matching (isolated PostgreSQL)', () =>
         'utf8',
       ),
     );
+    for (const name of [
+      '20261020191646_booking_departure_deadline.sql',
+      '20261020191658_ride_publication_idempotency.sql',
+    ])
+      await db.exec(
+        await readFile(
+          new URL(
+            '../../../../../../supabase/migrations/' + name,
+            import.meta.url,
+          ),
+          'utf8',
+        ),
+      );
     corridor = (
       await db.query<{ corridor_id: string }>(
         "select corridor_id from public.transport_corridors where code='pablo-livas'",
@@ -187,6 +205,46 @@ describe('pilot corridors and destination matching (isolated PostgreSQL)', () =>
       close,
       middle,
     ]);
+  });
+  it('filters by inclusive optional time bounds without changing proximity ranking', async () => {
+    const close = await publish([stops[0]], 30);
+    const middle = await publish([stops[1]], 60);
+    const far = await publish([stops[2]], 90);
+    const departure = (
+      await db.query<{ time: string }>(
+        'select departure_time::text time from public.rides where ride_id=$1',
+        [middle],
+      )
+    ).rows[0].time;
+    expect(
+      (await search(3000, 50, departure, departure)).rows.map(
+        (row) => row.ride_id,
+      ),
+    ).toEqual([middle]);
+    expect(
+      (await search(3000, 50, departure, null)).rows.map((row) => row.ride_id),
+    ).toEqual([middle, far]);
+    expect(
+      (await search(3000, 50, null, departure)).rows.map((row) => row.ride_id),
+    ).toEqual([close, middle]);
+    expect((await search()).rows.map((row) => row.ride_id)).toEqual([
+      close,
+      middle,
+      far,
+    ]);
+  });
+  it('rejects reversed time bounds and excludes expired trips even with a past lower bound', async () => {
+    const expired = await publish([stops[0]]);
+    await db.query(
+      "update public.rides set departure_time=now()-interval '1 minute' where ride_id=$1",
+      [expired],
+    );
+    const past = new Date(Date.now() - 3600000).toISOString();
+    const future = new Date(Date.now() + 3600000).toISOString();
+    expect((await search(3000, 50, past, future)).rows).toHaveLength(0);
+    await expect(search(3000, 50, future, past)).rejects.toThrow(
+      'El rango de fechas no es valido',
+    );
   });
   it('shows every available descent in detail even outside the matching radius', async () => {
     const far = randomUUID();
@@ -256,6 +314,22 @@ describe('pilot corridors and destination matching (isolated PostgreSQL)', () =>
       ).rows[0].dropoff_stop_id,
     ).toBe(real.rows[1].stop_id);
   });
+  it('preserves an ongoing trip snapshot when a catalog point is moved', async () => {
+    const id = await publish([stops[0]]);
+    const snapshotSql =
+      'select stop_id,transport_stop_id,lat,lng,address,stop_order from public.ride_stops where ride_id=$1 order by stop_order';
+    const before = (await db.query(snapshotSql, [id])).rows;
+    await db.query(
+      "update public.rides set status='in_progress' where ride_id=$1",
+      [id],
+    );
+    await db.query(
+      'update public.transport_stops set latitude=latitude+0.01,longitude=longitude+0.01,name=$2 where stop_id=$1',
+      [stops[0], 'Moved catalog point'],
+    );
+    expect((await db.query(snapshotSql, [id])).rows).toEqual(before);
+  });
+
   it('keeps a legacy trip without corridor discoverable and its stops unchanged', async () => {
     const id = await publish([stops[0]]);
     await db.query(
@@ -296,6 +370,149 @@ describe('pilot corridors and destination matching (isolated PostgreSQL)', () =>
     });
     await asActor('');
     await expect(search()).rejects.toThrow('No autenticado');
+  });
+  it('replays publication after a lost response, even when the catalog and departure have changed', async () => {
+    await asActor(driverUser);
+    const requestId = randomUUID();
+    const request = { destination, price: 1234 };
+    const data = {
+      ...payload([stops[0]]),
+      publication_request_id: requestId,
+      publication_request: request,
+    };
+    const first = await db.query<{ id: string }>(
+      'select public.create_ride_v2($1::jsonb) id',
+      [data],
+    );
+    const id = first.rows[0].id;
+    await db.query(
+      "update public.rides set departure_time=now()-interval '1 hour' where ride_id=$1",
+      [id],
+    );
+    await db.query(
+      'update public.transport_stops set active=false where stop_id=$1',
+      [stops[0]],
+    );
+    const replay = await db.query<{ id: string }>(
+      'select public.create_ride_v2($1::jsonb) id',
+      [{ ...data, route_polyline: 'provider-changed' }],
+    );
+    expect(replay.rows[0].id).toBe(id);
+    expect((await db.query('select * from public.rides')).rows).toHaveLength(1);
+    await expect(
+      db.query('select public.get_ride_publication($1,$2)', [
+        requestId,
+        { ...request, price: 999 },
+      ]),
+    ).rejects.toThrow('Conflicto de publicación');
+    await asActor(actor);
+    expect(
+      (
+        await db.query<{ id: string | null }>(
+          'select public.get_ride_publication($1,$2) id',
+          [requestId, request],
+        )
+      ).rows[0].id,
+    ).toBeNull();
+    const privileges = await db.query<{
+      client_read: boolean;
+      api_read: boolean;
+      anon_execute: boolean;
+      client_create: boolean;
+    }>(
+      `select has_table_privilege('authenticated','private.ride_publication_requests','SELECT') client_read,
+       has_table_privilege('krow_pilot_service','private.ride_publication_requests','SELECT') api_read,
+       has_function_privilege('anon','public.get_ride_publication(uuid,jsonb)','EXECUTE') anon_execute,
+       has_function_privilege('authenticated','public.create_ride_v2(jsonb)','EXECUTE') client_create`,
+    );
+    expect(privileges.rows[0]).toEqual({
+      client_read: false,
+      api_read: false,
+      anon_execute: false,
+      client_create: false,
+    });
+    await asActor(driverUser);
+    await db.exec('set role authenticated');
+    try {
+      expect(
+        (
+          await db.query<{ id: string }>(
+            'select public.get_ride_publication($1,$2) id',
+            [requestId, request],
+          )
+        ).rows[0].id,
+      ).toBe(id);
+    } finally {
+      await db.exec('reset role');
+    }
+    await asActor('');
+    await expect(
+      db.query('select public.get_ride_publication($1,$2)', [
+        requestId,
+        request,
+      ]),
+    ).rejects.toThrow('No autenticado');
+    await asActor(driverUser);
+    await db.query('update public.users set is_active=false where uuid=$1', [
+      driverUser,
+    ]);
+    try {
+      await expect(
+        db.query('select public.get_ride_publication($1,$2)', [
+          requestId,
+          request,
+        ]),
+      ).rejects.toThrow('cuenta no está disponible');
+    } finally {
+      await db.query('update public.users set is_active=true where uuid=$1', [
+        driverUser,
+      ]);
+    }
+  });
+  it('rolls back a failed publication and allows retrying its request ID', async () => {
+    await asActor(driverUser);
+    const data = {
+      ...payload([stops[0]]),
+      publication_request_id: randomUUID(),
+      publication_request: { trip: 'retry' },
+    };
+    await expect(
+      db.query('select public.create_ride_v2($1)', [
+        { ...data, price_per_seat: -1 },
+      ]),
+    ).rejects.toThrow('precio');
+    expect(
+      (await db.query('select * from private.ride_publication_requests')).rows,
+    ).toHaveLength(0);
+    await db.query('select public.create_ride_v2($1)', [data]);
+    expect(
+      (await db.query('select * from private.ride_publication_requests')).rows,
+    ).toHaveLength(1);
+  });
+  it('rejects a booking from a stale search after its scheduled departure', async () => {
+    const id = await publish([stops[0]]);
+    await db.query(
+      "update public.rides set departure_time=now()-interval '1 second' where ride_id=$1",
+      [id],
+    );
+    const rideStops = (
+      await db.query<{ stop_id: string }>(
+        'select stop_id from public.ride_stops where ride_id=$1 order by stop_order',
+        [id],
+      )
+    ).rows;
+    await expect(
+      db.query('select public.request_booking_v2($1)', [
+        {
+          ride_id: id,
+          pickup_stop_id: rideStops[0].stop_id,
+          dropoff_stop_id: rideStops[1].stop_id,
+        },
+      ]),
+    ).rejects.toThrow('hora de salida');
+    expect((await db.query('select * from public.bookings')).rows).toHaveLength(
+      0,
+    );
   });
   it('validates null/invalid direct RPC arguments before unbounded queries or map data', async () => {
     await expect(

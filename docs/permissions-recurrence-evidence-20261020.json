@@ -1,0 +1,141 @@
+{
+  "checkedAt": "2026-10-20T22:24:27.200Z",
+  "scope": "Android notification startup permission, automatic registration, bounded recurring publication, shared invitations and departure reminders",
+  "architectureChanged": false,
+  "newAppDependencies": 0,
+  "schemaMigrations": 0,
+  "automated": {
+    "api": {
+      "passed": 197,
+      "suites": 28,
+      "postgresTemporary": true
+    },
+    "httpE2e": {
+      "passed": 9,
+      "suites": 2,
+      "authAndMaps": "test doubles"
+    },
+    "mobileFull": {
+      "passed": 269,
+      "suites": 44
+    },
+    "web": {
+      "passed": 57,
+      "files": 12
+    },
+    "types": "passed",
+    "apiLint": "passed",
+    "mobileLint": {
+      "errors": 0,
+      "warningCountAtEarlierFullRun": 383,
+      "finalFocusedErrors": 0
+    },
+    "apiBuild": "passed",
+    "androidBuild": "passed",
+    "apiAdditionalRegression": {
+      "passed": 27,
+      "suites": 1
+    }
+  },
+  "api": {
+    "deploymentId": "54fa0b9d-1d40-49c3-ae0a-6b1ef0b167cf",
+    "status": "SUCCESS",
+    "sourceMode": "working_tree_upload",
+    "origin": "https://krow-api-production.up.railway.app/v1",
+    "httpChecksPassed": 18,
+    "evidence": "permissions-recurrence-http-20261020.json"
+  },
+  "web": {
+    "checkedAt": "2026-10-20T22:17:16.624Z",
+    "origin": "https://krow-web-gamma.vercel.app",
+    "deploymentId": "dpl_YdvLJ5xsU4UMjjrmBf7j7tQQdnGy",
+    "ready": true,
+    "promoted": true,
+    "checks": [
+      {
+        "path": "/rides/11111111-1111-4111-8111-111111111111?invite=1",
+        "status": 200,
+        "passed": true
+      },
+      {
+        "path": "/.well-known/assetlinks.json",
+        "status": 200,
+        "passed": true
+      },
+      {
+        "path": "/auth/callback",
+        "status": 200,
+        "passed": true
+      }
+    ],
+    "passed": true,
+    "hydratedBrowserVerified": false
+  },
+  "sql": {
+    "checksPassed": 5,
+    "limitedRole": true,
+    "transactionRolledBack": true,
+    "persistedTestWrites": false,
+    "evidence": "permissions-recurrence-live-20261020.json",
+    "checkedAt": "2026-10-20T22:21:15.785Z"
+  },
+  "android": {
+    "checkedAt": "2026-10-20T22:23:17.8019286Z",
+    "apk": "artifacts/android/krow-0.7.0-trial.apk",
+    "sha256": "2BCFC430CE425955CE4A9C0524279F8D23F0CAAA384EE9A101411861F1DB05E1",
+    "bytes": 137078114,
+    "package": "com.krownmobileapp",
+    "versionCode": 12,
+    "versionName": "0.7.0-trial",
+    "minimumAndroidApi": 24,
+    "signing": "Debug certificate for private testing",
+    "signingSha1": "5E:8F:16:06:2E:A3:CD:2C:4A:0D:54:78:76:BA:A6:F3:8C:AB:F6:25",
+    "signatureVerified": true,
+    "debuggable": false,
+    "cleartextTraffic": false,
+    "bundledHermes": true,
+    "bundleBytes": 3960320,
+    "architectures": [
+      "arm64-v8a",
+      "armeabi-v7a"
+    ],
+    "physicalInstallationVerified": false,
+    "physicalGpsVerified": false,
+    "firebase": {
+      "projectId": "krowapp",
+      "nativeResourcesVerified": true,
+      "pushEnabled": true,
+      "deliveryVerified": false
+    },
+    "features": [
+      "startup-notification-permission",
+      "automatic-registration-after-login",
+      "recurrence-batch",
+      "shared-invitations",
+      "departure-reminders",
+      "fresh-invitation-after-cancellation"
+    ],
+    "installed": false,
+    "absolutePath": "C:/Users/Novasys/Documents/krow-app-mobile/artifacts/android/krow-0.7.0-trial.apk"
+  },
+  "supabaseAuth": {
+    "redirect": "https://krow-web-gamma.vercel.app/auth/callback",
+    "status": "user will add; not yet confirmed",
+    "endToEndEmailVerified": false
+  },
+  "physicalDeliveryVerified": false,
+  "installedOnDevice": false,
+  "testNotificationsSent": 0,
+  "createdProductionTestTrips": false,
+  "createdProductionTestBookings": false,
+  "pending": [
+    "Android permission and FCM device registration",
+    "Foreground/background/closed-app delivery and opening",
+    "Two-participant invitation, approval and consistency",
+    "Physical recurrence recovery, Keystore and airplane mode",
+    "GPS, chat keyboard, accessibility and performance",
+    "Supabase Auth callback save confirmation and actual recovery/confirmation flow",
+    "Final academic acceptance evidence"
+  ],
+  "iosBuilt": false
+}

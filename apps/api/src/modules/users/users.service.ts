@@ -35,7 +35,7 @@ export class UsersService {
   async me(user: AuthenticatedUser) {
     let data = await this.profile(user);
     if (!data) {
-      const period = Number(this.metadataString(user, 'academic_period'));
+      const period = Number(user.userMetadata.academic_period);
       await this.upsertProfile(user, {
         fullName: this.metadataString(user, 'full_name') ?? '',
         institutionalId: this.metadataString(user, 'institutional_id') ?? '',
@@ -72,10 +72,12 @@ export class UsersService {
       email: user.email,
       fullName: data?.full_name ?? this.metadataString(user, 'full_name'),
       profilePhoto: data?.profile_photo ?? null,
-      institutionalId:
-        data?.institutional_id ?? this.metadataString(user, 'institutional_id'),
-      academicProgram:
-        data?.academic_program ?? this.metadataString(user, 'academic_program'),
+      institutionalId: data
+        ? data.institutional_id
+        : this.metadataString(user, 'institutional_id'),
+      academicProgram: data
+        ? data.academic_program
+        : this.metadataString(user, 'academic_program'),
       academicPeriod: data?.academic_period ?? null,
       capabilities: { passenger: true, driver: driver?.status === 'approved' },
       rating: data?.rating == null ? null : Number(data.rating),
@@ -105,8 +107,8 @@ export class UsersService {
           if (rows[0]?.is_active === false || rows[0]?.deleted_at)
             throw new ForbiddenException('Esta cuenta está desactivada');
           await client.query(
-            `insert into public.users(uuid,email_address,full_name,institutional_id,academic_program,academic_period) values($1,$2,$3,$4,$5,$6)
-          on conflict(uuid) do update set email_address=excluded.email_address,full_name=excluded.full_name,institutional_id=excluded.institutional_id,academic_program=excluded.academic_program,academic_period=excluded.academic_period`,
+            `insert into public.users(uuid,email_address,full_name,institutional_id,academic_program,academic_period,profile_photo) values($1,$2,$3,$4,$5,$6,$7)
+          on conflict(uuid) do update set email_address=excluded.email_address,full_name=excluded.full_name,institutional_id=excluded.institutional_id,academic_program=excluded.academic_program,academic_period=excluded.academic_period,profile_photo=case when $8 then excluded.profile_photo else public.users.profile_photo end`,
             [
               user.id,
               user.email,
@@ -114,6 +116,8 @@ export class UsersService {
               profile.institutionalId.trim() || null,
               profile.academicProgram,
               profile.academicPeriod ?? null,
+              profile.profilePhoto ?? null,
+              Object.hasOwn(profile, 'profilePhoto'),
             ],
           );
         });
@@ -142,11 +146,50 @@ export class UsersService {
           institutional_id: profile.institutionalId.trim() || null,
           academic_program: profile.academicProgram,
           academic_period: profile.academicPeriod ?? null,
+          ...(Object.hasOwn(profile, 'profilePhoto')
+            ? { profile_photo: profile.profilePhoto }
+            : {}),
         },
         { onConflict: 'uuid' },
       );
     if (error) throw error;
     return { success: true };
+  }
+
+  async driverMetrics(user: AuthenticatedUser) {
+    if (!this.pilot?.enabled)
+      throw new ForbiddenException('Las métricas requieren el piloto activo');
+    const [row] = await this.pilot.query<{ metrics: Record<string, unknown> }>(
+      `with driver as (
+      select driver_id,rating from public.driver_profiles where user_id=$1
+    ), trips as (
+      select r.* from public.rides r join driver d using(driver_id) where r.departure_time>=now()-interval '30 days' and r.departure_time<=now()
+    ), amounts as (
+      select coalesce(sum(p.amount_cents) filter(where b.status in ('confirmed','in_progress','completed')),0) committed,
+      coalesce(sum(c.amount_cents) filter(where c.status='collected'),0) collected,
+      coalesce(sum(b.seats_reserved) filter(where b.status='completed'),0) transported
+      from trips r join public.bookings b using(ride_id) join krow_pilot.booking_prices p using(booking_id)
+      left join krow_pilot.cash c using(booking_id) where r.status<>'cancelled'
+    ) select jsonb_build_object('periodDays',30,'currency','MXN','completed',count(*) filter(where t.status='completed'),
+      'cancelled',count(*) filter(where t.status='cancelled'),'totalTrips',count(*),'transportedPassengers',a.transported,
+      'committedCents',a.committed,'collectedCents',a.collected,'pendingCents',greatest(a.committed-a.collected,0),
+      'rating',(select rating from driver)) metrics from trips t cross join amounts a group by a.transported,a.committed,a.collected`,
+      [user.id],
+    );
+    if (!row)
+      return {
+        periodDays: 30,
+        currency: 'MXN',
+        completed: 0,
+        cancelled: 0,
+        totalTrips: 0,
+        transportedPassengers: 0,
+        committedCents: 0,
+        collectedCents: 0,
+        pendingCents: 0,
+        rating: null,
+      };
+    return row.metrics;
   }
 
   private async profile(user: AuthenticatedUser): Promise<ProfileRow | null> {

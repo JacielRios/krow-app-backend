@@ -1,0 +1,19 @@
+{
+  "checkedAt": "2026-10-20T19:16:22.228Z",
+  "limitedApiLogin": true,
+  "publicationBaselineMatches": true,
+  "before": {
+    "create_body_md5": "11ac247d6bbd6e8c5b3c18f881ef417a",
+    "rides": 55,
+    "bookings": 37,
+    "users": 12,
+    "stops": 0
+  },
+  "countScope": "limited API login without actor; RLS filters catalog stops, not a global count",
+  "globalCountsBefore": {
+    "rides": 55,
+    "bookings": 37,
+    "users": 12,
+    "stops": 21
+  }
+}

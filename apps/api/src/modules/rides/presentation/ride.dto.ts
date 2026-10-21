@@ -24,6 +24,7 @@ export class CoordinateDto {
 }
 
 export class CreateRideDto {
+  @IsOptional() @IsUUID('4') requestId?: string;
   @IsDefined() @IsUUID() corridorId!: string;
   @IsUUID() vehicleId!: string;
   @IsOptional() @IsUUID() favoriteRouteId?: string;

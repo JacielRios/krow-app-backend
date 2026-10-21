@@ -1,0 +1,282 @@
+.admin-stops-catalog {
+  margin-top: 24px;
+}
+.admin-stops-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 24px;
+  align-items: start;
+}
+.admin-stops-map-wrap {
+  min-width: 0;
+}
+.admin-map-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.admin-map-tools > span {
+  color: var(--muted);
+  font-size: 0.85rem;
+  flex: 1;
+  min-width: 160px;
+  line-height: 1.5;
+}
+.admin-stops-map {
+  position: relative;
+  isolation: isolate;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  overflow: hidden;
+  background: #e9edf1;
+}
+.admin-stops-map-canvas {
+  height: 470px;
+  width: 100%;
+  z-index: 0;
+  font: inherit;
+}
+.admin-stops-map.is-picking .leaflet-container {
+  cursor: crosshair;
+}
+.admin-stops-map .leaflet-bar {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 3px 12px #1a23401a;
+}
+.admin-stops-map .leaflet-bar a {
+  width: 44px;
+  height: 44px;
+  line-height: 44px;
+  color: var(--brand);
+}
+.admin-stops-map .leaflet-control-attribution {
+  font-size: 11px;
+  max-width: 100%;
+}
+.admin-stop-marker {
+  background: transparent;
+  border: 0;
+  display: grid;
+  place-items: center;
+}
+.admin-map-pin {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #252675;
+  color: white;
+  border: 3px solid white;
+  box-shadow: 0 2px 7px #15193266;
+  font-size: 14px;
+  font-weight: 750;
+}
+.admin-stop-marker.is-inactive .admin-map-pin {
+  background: #f1f3f8;
+  color: #535f75;
+  border: 3px dashed #626d81;
+}
+.admin-stop-marker.is-selected .admin-map-pin {
+  outline: 4px solid #b3b5f3;
+  outline-offset: 2px;
+}
+.admin-stop-marker.is-draft .admin-map-pin {
+  background: #b35b10;
+  border-color: #fff;
+  font-size: 24px;
+}
+.admin-stop-marker[aria-disabled='true'] {
+  cursor: default;
+}
+.admin-map-crosshair {
+  pointer-events: none;
+  position: absolute;
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
+  font: 30px/1 system-ui;
+  color: #252675;
+  text-shadow: 0 0 3px white;
+  z-index: 2;
+}
+.admin-map-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin: 0;
+  padding: 24px;
+  background: #f4f6faed;
+  text-align: center;
+  z-index: 3;
+}
+.admin-map-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding: 14px 0 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+  align-items: center;
+}
+.admin-map-legend > span {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+}
+.admin-map-legend small {
+  flex-basis: 100%;
+  line-height: 1.4;
+}
+.admin-map-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #252675;
+}
+.admin-map-dot.is-inactive {
+  background: #f1f3f8;
+  border: 2px dashed #626d81;
+}
+.admin-map-dot.is-draft {
+  background: #b35b10;
+}
+.admin-map-notice {
+  color: #865915;
+  background: #fff3de;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 0.82rem;
+}
+.admin-stop-detail {
+  background: #f7f8fc;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 22px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.admin-stop-detail h2 {
+  margin: 0 0 12px;
+}
+.admin-stop-detail .admin-description {
+  font-size: 0.86rem;
+  margin-top: 14px;
+}
+.admin-stop-detail .admin-detail-list {
+  margin-top: 20px;
+}
+.admin-stop-detail .admin-detail-list dd {
+  font-size: 0.87rem;
+  line-height: 1.5;
+}
+.admin-stop-detail-empty {
+  text-align: center;
+  padding: 44px 0;
+}
+.admin-stop-detail-empty small {
+  display: block;
+  margin-top: 20px;
+  color: var(--muted);
+}
+.admin-stop-empty-icon {
+  display: block;
+  color: var(--brand);
+  font-size: 44px;
+  margin-bottom: 18px;
+}
+.admin-stop-actions {
+  display: grid;
+  gap: 10px;
+  margin-top: 22px;
+}
+.admin-stop-actions .button {
+  width: 100%;
+  white-space: normal;
+  text-align: center;
+}
+.admin-stop-actions .admin-text-button {
+  font-size: 0.83rem;
+  margin-top: 4px;
+  line-height: 1.5;
+}
+.admin-product .button.admin-stop-deactivate {
+  color: #8c3048;
+  border-color: #e9c6ce;
+}
+.admin-stop-coordinates {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 20px 0 0;
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.admin-stop-coordinates dt {
+  color: var(--muted);
+  font-size: 0.75rem;
+  margin-bottom: 6px;
+}
+.admin-stop-coordinates dd {
+  margin: 0;
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+}
+.admin-stops-count {
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin: 22px 0 14px;
+}
+.admin-stop-row-selected {
+  background: #f0f0fe;
+}
+.admin-stop-location-note {
+  background: #f0f0fe;
+  border-radius: 10px;
+  color: #303580;
+  padding: 14px;
+  margin: 0 0 20px;
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+@media (max-width: 1200px) {
+  .admin-stops-workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .admin-stop-detail-empty {
+    padding: 10px 0;
+  }
+  .admin-stop-actions {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  }
+}
+@media (max-width: 600px) {
+  .admin-stops-map-canvas {
+    height: 350px;
+  }
+  .admin-map-tools .admin-row {
+    width: 100%;
+  }
+  .admin-map-tools .button {
+    flex: 1;
+  }
+  .admin-stop-detail {
+    padding: 18px;
+  }
+  .admin-stop-actions {
+    grid-template-columns: 1fr;
+  }
+  .admin-stops-catalog .admin-toolbar > .field {
+    width: 100%;
+  }
+}

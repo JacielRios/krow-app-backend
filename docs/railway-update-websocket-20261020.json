@@ -1,0 +1,8 @@
+{
+  "checkedAt": "2026-10-20T21:07:24.782Z",
+  "deploymentId": "5d625538-76ab-4961-890d-493a72978442",
+  "transport": "Engine.IO v4 over WebSocket",
+  "passed": true,
+  "authenticatedTrackingVerified": false,
+  "physicalGpsVerified": false
+}

@@ -14,7 +14,7 @@ describe('BookingsService commands', () => {
 
   function createService() {
     const rpc = jest
-      .fn<() => Promise<{ data: null; error: null }>>()
+      .fn<() => Promise<{ data: null; error: { message: string } | null }>>()
       .mockResolvedValue({ data: null, error: null });
     const from = jest.fn();
     const client = { rpc, from };
@@ -67,5 +67,21 @@ describe('BookingsService commands', () => {
         dropoff_stop_id: '22222222-2222-4222-8222-222222222222',
       },
     });
+  });
+  it('returns a conflict when a stale search tries to reserve after departure', async () => {
+    const { service, rpc } = createService();
+    rpc.mockResolvedValueOnce({
+      data: null,
+      error: {
+        message: 'El viaje no acepta reservaciones: la hora de salida ya pasó',
+      },
+    });
+    await expect(
+      service.request(user, 'ride', {
+        seats: 1,
+        pickupStopId: 'pickup',
+        dropoffStopId: 'dropoff',
+      }),
+    ).rejects.toMatchObject({ status: 409 });
   });
 });

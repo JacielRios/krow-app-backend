@@ -23,6 +23,11 @@ import { TransportStopsService } from './transport-stops.service.js';
 export class TransportStopsController {
   constructor(private readonly stops: TransportStopsService) {}
 
+  @Get('corridors')
+  corridors(@CurrentUser() user: AuthenticatedUser) {
+    return this.stops.corridors(user);
+  }
+
   @Get()
   list(@CurrentUser() user: AuthenticatedUser) {
     return this.stops.list(user);

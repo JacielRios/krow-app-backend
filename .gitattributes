@@ -1,0 +1,2 @@
+# ReportLab PDFs can be ASCII-only; prevent newline conversion on checkout.
+*.pdf binary

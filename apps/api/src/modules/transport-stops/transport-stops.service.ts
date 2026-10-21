@@ -7,12 +7,27 @@ import type { SaveTransportStopDto } from './transport-stop.dto.js';
 export class TransportStopsService {
   constructor(private readonly supabase: SupabaseService) {}
 
+  async corridors(user: AuthenticatedUser) {
+    const { data, error } = await this.supabase
+      .forUser(user.accessToken)
+      .from('transport_corridors')
+      .select('corridor_id,name,direction,active')
+      .order('display_order');
+    if (error) throw new BadRequestException('No pudimos cargar las avenidas');
+    return (data ?? []).map((row) => ({
+      corridorId: row.corridor_id,
+      name: row.name,
+      direction: row.direction,
+      active: row.active,
+    }));
+  }
+
   async list(user: AuthenticatedUser) {
     const { data, error } = await this.supabase
       .forUser(user.accessToken)
       .from('transport_stops')
       .select(
-        'stop_id, external_id, name, address, municipality, latitude, longitude, stop_type, active, created_at, updated_at',
+        'stop_id, external_id, name, address, municipality, latitude, longitude, stop_type, active, created_at, updated_at, corridor_id, corridor_order, direction',
       )
       .order('stop_type')
       .order('name');
@@ -29,6 +44,9 @@ export class TransportStopsService {
       active: stop.active,
       createdAt: stop.created_at,
       updatedAt: stop.updated_at,
+      corridorId: stop.corridor_id,
+      stopOrder: stop.corridor_order,
+      direction: stop.direction,
     }));
   }
 
@@ -62,6 +80,15 @@ export class TransportStopsService {
           longitude: dto.longitude,
           stop_type: dto.stopType,
           active: dto.active,
+          ...(dto.corridorId !== undefined
+            ? { corridor_id: dto.corridorId }
+            : {}),
+          ...(dto.stopOrder !== undefined
+            ? { corridor_order: dto.stopOrder }
+            : {}),
+          ...(dto.direction !== undefined
+            ? { direction: dto.direction?.trim() || null }
+            : {}),
         },
       });
     if (error) throw new BadRequestException(error.message);

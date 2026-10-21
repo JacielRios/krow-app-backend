@@ -1,0 +1,31 @@
+{
+  "checkedAt": "2026-10-20T22:21:15.785Z",
+  "checks": [
+    {
+      "name": "limited_database_role",
+      "passed": true
+    },
+    {
+      "name": "owner_invitation_with_live_schema",
+      "passed": true,
+      "stopCount": 8
+    },
+    {
+      "name": "nonparticipant_gets_minimal_preview_only",
+      "passed": true
+    },
+    {
+      "name": "existing_outbox_supports_reminders_with_limited_role",
+      "passed": true,
+      "rolledBackIntents": 0
+    },
+    {
+      "name": "missing_reminder_is_not_current",
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "transactionRolledBack": true,
+  "persistedTestWrites": false,
+  "notificationsSent": 0
+}

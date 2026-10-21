@@ -4,10 +4,12 @@ import { SupabaseModule } from '../../infrastructure/supabase/supabase.module.js
 import { PilotModule } from '../pilot/pilot.module.js';
 import { AdminController } from './admin.controller.js';
 import { AdminService } from './admin.service.js';
+import { AdminOperations } from './admin.operations.js';
+import { AdminOperationsController } from './admin.operations.controller.js';
 
 @Module({
   imports: [AuthModule, SupabaseModule, PilotModule],
-  controllers: [AdminController],
-  providers: [AdminService],
+  controllers: [AdminController, AdminOperationsController],
+  providers: [AdminService, AdminOperations],
 })
 export class AdminModule {}

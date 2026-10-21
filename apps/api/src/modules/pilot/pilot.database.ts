@@ -65,6 +65,14 @@ export class PilotDatabase implements OnModuleDestroy {
     try {
       await client.query('begin');
       await client.query("set local lock_timeout = '3s'");
+      await client.query(
+        "select set_config('krow.require_documents',$1,true)",
+        [
+          this.config.get<string>('RIDE_DOCUMENT_CHECKS_REQUIRED') === 'true'
+            ? 'true'
+            : 'false',
+        ],
+      );
       const result = await work(client);
       await client.query('commit');
       return result;
@@ -73,6 +81,19 @@ export class PilotDatabase implements OnModuleDestroy {
         await client.query('rollback');
       } catch {
         broken = true;
+      }
+      if (
+        typeof error === 'object' &&
+        error !== null &&
+        'code' in error &&
+        error.code === 'P0001' &&
+        'message' in error &&
+        typeof error.message === 'string' &&
+        /^(El conductor debe estar aprobado|La licencia, el seguro)/.test(
+          error.message,
+        )
+      ) {
+        throw new ForbiddenException(error.message);
       }
       if (error instanceof Error) throw error;
       throw new Error('No se pudo completar la operación de base de datos');
@@ -86,6 +107,7 @@ export class PilotDatabase implements OnModuleDestroy {
     actorId: string,
     name:
       | 'create_ride_v2'
+      | 'get_ride_publication'
       | 'update_ride_v2'
       | 'upsert_favorite_route'
       | 'request_booking_v2'
@@ -114,7 +136,7 @@ export class PilotDatabase implements OnModuleDestroy {
         const placeholders = values
           .map((_, index) => `$${index + 1}`)
           .join(',');
-        const result = await client.query<{ value: string | number }>(
+        const result = await client.query<{ value: string | number | null }>(
           `select public.${name}(${placeholders}) as value`,
           values,
         );
@@ -144,7 +166,7 @@ export class PilotDatabase implements OnModuleDestroy {
         if (/no encontrado|no encontrada|no existe/.test(message))
           throw new NotFoundException(message);
         if (
-          /Conflicto de version|ya no se puede editar|reservas activas|Ya tienes una reservacion activa|no acepta reservaciones|No hay suficientes asientos/.test(
+          /Conflicto de version|Conflicto de publicación|ya no se puede editar|reservas activas|Ya tienes una reservacion activa|no acepta reservaciones|No hay suficientes asientos/.test(
             message,
           )
         )

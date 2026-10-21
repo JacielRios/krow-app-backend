@@ -19,6 +19,8 @@ export class AppController {
         `select to_regclass('krow_pilot.tracking_sessions') is not null and to_regclass('krow_pilot.outbox') is not null and to_regclass('krow_pilot.account_closure_requests') is not null
         and has_column_privilege(current_user,'public.rides','status','UPDATE')
         and has_function_privilege(current_user,'public.request_booking_v2(jsonb)','EXECUTE')
+        and has_function_privilege(current_user,'public.get_ride_publication(uuid,jsonb)','EXECUTE')
+        and exists(select 1 from pg_trigger where tgrelid='public.bookings'::regclass and tgname='bookings_validate_departure' and tgenabled in ('O','A'))
         and has_table_privilege(current_user,'public.users','SELECT')
         and not exists(select 1 from (values ('uuid'),('email_address'),('full_name'),('institutional_id'),('academic_program'),('academic_period')) c(name) where not has_column_privilege(current_user,'public.users',c.name,'INSERT'))
         and not exists(select 1 from (values ('email_address'),('full_name'),('institutional_id'),('academic_program'),('academic_period')) c(name) where not has_column_privilege(current_user,'public.users',c.name,'UPDATE'))

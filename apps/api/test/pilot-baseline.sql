@@ -2,6 +2,7 @@
 -- Always loaded into an isolated in-memory database by pilot.integration.spec.
 create role anon; create role authenticated;
 create schema auth;
+create schema if not exists krow_pilot;
 create table auth.users(id uuid primary key);
 create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid $$;
 create table public.users(uuid uuid primary key references auth.users(id),full_name text,email_address text,profile_photo text,rating numeric,updated_at timestamptz default now(),is_active boolean default true,deleted_at timestamptz);
@@ -42,3 +43,4 @@ alter table public.users enable row level security;
 create policy fixture_user_select on public.users for select to authenticated using(auth.uid()=uuid);
 create policy fixture_user_insert on public.users for insert to authenticated with check(auth.uid()=uuid);
 create policy fixture_user_update on public.users for update to authenticated using(auth.uid()=uuid) with check(auth.uid()=uuid);
+create table krow_pilot.operational_routes(ride_id uuid primary key references public.rides(ride_id) on delete cascade,route_id uuid default gen_random_uuid(),ride_version integer,polyline text,duration_seconds integer,calculated_at timestamptz default now());

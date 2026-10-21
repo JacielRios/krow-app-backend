@@ -5,7 +5,7 @@ import { useAdminAuth } from './admin-auth';
 import { apiBaseUrl, readableError } from './admin-utils';
 
 type RequestOptions = {
-  method?: 'GET' | 'POST' | 'PATCH';
+  method?: 'GET' | 'POST' | 'PATCH' | 'DELETE';
   body?: unknown;
   signal?: AbortSignal;
 };
@@ -14,39 +14,57 @@ export function useAdminApi() {
   return useCallback(
     async <T>(path: string, options: RequestOptions = {}): Promise<T> => {
       const token = await getAccessToken();
-      const response = await fetch(
-        `${apiBaseUrl(process.env.NEXT_PUBLIC_API_URL)}${path}`,
-        {
-          method: options.method ?? 'GET',
-          signal: options.signal,
-          cache: 'no-store',
-          headers: {
-            Authorization: `Bearer ${token}`,
-            ...(options.body ? { 'Content-Type': 'application/json' } : {}),
+      const controller = new AbortController();
+      const cancel = () => controller.abort();
+      if (options.signal?.aborted) cancel();
+      else options.signal?.addEventListener('abort', cancel, { once: true });
+      const timeout = setTimeout(() => controller.abort(), 15000);
+      try {
+        const response = await fetch(
+          `${apiBaseUrl(process.env.NEXT_PUBLIC_API_URL)}${path}`,
+          {
+            method: options.method ?? 'GET',
+            signal: controller.signal,
+            cache: 'no-store',
+            headers: {
+              Authorization: `Bearer ${token}`,
+              ...(options.body ? { 'Content-Type': 'application/json' } : {}),
+            },
+            ...(options.body ? { body: JSON.stringify(options.body) } : {}),
           },
-          ...(options.body ? { body: JSON.stringify(options.body) } : {}),
-        },
-      );
-      if (response.status === 401 || response.status === 403) {
-        const message =
-          response.status === 401
-            ? 'Tu sesión expiró. Vuelve a iniciar sesión.'
-            : 'Tu cuenta ya no tiene permiso para esta acción.';
-        invalidate(message);
-        throw new Error(message);
-      }
-      if (!response.ok) {
-        const result = await response.json().catch(() => null);
-        const message = result?.message;
-        throw new Error(
-          typeof message === 'string'
-            ? message
-            : Array.isArray(message)
-              ? message.join('. ')
-              : 'No se pudo completar la acción. Intenta nuevamente.',
         );
+        if (response.status === 401 || response.status === 403) {
+          const message =
+            response.status === 401
+              ? 'Tu sesión expiró. Vuelve a iniciar sesión.'
+              : 'Tu cuenta ya no tiene permiso para esta acción.';
+          invalidate(message);
+          throw new Error(message);
+        }
+        if (!response.ok) {
+          const result = await response.json().catch(() => null);
+          const message = result?.message;
+          throw new Error(
+            typeof message === 'string'
+              ? message
+              : Array.isArray(message)
+                ? message.join('. ')
+                : 'No se pudo completar la acción. Intenta nuevamente.',
+          );
+        }
+        return response.status === 204
+          ? (undefined as T)
+          : await response.json();
+      } catch (error) {
+        if (controller.signal.aborted && !options.signal?.aborted)
+          throw new Error(
+            'KROW tardó demasiado en responder. Revisa tu conexión e intenta de nuevo.',
+          );
+        throw error;
+      } finally {
+        clearTimeout(timeout);
+        options.signal?.removeEventListener('abort', cancel);
       }
-      return response.status === 204 ? (undefined as T) : response.json();
     },
     [getAccessToken, invalidate],
   );

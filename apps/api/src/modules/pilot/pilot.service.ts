@@ -13,6 +13,8 @@ import type { AuthenticatedUser } from '../auth/domain/authenticated-user.js';
 import { GoogleMapsService } from '../maps/infrastructure/google-maps.service.js';
 import { PilotDatabase } from './pilot.database.js';
 import { approximateEta } from './pilot.eta.js';
+import { bookingInbox } from './pilot.inbox.js';
+import { rideInvitation } from './pilot.invitation.js';
 import {
   nextBookingState,
   trackingFreshness,
@@ -82,6 +84,9 @@ const hash = (token: string) =>
 
 @Injectable()
 export class PilotService {
+  invitation(user: AuthenticatedUser, rideId: string) {
+    return rideInvitation(this.db, user.id, rideId);
+  }
   private readonly routeCache = new Map<
     string,
     {
@@ -398,11 +403,16 @@ export class PilotService {
         'insert into public.ride_status_history(ride_id,status,previous_status,actor_id,reason) values($1,$2,$3,$4,$5)',
         [rideId, target, ride.status, user.id, 'pilot_' + action],
       );
-      if (action !== 'start')
+      if (action !== 'start') {
         await client.query(
           'delete from krow_pilot.tracking_sessions where ride_id=$1',
           [rideId],
         );
+        await client.query(
+          'delete from krow_pilot.operational_routes where ride_id=$1',
+          [rideId],
+        );
+      }
       return { success: true };
     });
   }
@@ -439,6 +449,13 @@ export class PilotService {
           'No puedes realizar esta acción sobre la reserva',
         );
       if (b.status === target) return { success: true };
+      if (
+        target === 'confirmed' &&
+        new Date(ride.departure_time).getTime() <= Date.now()
+      )
+        throw new ConflictException(
+          'La solicitud ya no está disponible: la hora de salida ya pasó',
+        );
       if (!['scheduled', 'full'].includes(ride.status))
         throw new ConflictException(
           'La reserva solo puede modificarse antes del inicio',
@@ -545,13 +562,19 @@ export class PilotService {
       `select r.ride_id as "rideId",r.status,r.departure_time as "departureTime",r.origin_address as "originAddress",r.destination_address as "destinationAddress",b.status as "bookingStatus"
        from public.rides r join public.driver_profiles d using(driver_id)
        left join lateral(select own.status from public.bookings own where own.ride_id=r.ride_id and own.user_id=$1 order by own.created_at desc,own.booking_id desc limit 1)b on true
-       where ${driver ? 'd.user_id=$1' : "b.status in('pending','confirmed','in_progress')"} and r.status in('scheduled','full','in_progress')
+       where ${driver ? 'd.user_id=$1' : "b.status in('pending','confirmed','in_progress')"} and (r.status='in_progress' or (r.status in('scheduled','full') and r.departure_time>now()))
        order by (r.status='in_progress') desc,r.departure_time asc,r.ride_id limit 1`,
       [user.id],
     );
     return rows[0]
       ? { ...rows[0], role: driver ? 'driver' : 'passenger' }
       : null;
+  }
+  async bookingInbox(user: AuthenticatedUser, bookingId?: string) {
+    const rows = await bookingInbox(this.db, user.id, bookingId);
+    if (bookingId && !rows.length)
+      throw new NotFoundException('Solicitud no disponible para esta cuenta');
+    return bookingId ? rows[0] : rows;
   }
   private assertTracking() {
     if (!this.db.trackingEnabled)
@@ -726,20 +749,36 @@ export class PilotService {
       position.accuracy <= 100
         ? position
         : null;
-    const key = `${rideId}:${ride.version}:${pending.map((b) => `${b.booking_id}:${b.status}`).join(',')}:${liveOrigin ? 'gps' : 'published'}`;
+    const [operational] = await this.db.query<{
+      route_id: string;
+      polyline: string;
+      duration_seconds: number;
+      calculated_at: Date;
+    }>(
+      'select route_id,polyline,duration_seconds,calculated_at from krow_pilot.operational_routes where ride_id=$1 and ride_version=$2',
+      [rideId, ride.version],
+    );
+    const key = `${rideId}:${ride.version}:${pending.map((b) => `${b.booking_id}:${b.status}`).join(',')}:${liveOrigin ? 'gps' : 'published'}:${operational?.route_id ?? 'original'}`;
     // Corridor trips commit to the published route and enabled stops. Removing
     // unbooked stops during GPS updates could silently change the avenue that
     // the driver offered. Position and ETA still advance along this geometry.
-    const publishedCorridorRoute = ride.corridor_id
+    const publishedCorridorRoute = operational
       ? {
-          polyline: ride.route_polyline,
-          durationSeconds: Number(ride.route_duration_seconds) || 0,
-          calculatedAt: ride.route_calculated_at
-            ? new Date(ride.route_calculated_at).toISOString()
-            : '',
+          polyline: operational.polyline,
+          durationSeconds: Number(operational.duration_seconds),
+          calculatedAt: new Date(operational.calculated_at).toISOString(),
           error: undefined as string | undefined,
         }
-      : undefined;
+      : ride.corridor_id
+        ? {
+            polyline: ride.route_polyline,
+            durationSeconds: Number(ride.route_duration_seconds) || 0,
+            calculatedAt: ride.route_calculated_at
+              ? new Date(ride.route_calculated_at).toISOString()
+              : '',
+            error: undefined as string | undefined,
+          }
+        : undefined;
     let route = publishedCorridorRoute ?? this.routeCache.get(key)?.value;
     let routeError: string | null = route?.error ?? null;
     if (

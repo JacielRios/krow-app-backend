@@ -1,0 +1,24 @@
+{
+  "date": "2026-10-16",
+  "database": "PostgreSQL 17.11, disposable local cluster",
+  "bindAddress": "127.0.0.1",
+  "productionDataUsed": false,
+  "passed": 13,
+  "failed": 0,
+  "suites": 2,
+  "serverStopped": true,
+  "harness": "scripts/test-postgres-local.ps1",
+  "coverage": [
+    "Concurrent acceptance for last available seat",
+    "Duplicate booking requests",
+    "Concurrent starts for one driver",
+    "Atomic transactions and idempotent commands",
+    "Private LOGIN and RLS permissions",
+    "Runtime device ownership and revoked passenger access"
+  ],
+  "fixtureCorrection": "String.replace callback preserves PostgreSQL dollar-quote delimiters",
+  "officialDownload": "https://get.enterprisedb.com/postgresql/postgresql-17.11-3-windows-x64-binaries.zip",
+  "zipSha256": "4B8DB0930C38F6EF845DB919551DEDDA3B6B845AEB0927B3D79A6E8E9E4537CF",
+  "fullSupabaseBaselineVerified": false,
+  "productionBackupRestoreVerified": false
+}

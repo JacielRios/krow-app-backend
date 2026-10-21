@@ -9,6 +9,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { createCipheriv, createDecipheriv, randomBytes } from 'node:crypto';
 import { PilotDatabase } from './pilot.database.js';
+import { enqueueRideReminders, reminderIsCurrent } from './pilot.reminders.js';
 import {
   NotificationProviders,
   DeliveryError,
@@ -21,11 +22,13 @@ interface Intent {
   kind: string;
   expires_at: Date;
   attempts: number;
+  event_key: string;
 }
 @Injectable()
 export class PilotNotifications implements OnModuleInit, OnModuleDestroy {
   private timer?: ReturnType<typeof setTimeout>;
   private stopped = false;
+  private lastMaintenance = 0;
   private readonly logger = new Logger(PilotNotifications.name);
   constructor(
     private readonly db: PilotDatabase,
@@ -101,7 +104,7 @@ export class PilotNotifications implements OnModuleInit, OnModuleDestroy {
     return { success: true };
   }
   onModuleInit() {
-    if (this.enabled) this.schedule();
+    if (this.db.enabled) this.schedule();
   }
   private schedule() {
     if (this.stopped) return;
@@ -112,6 +115,14 @@ export class PilotNotifications implements OnModuleInit, OnModuleDestroy {
     }, 1000);
   }
   async dispatch() {
+    if (Date.now() - this.lastMaintenance >= 60000) {
+      await this.db.query(
+        "update krow_pilot.outbox set status='expired',lease_until=null where status='pending' and expires_at<=now() and (lease_until is null or lease_until<now())",
+      );
+      if (this.enabled) await enqueueRideReminders(this.db);
+      this.lastMaintenance = Date.now();
+    }
+    if (!this.enabled) return;
     const intents = await this.db
       .query<Intent>(`with due as(select intent_id from krow_pilot.outbox where status='pending' and next_at<=now() and (lease_until is null or lease_until<now()) order by next_at for update skip locked limit 20)
       update krow_pilot.outbox o set lease_until=now()+interval '2 minutes',attempts=attempts+1 from due where o.intent_id=due.intent_id returning o.*`);
@@ -119,6 +130,26 @@ export class PilotNotifications implements OnModuleInit, OnModuleDestroy {
       if (intent.expires_at.getTime() <= Date.now()) {
         await this.done(intent, 'expired');
         continue;
+      }
+      if (
+        intent.kind === 'reminder' &&
+        !(await reminderIsCurrent(this.db, intent))
+      ) {
+        await this.done(intent, 'expired');
+        continue;
+      }
+      if (intent.kind === 'booking' && intent.booking_id) {
+        const current = await this.db.query<{ current: boolean }>(
+          `select b.booking_id::text||':'||b.status=$2 as current from public.bookings b
+           join public.rides r using(ride_id) join public.driver_profiles d using(driver_id)
+           where b.booking_id=$1 and (b.user_id=$3 or d.user_id=$3)
+           and (b.status<>'pending' or (r.status in ('scheduled','full') and r.departure_time>now()))`,
+          [intent.booking_id, intent.event_key, intent.recipient_id],
+        );
+        if (!current[0]?.current) {
+          await this.done(intent, 'expired');
+          continue;
+        }
       }
       const devices = await this.db.query<{
         device_id: string;
@@ -140,6 +171,7 @@ export class PilotNotifications implements OnModuleInit, OnModuleDestroy {
                 rideId: intent.ride_id,
                 kind: intent.kind,
                 recipientId: intent.recipient_id,
+                ...(intent.booking_id ? { bookingId: intent.booking_id } : {}),
                 expiresAt: intent.expires_at,
               },
             );
