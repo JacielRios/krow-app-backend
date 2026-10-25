@@ -2,6 +2,8 @@
 
 Revisión del 21 de octubre de 2026. Esta nota no contiene credenciales ni certifica que la cuenta esté libre de compromiso.
 
+**Actualización del 24 de octubre:** el bloqueo de despliegues quedó resuelto y se completaron la publicación del API y la promoción del panel. Las comprobaciones conectadas pasaron. La rotación de credenciales descrita aquí sigue pendiente: publicar el código no rota secretos. El estado inicial que se describe a continuación es histórico. Consulta el [registro final de publicación](release-20261024.md).
+
 ## Estado comprobado
 
 - Railway confirmó un incidente relacionado con variables de entorno y mantuvo pausados los despliegues. El intento de publicar el API de KROW volvió a responder `Deploys have been paused temporarily`.
