@@ -29,7 +29,7 @@ export default function EmpresasPage() {
       <Navbar />
       <section className="page-hero">
         <p className="eyebrow">Para Empresas</p>
-        <h1>Exploremos los viajes compartidos en tu organización</h1>
+        <h1 style={{ maxWidth: '600px', margin: '0 auto', textAlign: 'center' }}>Exploremos los viajes compartidos en tu organización</h1>
         <p>
           KROW está probando su experiencia con la comunidad del Instituto
           Tecnológico de Nuevo León. La oferta para empresas es una posible

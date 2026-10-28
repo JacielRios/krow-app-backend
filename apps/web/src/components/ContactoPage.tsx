@@ -26,7 +26,7 @@ export default function ContactoPage() {
       <Navbar />
       <section className="page-hero">
         <p className="eyebrow">Contacto</p>
-        <h1>Hablemos</h1>
+        <h1 style={{ maxWidth: '600px', margin: '0 auto', textAlign: 'center' }}>Hablemos</h1>
         <p>
           Consulta al equipo del piloto sobre dudas, sugerencias o problemas con
           un viaje.

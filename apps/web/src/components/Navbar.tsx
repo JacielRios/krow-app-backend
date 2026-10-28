@@ -5,6 +5,7 @@ const LINKS = [
   { label: 'Para Empresas', href: '/empresas' },
   { label: 'Sobre Nosotros', href: '/sobre-nosotros' },
   { label: 'Contacto', href: '/contacto' },
+  //{ label: 'Terminos', href: '/terminos' },
 ];
 
 export function Navbar() {
@@ -15,7 +16,7 @@ export function Navbar() {
         <img src="/img/Logo_KROW.png" alt="" />
         KROW
       </a>
-      <nav
+      <nav style={{ display: 'flex', alignItems: 'center', gap: '32px' }}
         id="public-navigation"
         className={open ? 'open' : ''}
         aria-label="Principal"

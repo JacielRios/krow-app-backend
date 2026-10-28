@@ -15,6 +15,7 @@ import { TransportStopsModule } from './modules/transport-stops/transport-stops.
 import { RideRuntimeModule } from './modules/ride-runtime/ride-runtime.module.js';
 import { PilotModule } from './modules/pilot/pilot.module.js';
 import { AdminModule } from './modules/admin/admin.module.js';
+import { DriversModule } from './modules/drivers/drivers.module.js';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { AdminModule } from './modules/admin/admin.module.js';
     RideRuntimeModule,
     PilotModule,
     AdminModule,
+    DriversModule,
   ],
   controllers: [AppController],
 })

@@ -1,7 +1,7 @@
 import EmpresasPage from "@/components/EmpresasPage";
 
 export const metadata = {
-  title: "Empresas | KROW",
+  title: "Empresas",
   description: "Lleva el carpooling a tu organización con KROW.",
 };
 

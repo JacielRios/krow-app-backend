@@ -52,8 +52,18 @@ export class SupabaseAuthGuard implements CanActivate {
         .select('is_active, deleted_at')
         .eq('uuid', data.user.id)
         .maybeSingle();
-      if (result.error)
+        /*Cambio-Alexa*/
+      if (result.error) {
+        console.error('[SupabaseAuthGuard] Error al consultar users:', {
+        code: result.error.code,
+        message: result.error.message,
+        details: result.error.details,
+        hint: result.error.hint,
+      });
         throw new UnauthorizedException('No se pudo verificar la cuenta');
+      }
+      /*if (result.error)
+        throw new UnauthorizedException('No se pudo verificar la cuenta');*/
       profile = result.data;
     }
     if (profile?.is_active === false || profile?.deleted_at)

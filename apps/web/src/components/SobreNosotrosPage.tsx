@@ -28,7 +28,7 @@ export default function SobreNosotrosPage() {
       <Navbar />
       <section className="page-hero">
         <p className="eyebrow">Sobre Nosotros</p>
-        <h1>Movemos personas, no solo autos</h1>
+        <h1 style={{ maxWidth: '600px', margin: '0 auto', textAlign: 'center' }}>Movemos personas, no solo autos</h1>
         <p>
           KROW nació para resolver un problema simple: miles de autos recorren
           todos los días las mismas rutas con un solo pasajero adentro. Creemos

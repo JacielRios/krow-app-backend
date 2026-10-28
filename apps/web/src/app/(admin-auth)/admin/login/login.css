@@ -1,0 +1,202 @@
+/* Pantalla de acceso KROW (Administrador / Conductor) */
+.login-page {
+  --krow-indigo: #25236f;
+  --krow-indigo-dark: #1a1950;
+  --krow-ink: #14211f;
+  --krow-muted: #5b6770;
+  --krow-line: #e3e6ea;
+  --krow-surface: #ffffff;
+  --krow-bg: #f1f3f2;
+  --krow-track: #ecedf2;
+  --krow-danger: #b42318;
+
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
+  background: var(--krow-bg);
+  color: var(--krow-ink);
+  font-family: inherit;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 600px;
+  padding: 40px 38px 36px;
+  background: var(--krow-surface);
+  border: 1px solid var(--krow-line);
+  border-radius: 24px;
+}
+
+.login-brand {
+  display: inline-block;
+  margin-bottom: 24px;
+  color: var(--krow-indigo);
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+}
+
+/* Selector de rol */
+.login-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 5px;
+  margin-bottom: 20px;
+  background: var(--krow-track);
+  border-radius: 999px;
+}
+
+.login-tab {
+  padding: 14px 12px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--krow-muted);
+  font: inherit;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.login-tab[aria-selected='true'] {
+  background: var(--krow-indigo);
+  color: #fff;
+}
+
+.login-tab:not([aria-selected='true']):hover {
+  color: var(--krow-ink);
+}
+
+.login-eyebrow {
+  margin: 0 0 8px;
+  color: var(--krow-indigo);
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.login-title {
+  margin: 0 0 12px;
+  font-size: clamp(2rem, 6vw, 2.9rem);
+  line-height: 1.1;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.login-description {
+  margin: 0 0 24px;
+  color: var(--krow-muted);
+  font-size: 1.1rem;
+  line-height: 1.5;
+}
+
+.login-small {
+  margin: 28px 0 14px;
+  font-size: 0.95rem;
+}
+
+/* Formulario */
+.login-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.login-field label {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.login-field input {
+  width: 100%;
+  height: 56px;
+  padding: 0 16px;
+  border: 1px solid var(--krow-line);
+  border-radius: 14px;
+  background: #fff;
+  color: var(--krow-ink);
+  font: inherit;
+  font-size: 1rem;
+}
+
+.login-field input:focus-visible {
+  outline: 3px solid rgba(37, 35, 111, 0.25);
+  outline-offset: 1px;
+  border-color: var(--krow-indigo);
+}
+
+.login-link {
+  align-self: flex-start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--krow-indigo);
+  font: inherit;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+
+.login-link:focus-visible,
+.login-tab:focus-visible,
+.login-button:focus-visible,
+.login-brand:focus-visible {
+  outline: 3px solid rgba(37, 35, 111, 0.35);
+  outline-offset: 3px;
+}
+
+.login-error {
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #fef3f2;
+  color: var(--krow-danger);
+  font-weight: 600;
+}
+
+.login-button {
+  width: 100%;
+  height: 60px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--krow-indigo);
+  color: #fff;
+  font: inherit;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.login-button:hover:not(:disabled) {
+  background: var(--krow-indigo-dark);
+}
+
+.login-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+@media (max-width: 480px) {
+  .login-card {
+    padding: 28px 20px 24px;
+    border-radius: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-tab,
+  .login-button {
+    transition: none;
+  }
+}
